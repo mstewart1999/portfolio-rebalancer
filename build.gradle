@@ -1,0 +1,32 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.8'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://nexus.gluonhq.com/nexus/content/repositories/releases'
+    }
+}
+
+mainClassName = 'com.msfinance.App'
+
+dependencies {
+    implementation 'com.gluonhq:charm-glisten:6.0.6'
+}
+
+javafx {
+    version = '17.0.0.1'
+    modules = [ 'javafx.controls' ]
+}
+
+gluonfx {
+    // target = 'ios' // Uncomment to enable iOS
+    // target = 'android' // Uncomment to enable Android
+    attachConfig {
+        version = "4.0.12"
+        services 'display', 'lifecycle', 'statusbar', 'storage'
+    }
+}
