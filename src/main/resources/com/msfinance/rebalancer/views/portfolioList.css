@@ -1,0 +1,16 @@
+.view {
+
+}
+
+.list-cell {
+  -fx-min-height: 50px;
+  -fx-padding: 5px;
+  -fx-margin: 5px;
+}
+
+.list-cell:even {
+  -fx-background-color: #f0ffff;
+}
+.list-cell:odd {
+  -fx-background-color: #f0f8ff;
+}

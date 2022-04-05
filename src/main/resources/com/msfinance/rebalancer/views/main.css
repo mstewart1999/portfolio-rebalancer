@@ -1,0 +1,24 @@
+.view {
+
+}
+.tree-table-cell {
+  /* 30x30 images */
+  -fx-min-height: 50px;
+  -fx-padding: 5px;
+  -fx-font-family: monospace;
+}
+
+.tree-table-cell:focused {
+  -fx-background-color: #00ffff;
+  -fx-text-fill: black;
+  -fx-font-weight: bold;
+}
+.tree-table-cell:even {
+  -fx-background-color: #f0ffff;
+  -fx-text-fill: black;
+}
+.tree-table-cell:odd {
+  -fx-background-color: #f0f8ff;
+  -fx-text-fill: black;
+}
+/* -fx-text-alignment   [ left | center | right | justify ], currently handled by monospace font and explicit padding with spaces */
