@@ -11,10 +11,15 @@ public class DoubleExpression
     private final String expr;
     private double value;
 
+    public static DoubleExpression createSafe0Percent()
+    {
+        return new DoubleExpression("0%", 0.0);
+    }
     public static DoubleExpression createSafe100Percent()
     {
         return new DoubleExpression("100%", 1.0);
     }
+
 
     public DoubleExpression(final String expr) throws InvalidDataException
     {

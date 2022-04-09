@@ -1,9 +1,7 @@
 {
-  "name": "Classic 60-40 Portfolio",
-  "url": "https://portfoliocharts.com/portfolio/classic-60-40/",
   "nodeCsvs": [
-    ",ROOT,All,1,100%",
-    "  ROOT,EQ,EQ-US-TSM,1,60%",
-    "  ROOT,FI,FI-IT-TBM,2,40%"
+    ",ROOT,All,1,100%,R",
+    "  ROOT,EQ,EQ-US-TSM,1,60%,AC",
+    "  ROOT,FI,FI-IT-TBM,2,40%,AC"
   ]
 }

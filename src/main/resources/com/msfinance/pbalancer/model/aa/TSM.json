@@ -1,8 +1,6 @@
 {
-  "name": "Total Stock Market Portfolio",
-  "url": "https://portfoliocharts.com/portfolio/total-stock-market/",
   "nodeCsvs": [
-    ",ROOT,All,1,100%",
-    "  ROOT,EQ,EQ-US-TSM,1,100%"
+    ",ROOT,All,1,100%,R",
+    "  ROOT,EQ,EQ-US-TSM,1,100%,AC"
   ]
 }

@@ -15,6 +15,7 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.Icon;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.service.DataFactory;
@@ -29,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Paint;
 
 public class PortfolioController
@@ -49,6 +51,9 @@ public class PortfolioController
     private Button accountsButton;
 
     @FXML
+    private Button actualAAButton;
+
+    @FXML
     private Button alertsButton;
 
     @FXML
@@ -64,10 +69,19 @@ public class PortfolioController
     private ComboBox<PortfolioGoal> goalCombo;
 
     @FXML
+    private Label goalLabel;
+
+    @FXML
+    private Button investButton;
+
+    @FXML
+    private Label nameLabel;
+
+    @FXML
     private TextField nameText;
 
     @FXML
-    private Button rebalancingButton;
+    private Button rebalanceButton;
 
     @FXML
     private Button targetAAButton;
@@ -79,20 +93,32 @@ public class PortfolioController
     private Label valueLabel;
 
     @FXML
+    private Button withdrawalButton;
+
+
+    @FXML
     void initialize()
     {
         Validation.assertNonNull(view);
         Validation.assertNonNull(accountsButton);
+        Validation.assertNonNull(actualAAButton);
         Validation.assertNonNull(alertsErrorIcon);
         Validation.assertNonNull(alertsButton);
         Validation.assertNonNull(alertsInfoIcon);
         Validation.assertNonNull(alertsWarnIcon);
         Validation.assertNonNull(goalCombo);
+        Validation.assertNonNull(goalLabel);
+        Validation.assertNonNull(investButton);
+        Validation.assertNonNull(nameLabel);
         Validation.assertNonNull(nameText);
-        Validation.assertNonNull(rebalancingButton);
+        Validation.assertNonNull(rebalanceButton);
         Validation.assertNonNull(targetAAButton);
         Validation.assertNonNull(valueAsOfLabel);
         Validation.assertNonNull(valueLabel);
+        Validation.assertNonNull(withdrawalButton);
+
+        // critical to get proper scrollbar behavior
+        view.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
 
         //view.setShowTransitionFactory(BounceInRightTransition::new);
         view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
@@ -101,22 +127,43 @@ public class PortfolioController
             populateData();
             updateAppBar();
         });
-// Is there another way to get "back" other than our app bar nav icon?
+// TODO: Is there another way to get "back" other than our app bar nav icon?
+// setOnCloseRequest ??
 //        view.setOnHiding(e -> {
 //            savePortfolio();
 //            e.consume();
 //        });
 
-        for(PortfolioGoal g : PortfolioGoal.values())
-        {
-            goalCombo.getItems().add(g);
-        }
+        nameLabel.setLabelFor(nameText);
+        goalLabel.setLabelFor(goalCombo);
+
+        goalCombo.getItems().setAll(PortfolioGoal.values());
+        goalCombo.setButtonCell(new PortfolioGoalListCell());
+        goalCombo.setCellFactory(new PortfolioGoalListCell.Factory());
+
 
         // TODO
+        accountsButton.setDisable(true);
+        //targetAAButton.setDisable(true);
+        actualAAButton.setDisable(true);
+        alertsButton.setDisable(true);
+        investButton.setDisable(true);
+        withdrawalButton.setDisable(true);
+        rebalanceButton.setDisable(true);
         accountsButton.setOnAction(e -> {});
-        targetAAButton.setOnAction(e -> {});
-        rebalancingButton.setOnAction(e -> {});
+        targetAAButton.setOnAction(e -> view.getAppManager().switchView(App.TARGET_AA_VIEW));
+        actualAAButton.setOnAction(e -> {});
         alertsButton.setOnAction(e -> {});
+        investButton.setOnAction(e -> {});
+        withdrawalButton.setOnAction(e -> {});
+        rebalanceButton.setOnAction(e -> {});
+        accountsButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        targetAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        actualAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        alertsButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        investButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        withdrawalButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        rebalanceButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
 
         // colors?
         alertsInfoIcon.setBackground(new Background(new BackgroundFill(Paint.valueOf("blue"), null, null)));
@@ -124,7 +171,6 @@ public class PortfolioController
         alertsErrorIcon.setBackground(new Background(new BackgroundFill(Paint.valueOf("red"), null, null)));
     }
 
-    //------------------------------------
     protected void populateData()
     {
         try
@@ -148,13 +194,13 @@ public class PortfolioController
         catch (IOException e)
         {
             LOG.error("Error reading: " + StateManager.currentPortfolioId, e);
-            view.getApplication().showMessage("Error reading: " + StateManager.currentPortfolioId);
+            view.getAppManager().showMessage("Error reading: " + StateManager.currentPortfolioId);
         }
     }
 
     protected void updateAppBar()
     {
-        final AppBar appBar = view.getApplication().getAppBar();
+        final AppBar appBar = view.getAppManager().getAppBar();
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.getActionItems().add(MaterialDesignIcon.DELETE_FOREVER.button(e -> deletePortfolio()));
@@ -164,7 +210,7 @@ public class PortfolioController
     private void goBack()
     {
         savePortfolio();
-        view.getApplication().switchToPreviousView();
+        view.getAppManager().switchToPreviousView();
     }
 
     private void savePortfolio()
@@ -196,7 +242,7 @@ public class PortfolioController
             catch (IOException e)
             {
                 LOG.error("Error updating: " + StateManager.currentPortfolioId, e);
-                view.getApplication().showMessage("Error updating: " + StateManager.currentPortfolioId);
+                view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolioId);
             }
         }
     }
@@ -210,13 +256,13 @@ public class PortfolioController
             try
             {
                 DataFactory.get().deletePortfolio(StateManager.currentPortfolioId);
-                view.getApplication().showMessage("Deleted: " + StateManager.currentPortfolioId);
-                view.getApplication().switchToPreviousView();
+                view.getAppManager().showMessage("Deleted: " + StateManager.currentPortfolioId);
+                view.getAppManager().switchToPreviousView();
             }
             catch (IOException e)
             {
                 LOG.error("Error deleting: " + StateManager.currentPortfolioId, e);
-                view.getApplication().showMessage("Error deleting: " + StateManager.currentPortfolioId);
+                view.getAppManager().showMessage("Error deleting: " + StateManager.currentPortfolioId);
             }
         }
     }

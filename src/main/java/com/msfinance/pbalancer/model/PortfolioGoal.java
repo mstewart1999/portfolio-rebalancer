@@ -2,12 +2,23 @@ package com.msfinance.pbalancer.model;
 
 public enum PortfolioGoal
 {
-    // TODO friendly text
-    Retirement,
-    Education,
-    Purchase, //  (home, vehicle, etc..)
-    Emergency_Fund,
-    Bequest,
-    Other,
+    Retirement("Retirement"),
+    Education("Education"),
+    Purchase("Purchase (home, vehicle, etc..)"),
+    Emergency_Fund("Emergency Fund"),
+    Bequest("Bequest"),
+    Other("Other"),
     ;
+
+    private String text;
+
+    PortfolioGoal(final String text)
+    {
+        this.text = text;
+    }
+
+    public String getText()
+    {
+        return text;
+    }
 }

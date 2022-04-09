@@ -1,0 +1,26 @@
+.view {
+
+}
+.tree-table-cell {
+  -fx-min-height: 30px;
+  /*-fx-padding: 5px;*/
+  -fx-font-family: monospace;
+}
+.table-cell {
+  -fx-min-height: 30px;
+  -fx-font-family: monospace;
+}
+
+.has-error-alert {
+  -fx-background-color: #805555;
+  -fx-text-fill: black;
+}
+.has-warn-alert {
+  -fx-background-color: #ffff80;
+  -fx-text-fill: black;
+
+}
+.has-info-alert {
+  -fx-background-color: #555580;
+  -fx-text-fill: black;
+}

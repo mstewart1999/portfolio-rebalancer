@@ -36,7 +36,7 @@ public class SecondaryView extends View
     @Override
     protected void updateAppBar(final AppBar appBar)
     {
-        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> getApplication().getDrawer().open()));
+        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> getAppManager().getDrawer().open()));
         appBar.setTitleText("Settings");
         appBar.getActionItems().add(MaterialDesignIcon.FAVORITE.button(e -> System.out.println("Favorite")));
     }

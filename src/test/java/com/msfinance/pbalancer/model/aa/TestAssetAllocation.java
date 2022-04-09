@@ -1,14 +1,9 @@
 package com.msfinance.pbalancer.model.aa;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.msfinance.pbalancer.model.InvalidDataException;
-import com.msfinance.pbalancer.model.aa.AANode;
-import com.msfinance.pbalancer.model.aa.AssetAllocation;
-import com.msfinance.pbalancer.model.aa.DoubleExpression;
 
 public class TestAssetAllocation
 {
@@ -17,12 +12,12 @@ public class TestAssetAllocation
     public void aa1() throws Exception
     {
         AssetAllocation aa = aa(
-            ",ROOT,All,1,1.0",
-            "ROOT,EQ,Stocks,1,0.6",
-            "ROOT,FI,Bonds,2,0.4",
-            "EQ,EQ-US-TSM,EQ-US-TSM,1,70%",
-            "EQ,EQ-IG-TSM,EQ-IG-TSM,2,30%",
-            "FI,FI-IT-TBM,FI-IT-TBM,1,=100/10/10"
+            ",ROOT,All,1,1.0,R",
+            "ROOT,EQ,Stocks,1,0.6,G",
+            "ROOT,FI,Bonds,2,0.4,G",
+            "EQ,EQ-US-TSM,EQ-US-TSM,1,70%,AC",
+            "EQ,EQ-IG-TSM,EQ-IG-TSM,2,30%,AC",
+            "FI,FI-IT-TBM,FI-IT-TBM,1,=100/10/10,AC"
         );
         System.out.println(aa.toCsv());
     }
@@ -33,11 +28,11 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0,Extra"
+                ",ROOT,All,1,1.0,R,Extra,"
             );
         });
 
-        Assertions.assertTrue(e.getMessage().contains("Wrong number of csv fields: 6"));
+        Assertions.assertTrue(e.getMessage().contains("Wrong number of csv fields: 7"));
     }
 
     @Test
@@ -57,8 +52,8 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",X,All1,1,1.0",
-                ",Y,All2,1,1.0"
+                ",X,All1,1,1.0,R",
+                ",Y,All2,1,1.0,R"
             );
         });
 
@@ -70,8 +65,8 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                "Y,X,All1,1,1.0",
-                "X,Y,All2,1,1.0"
+                "Y,X,All1,1,1.0,G",
+                "X,Y,All2,1,1.0,G"
             );
         });
 
@@ -84,9 +79,9 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0",
-                "ROOT,W,W1,1,0.5",
-                "ROOT,W,W2,2,0.5"
+                ",ROOT,All,1,1.0,R",
+                "ROOT,W,W1,1,0.5,G",
+                "ROOT,W,W2,2,0.5,G"
             );
         });
 
@@ -99,7 +94,7 @@ public class TestAssetAllocation
     public void tErrorParentId() throws Exception
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("x,z", "ID", "NM", 0, new DoubleExpression("1")).validate();
+            new AANode("x,z", "ID", "NM", 0, new DoubleExpression("1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e.getMessage().contains("invalid parentId"));
@@ -110,14 +105,14 @@ public class TestAssetAllocation
     {
         // empty
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("ROOT", "", "NM", 0, new DoubleExpression("1")).validate();
+            new AANode("ROOT", "", "NM", 0, new DoubleExpression("1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e.getMessage().contains("invalid id"));
 
         // comma
         InvalidDataException e2 = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("ROOT", "x,y", "NM", 0, new DoubleExpression("1")).validate();
+            new AANode("ROOT", "x,y", "NM", 0, new DoubleExpression("1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e2.getMessage().contains("invalid id"));
@@ -128,14 +123,14 @@ public class TestAssetAllocation
     {
         // empty
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("ROOT", "ID", "", 0, new DoubleExpression("1")).validate();
+            new AANode("ROOT", "ID", "", 0, new DoubleExpression("1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e.getMessage().contains("invalid name"));
 
         // comma
         InvalidDataException e2 = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("ROOT", "ID", "x,y", 0, new DoubleExpression("1")).validate();
+            new AANode("ROOT", "ID", "x,y", 0, new DoubleExpression("1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e2.getMessage().contains("invalid name"));
@@ -146,14 +141,14 @@ public class TestAssetAllocation
     {
         // low
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("ROOT", "ID", "NM", 0, new DoubleExpression("-1")).validate();
+            new AANode("ROOT", "ID", "NM", 0, new DoubleExpression("-1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e.getMessage().contains("percentOfParent too low"));
 
         // high
         InvalidDataException e2 = Assertions.assertThrows(InvalidDataException.class, () -> {
-            new AANode("ROOT", "ID", "NM", 0, new DoubleExpression("1.1")).validate();
+            new AANode("ROOT", "ID", "NM", 0, new DoubleExpression("1.1"), AANodeType.R).validate();
         });
 
         Assertions.assertTrue(e2.getMessage().contains("percentOfParent too high"));
@@ -165,8 +160,8 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",X,All,1,1.0",
-                "X,EQ-US-TSM,EQ-US-TSM,1,1.0"
+                ",X,All,1,1.0,R",
+                "X,EQ-US-TSM,EQ-US-TSM,1,1.0,AC"
             );
         });
 
@@ -179,8 +174,8 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,0.80",
-                "ROOT,EQ-US-TSM,EQ-US-TSM,1,1.0"
+                ",ROOT,All,1,0.80,R",
+                "ROOT,EQ-US-TSM,EQ-US-TSM,1,1.0,AC"
             );
         });
 
@@ -193,8 +188,8 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0",
-                "ROOT,EQ-US-TSM,EQ-US-ZZZ,1,1.0"
+                ",ROOT,All,1,1.0,R",
+                "ROOT,EQ-US-TSM,EQ-US-ZZZ,1,1.0,AC"
             );
         });
 
@@ -206,9 +201,9 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0",
-                "ROOT,EQ1,EQ-US-LV,1,0.50",
-                "ROOT,EQ2,EQ-US-LG,1,0.50"
+                ",ROOT,All,1,1.0,R",
+                "ROOT,EQ1,EQ-US-LV,1,0.50,AC",
+                "ROOT,EQ2,EQ-US-LG,1,0.50,AC"
             );
         });
 
@@ -220,9 +215,9 @@ public class TestAssetAllocation
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0",
-                "ROOT,EQ1,EQ-US-LV,1,0.50",
-                "ROOT,EQ2,EQ-US-LV,2,0.50"
+                ",ROOT,All,1,1.0,R",
+                "ROOT,EQ1,EQ-US-LV,1,0.50,AC",
+                "ROOT,EQ2,EQ-US-LV,2,0.50,AC"
             );
         });
 
@@ -235,9 +230,9 @@ public class TestAssetAllocation
         // low
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0",
-                "ROOT,EQ1,EQ-US-LV,1,0.49",
-                "ROOT,EQ2,EQ-US-LG,2,0.50"
+                ",ROOT,All,1,1.0,R",
+                "ROOT,EQ1,EQ-US-LV,1,0.49,AC",
+                "ROOT,EQ2,EQ-US-LG,2,0.50,AC"
             );
         });
 
@@ -246,9 +241,9 @@ public class TestAssetAllocation
         // high
         InvalidDataException e2 = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
-                ",ROOT,All,1,1.0",
-                "ROOT,EQ1,EQ-US-LV,1,0.51",
-                "ROOT,EQ2,EQ-US-LG,2,0.50"
+                ",ROOT,All,1,1.0,R",
+                "ROOT,EQ1,EQ-US-LV,1,0.51,AC",
+                "ROOT,EQ2,EQ-US-LG,2,0.50,AC"
             );
         });
 
@@ -258,10 +253,10 @@ public class TestAssetAllocation
     @Test
     public void tErrorParentChildMismatch() throws Exception
     {
-        AANode r = new AANode("", "ROOT", "NM0", 0, new DoubleExpression("1"));
-        AANode p = new AANode("ROOT", "X1", "NM1", 1, new DoubleExpression("0.5"));
-        AANode p2 = new AANode("ROOT", "X2", "NM2", 2, new DoubleExpression("0.5"));
-        AANode n = new AANode("X1", "EQ", "EQ-US-LV", 0, new DoubleExpression("1"));
+        AANode r = new AANode("", "ROOT", "NM0", 0, new DoubleExpression("1"), AANodeType.R);
+        AANode p = new AANode("ROOT", "X1", "NM1", 1, new DoubleExpression("0.5"), AANodeType.G);
+        AANode p2 = new AANode("ROOT", "X2", "NM2", 2, new DoubleExpression("0.5"), AANodeType.G);
+        AANode n = new AANode("X1", "EQ", "EQ-US-LV", 0, new DoubleExpression("1"), AANodeType.AC);
         r.addChild(p);
         r.addChild(p2);
         p.setParent(r);
@@ -279,7 +274,7 @@ public class TestAssetAllocation
 
     private static AssetAllocation aa(final String... lines) throws InvalidDataException
     {
-        return new AssetAllocation( List.of(lines) );
+        return new AssetAllocation(null, lines);
     }
 
 }

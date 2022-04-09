@@ -32,7 +32,14 @@ public class Portfolio
         name = "";
         goal = PortfolioGoal.Other;
         accounts = new ArrayList<>();
-        targetAA = new AssetAllocation();
+        try
+        {
+            targetAA = new AssetAllocation();
+        }
+        catch (InvalidDataException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     @JsonProperty

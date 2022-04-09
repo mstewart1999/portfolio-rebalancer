@@ -24,7 +24,7 @@ jacocoTestReport {
 
 
 dependencies {
-    implementation 'com.gluonhq:charm-glisten:6.0.6'
+    implementation 'com.gluonhq:charm-glisten:6.1.0'
       // https://jmaven.com/maven/org.controlsfx/controlsfx 
       //implementation 'org.controlsfx:controlsfx:11.1.1'
     implementation 'net.objecthunter:exp4j:0.4.8'
@@ -36,8 +36,9 @@ dependencies {
 }
 
 javafx {
-    version = '17.0.0.1'
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    //version = '17.0.0.1'
+    version = '18'
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
 }
 
 gluonfx {

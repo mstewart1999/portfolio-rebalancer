@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import com.msfinance.pbalancer.model.aa.PresetAA;
+import com.msfinance.pbalancer.model.aa.PredefinedAA;
 
 class TestPresetAA
 {
@@ -12,7 +12,7 @@ class TestPresetAA
     @Test
     void test() throws IOException
     {
-        for(PresetAA aa : PresetAA.values())
+        for(PredefinedAA aa : PredefinedAA.values())
         {
             System.out.println(aa.getAA().toJson());
         }

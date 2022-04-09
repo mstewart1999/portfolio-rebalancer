@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.gluonhq.attach.lifecycle.LifecycleService;
 import com.gluonhq.attach.util.Platform;
 import com.gluonhq.attach.util.Services;
+import com.gluonhq.charm.glisten.application.AppManager;
 import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.application.ViewStackPolicy;
 import com.gluonhq.charm.glisten.control.Avatar;
@@ -38,11 +39,13 @@ public class App extends MobileApplication
         LOG = LoggerFactory.getLogger(App.class);
     }
 
-    public static final String PORTFOLIO_LIST_VIEW = HOME_VIEW;
+    public static final String PORTFOLIO_LIST_VIEW = AppManager.HOME_VIEW;
     public static final String ABOUT_VIEW = "ABOUT_VIEW";
     public static final String SETTINGS_VIEW = "SETTINGS_VIEW";
 
     public static final String PORTFOLIO_VIEW = "PORTFOLIO_VIEW";
+    public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
+    public static final String WEB_VIEW = "WEB_VIEW";
 
     @Override
     public void init()
@@ -55,6 +58,8 @@ public class App extends MobileApplication
 
         // other views
         addViewFactory(PORTFOLIO_VIEW, () -> createView("portfolio.fxml"));
+        addViewFactory(TARGET_AA_VIEW, () -> createView("targetAA.fxml"));
+        addViewFactory(WEB_VIEW, () -> createView("webView.fxml"));
 
         buildDrawer();
 

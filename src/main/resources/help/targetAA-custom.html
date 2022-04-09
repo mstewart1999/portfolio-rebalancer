@@ -1,0 +1,143 @@
+<!doctype html>
+<!-- https://www.sitepoint.com/a-basic-html5-template/ -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>pBalancer Target Asset Allocation: Custom</title>
+  <meta name="description" content="How to define your own asset allocation.">
+
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+  <h1>pBalancer Target Asset Allocation: Custom</h1>
+  <div>
+    <h2>Purpose</h2>
+    <p>
+      Defining a target asset allocation provides structure for your portfolio
+      and helps to control the level of risk and reward.  You can expect
+      that taking more risk <b>MAY</b> lead to more reward over long time horizons,
+      but <b>WILL</b> lead to more volatility over short time horizons.  However,
+      in investing there are no guarantees, even over very long time periods,
+      so beware.
+    </p>
+    <p>
+      You should periodically evaluate your portfolio's <b>current</b>
+      asset allocation and its deviation from your target.  Rebalancing at least
+      once a year is recommended in order to bring the level of risk back to
+      your target level, although some people choose not to do so.
+    </p>
+  </div>
+  <div>
+    <h2>Guidance</h2>
+    <p>
+      An asset allocation consists of one or more <a href="https://www.investopedia.com/terms/a/assetclasses.asp">asset classes</a>
+      in a fixed ratio. pBalancer allows you to define a hierarchy or grouping
+      mechanism for defining the split between asset classes, although you can
+      simply define everything in a single group if desired.
+    </p>
+    <p>
+      pBalancer defines a few major asset classes:
+      <ul>
+        <li>Stocks (equity) - denoted as "EQ".<br>
+            Equity investments are best thought of as ownership of corporations.
+            They are the riskiest, but have the highest potential for reward.
+        <li>Bonds (fixed income) - denoted as "FI".<br>
+            Fixed income covers a variety of situations, but can be thought of as
+            a loan (to a government or corporation) with cashflows
+            defined by a contract.  Bonds are usually less risky than stocks,
+            and as an investor, you can expect to be compensated less as a result.
+        <li>Cash (considered a sub type of fixed income) - denoted as "FI-CASH".<br>
+            Most cash investments have virtually no risk to your principal,
+            except in extreme situations, but they also pay very little interest.
+            Beware of the risk of inflation.
+        <li>Various alternative investments - categorized under "OTH"<br>
+            These investments are somewhat out of the mainstream, so approach
+            with caution.  They include things like real estate, or commodities
+            such as gold.
+      </ul>
+      Within each major asset class, there are a variety of sub asset classes.
+      In some cases these are very broad ("EQ-US-TSM": US total stock market),
+      and in others they are diced very finely ("EQ-US-SV": US small cap value stocks)
+      in order to provide flexibility for you to define your asset allocation
+      at the desired level of granularity.
+    </p>
+    <p>
+      Be aware that asset classes at any level of granularity can be invested
+      in a single asset (a stock, bond, mutual fund, or ETF) or multiple - in
+      which case the assets will be aggregated in the "Current Asset Allocation"
+      view.
+    </p>
+    <p>
+      pBalancer provides some guidance for choosing among the predefined lazy
+      portfolios, but with a custom asset allocation, you are largely on your own.
+    </p>
+  </div>
+  <div>
+    <h2>Editing Mechanics</h2>
+    <p>
+      You can start with any of the Predefined Lazy Portfolios and then
+      customize them, or <strong>Reset</strong> to a completely blank state.
+    </p>
+    <p>
+      Select any row of the table and then perform an editing action:
+      <ul>
+        <li>Double click on the <strong>% of parent</strong> column to adjust
+            the percent. You can enter the value as a decimal like "0.5" for 50%,
+            an explicit percent like "50%", or an expression like you might enter
+            in a spreadsheet like "=1/3" which might be helpful for representing
+            exact ratios.<br>
+            Validation checks will be performed before you can save.
+        <li><strong>+ Group</strong>: add a grouping node as a child of an
+            existing group.  You will be prompted for a name, and the percent
+            will default to 0%.
+        <li><strong>+ Asset</strong>: add a grouping node as a child of an
+            existing group.  You will be prompted to select an asset class, 
+            and the percent will default to 0%.
+        <li><strong>Up</strong>: rearrange children with a group
+        <li><strong>Down</strong>: rearrange children with a group
+        <li><strong>Delete</strong>: remove child group or asset and all
+            of its children.  No undo!
+      </ul>
+    </p>
+  </div>
+  <div>
+    <h2>Nested vs Flat</h2>
+    <p>
+      The <strong>Nested</strong> tab allows viewing and editing of the
+      asset allocation with full representation of the hierarchy of grouping.
+      The percentage values in this view represent the proportion relative
+      to the immediate parent group.
+    </p>
+    <p>
+      The <strong>Flat</strong> tab allows viewing of all asset classes
+      and their computed proportion relative to the entire portfolio,
+      but omits all of the grouping information.<br>
+      No editing is allowed in this view.
+    </p>
+  </div>
+  <div>
+    <h2>Resources</h2>
+    <p>
+      <ul>
+        <li> <a href="https://www.investor.gov/additional-resources/general-resources/publications-research/info-sheets/beginners-guide-asset">SEC: Beginners’ Guide to Asset Allocation, Diversification, and Rebalancing</a>
+        <li> <a href="https://www.investopedia.com/terms/a/assetallocation.asp">Investopedia: Asset Allocation</a>
+        <li> <a href="https://investor.vanguard.com/investor-resources-education/how-to-invest/asset-allocation">Vanguard: Asset allocation: Key to your investment climate</a>
+        <li> <a href="https://www.bogleheads.org/wiki/Asset_allocation">Bogleheads: Asset allocation</a>
+        <li> <a href="https://www.amazon.com/All-About-Asset-Allocation-Second/dp/0071700781/">Book: All About Asset Allocation</a>
+        <li> <a href="https://portfoliocharts.com/portfolios/">Portfolio Charts</a>
+        <li> <a href="https://portfolioslab.com/lazy-portfolios">Portfolio Labs</a>
+        <li> <a href="https://www.portfolioeinstein.cominvestment-portfolios/">Portfolio Einstein</a>
+        <li> <a href="http://www.lazyportfolioetf.com/allocation/">Lazy Portfolio ETF</a>
+     </ul>
+    </p>
+  </div>
+  <!-- your content here... -->
+  <!--
+  <script src="js/scripts.js"></script>
+   -->
+</body>
+</html>

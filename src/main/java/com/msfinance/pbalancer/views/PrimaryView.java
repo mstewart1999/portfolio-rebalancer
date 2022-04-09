@@ -41,7 +41,7 @@ public class PrimaryView extends View
     protected void updateAppBar(final AppBar appBar)
     {
         super.updateAppBar(appBar);
-        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> getApplication().getDrawer().open()));
+        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> getAppManager().getDrawer().open()));
         appBar.setTitleText("About");
         appBar.getActionItems().add(MaterialDesignIcon.SEARCH.button(e -> System.out.println("Search")));
     }

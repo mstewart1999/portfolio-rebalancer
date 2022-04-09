@@ -1,13 +1,11 @@
 {
-  "name": "Three-Fund Portfolio (60/40)",
-  "url": "https://portfoliocharts.com/portfolio/three-fund-portfolio/",
   "nodeCsvs": [
-    ",ROOT,All,1,100%",
-    "  ROOT,EQ,EQ,1,60%",
-    "    EQ,EQ1,EQ-US-TSM,1,80%",
-    "    EQ,EQ2,EQ-IG-TSM,2,20%",
-    "  ROOT,FI,FI,2,40%",
-    "    FI,FI1,FI-IT-TBM,1,100%",
+    ",ROOT,All,1,100%,R",
+    "  ROOT,EQ,EQ,1,60%,G",
+    "    EQ,EQ1,EQ-US-TSM,1,80%,AC",
+    "    EQ,EQ2,EQ-IG-TSM,2,20%,AC",
+    "  ROOT,FI,FI,2,40%,G",
+    "    FI,FI1,FI-IT-TBM,1,100%,AC",
     ""
   ]
 }
