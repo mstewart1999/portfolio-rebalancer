@@ -1,59 +1,107 @@
 package com.msfinance.pbalancer.model.aa;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class AssetClass
 {
-    public static final String UNALLOCATED = "Unallocated";
+    public static final String UNDEFINED = "Undefined";
 
-    private static final Set<String> KNOWN = new HashSet<>();
+    private static final Map<String,AssetClass> KNOWN = new HashMap<>();
+    private static final List<AssetClass> KNOWN_LIST = new ArrayList<>();
 
     static
     {
-        add("EQ-US-TSM");
-        add("EQ-ID-TSM");
-        add("EQ-IE-TSM");
-        add("EQ-IG-TSM");
-        add("EQ-TW-TSM");
-        add("EQ-US", new String[]{"LV", "LB", "LG", "MV", "MB", "MG", "SV", "SB", "SG"});
-        add("EQ-ID", new String[]{"LV", "LB", "LG", "MV", "MB", "MG", "SV", "SB", "SG"});
-        add("EQ-IE", new String[]{"LV", "LB", "LG", "MV", "MB", "MG", "SV", "SB", "SG"});
-        add("EQ-IG", new String[]{"LV", "LB", "LG", "MV", "MB", "MG", "SV", "SB", "SG"});
+        // lazy load, each invocation gets its own copy
+        String fileNm = "AssetClassList.psv";
 
-        add("FI-CASH");
-        add("FI-F-TBM");
-        add("FI-ST-ANY");
-        add("FI-IT-ANY");
-        add("FI-LT-ANY");
-        add("FI-IT-TBM");
-        add("FI-IT-TIBM"); // TODO: regions?
-        add("FI-ST", new String[]{"MUN", "CORP", "GOV", "IPS"});
-        add("FI-IT", new String[]{"MUN", "CORP", "GOV", "IPS"});
-        add("FI-LT", new String[]{"MUN", "CORP", "GOV", "IPS"});
-
-        add("OTHER-COM-CCF");
-        add("OTHER-COM-NR");
-        add("OTHER-REIT-US");
-
-        add(UNALLOCATED);
-    }
-
-    public static final void add(final String nm)
-    {
-        KNOWN.add(nm);
-    }
-
-    public static final void add(final String nmPrefix, final String[] suffixes)
-    {
-        for(String suffix : suffixes)
+        // find the predefined data file as a resource relative to AA class
+        try(InputStream in = AssetClass.class.getResourceAsStream(fileNm))
         {
-            KNOWN.add(nmPrefix + "-" + suffix);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            for(String line : br.lines().collect(Collectors.toList()))
+            {
+                if(!line.isBlank())
+                {
+                    String[] fields = line.strip().split(Pattern.quote("|"));
+                    String longDescription = (fields.length >= 3) ? fields[2] : "";
+                    new AssetClass(true, fields[0], fields[1], longDescription);
+                }
+            }
+        }
+        catch(IOException|NullPointerException|ArrayIndexOutOfBoundsException e)
+        {
+            throw new RuntimeException("Unable to load asset classes from: " + fileNm, e);
+        }
+
+        new AssetClass(true, UNDEFINED, "TBD", "");
+    }
+
+    public static final void add(final String cd)
+    {
+        if(!KNOWN.containsKey(cd))
+        {
+            AssetClass ac = new AssetClass(false, cd, "Custom", "??");
+            KNOWN.put(cd, ac);
+            KNOWN_LIST.add(ac);
         }
     }
 
-    public static boolean exists(final String nm)
+    public static AssetClass lookup(final String cd)
     {
-        return KNOWN.contains(nm);
+        return KNOWN.get(cd);
     }
+
+    public static List<AssetClass> list()
+    {
+        return Collections.unmodifiableList(KNOWN_LIST);
+    }
+
+    //----------------------------------------
+    private final boolean builtIn;
+    private final String code;
+    private final String shortDescription;
+    private final String longDescription;
+
+    private AssetClass(final boolean builtIn, final String code, final String shortDescription, final String longDescription)
+    {
+        this.builtIn = builtIn;
+        this.code = code;
+        this.shortDescription = shortDescription;
+        this.longDescription = longDescription;
+
+        KNOWN.put(code, this);
+        KNOWN_LIST.add(this);
+    }
+
+    public boolean isBuiltIn()
+    {
+        return builtIn;
+    }
+
+    public String getCode()
+    {
+        return code;
+    }
+
+    public String getShortDescription()
+    {
+        return shortDescription;
+    }
+
+    public String getLongDescription()
+    {
+        return longDescription;
+    }
+
 }

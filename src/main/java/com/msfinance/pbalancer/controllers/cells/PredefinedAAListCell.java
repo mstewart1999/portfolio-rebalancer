@@ -1,4 +1,4 @@
-package com.msfinance.pbalancer.controllers;
+package com.msfinance.pbalancer.controllers.cells;
 
 import com.msfinance.pbalancer.model.aa.PredefinedAA;
 
@@ -6,7 +6,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
-class PredefinedAAListCell extends ListCell<PredefinedAA>
+public class PredefinedAAListCell extends ListCell<PredefinedAA>
 {
     @Override
     protected void updateItem(final PredefinedAA p, final boolean empty)

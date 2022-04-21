@@ -1,4 +1,4 @@
-package com.msfinance.pbalancer.controllers;
+package com.msfinance.pbalancer.controllers.cells;
 
 import com.msfinance.pbalancer.model.Portfolio;
 
@@ -6,7 +6,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
-class PortfolioListCell extends ListCell<Portfolio>
+public class PortfolioListCell extends ListCell<Portfolio>
 {
     @Override
     protected void updateItem(final Portfolio p, final boolean empty)

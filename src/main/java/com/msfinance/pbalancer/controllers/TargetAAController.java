@@ -17,6 +17,9 @@ import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.StateManager;
+import com.msfinance.pbalancer.controllers.cells.AAAlertsTreeTableCell;
+import com.msfinance.pbalancer.controllers.cells.PercentTableCell;
+import com.msfinance.pbalancer.controllers.cells.PredefinedAAListCell;
 import com.msfinance.pbalancer.model.InvalidDataException;
 import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.model.aa.AANode;
@@ -25,6 +28,7 @@ import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.aa.DoubleExpression;
 import com.msfinance.pbalancer.model.aa.PredefinedAA;
 import com.msfinance.pbalancer.service.DataFactory;
+import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.beans.InvalidationListener;
@@ -39,6 +43,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleGroup;
@@ -120,6 +125,7 @@ public class TargetAAController
         Validation.assertNonNull(predefinedCombo);
         Validation.assertNonNull(predefinedHelpIcon);
         Validation.assertNonNull(predefinedUrlHref);
+        Validation.assertNonNull(t);
         Validation.assertNonNull(tt);
         Validation.assertNonNull(customizePane);
         Validation.assertNonNull(addGroupButton);
@@ -163,7 +169,9 @@ public class TargetAAController
         ttCol1.setOnEditCommit(e -> onCommitPercentOfParent(e));
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
-        t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("percentOfRootAsString"));
+        TableColumn<AANode,Double> tcol1 = (TableColumn<AANode, Double>) t.getColumns().get(1);
+        tcol1.setCellValueFactory(new PropertyValueFactory<>("percentOfRoot"));
+        tcol1.setCellFactory(new PercentTableCell.Factory<AANode>());
 
         tt.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
             @Override
@@ -284,13 +292,13 @@ public class TargetAAController
 
     private void goBack()
     {
-        if(saveAA())
+        if(save())
         {
             view.getAppManager().switchToPreviousView();
         }
     }
 
-    private boolean saveAA()
+    private boolean save()
     {
         if(predefinedRB.isSelected())
         {
@@ -331,8 +339,8 @@ public class TargetAAController
         }
         catch (IOException e)
         {
-            LOG.error("Error updating: " + StateManager.currentPortfolioId, e);
-            view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolioId);
+            LOG.error("Error updating: " + StateManager.currentPortfolio.getId(), e);
+            view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolio.getId());
             return false;
         }
     }
@@ -341,8 +349,7 @@ public class TargetAAController
     {
         if(predefinedRB.isSelected())
         {
-            // TODO: try to open system browser for this one!  page is too complicated and makes it buggy
-            StateManager.currentUrl = PredefinedAA.PREDEFINED_HELP_URL;
+            StateManager.currentUrl = HelpUrls.TARGET_AA_PREDEFINED_HELP_URL;
             view.getAppManager().switchView(App.WEB_VIEW);
         }
     }
@@ -351,7 +358,7 @@ public class TargetAAController
     {
         if(customRB.isSelected())
         {
-            StateManager.currentUrl = PredefinedAA.CUSTOM_HELP_URL;
+            StateManager.currentUrl = HelpUrls.TARGET_AA_CUSTOM_HELP_URL;
             view.getAppManager().switchView(App.WEB_VIEW);
         }
     }
@@ -362,6 +369,7 @@ public class TargetAAController
         {
             if(predefinedCombo.getSelectionModel().getSelectedItem() != null)
             {
+                // TODO: try to open system browser for this one!  page is too complicated and makes it buggy
                 PredefinedAA p = predefinedCombo.getSelectionModel().getSelectedItem();
                 StateManager.currentUrl = p.getUrl();
                 view.getAppManager().switchView(App.WEB_VIEW);
@@ -483,15 +491,15 @@ public class TargetAAController
 
         AANode aan = item.getValue();
         String id = UUID.randomUUID().toString();
-        int childPos = 1;
-        Optional<Integer> currMaxChildPosition = aan
+        int listPos = 1;
+        Optional<Integer> currMaxListPosition = aan
             .children()
             .stream()
-            .map(c -> c.getChildPosition())
+            .map(c -> c.getListPosition())
             .max((i, j) -> i.compareTo(j));
-        if(currMaxChildPosition.isPresent())
+        if(currMaxListPosition.isPresent())
         {
-            childPos = currMaxChildPosition.get() + 1;
+            listPos = currMaxListPosition.get() + 1;
         }
 
         TextInputDialog inputdialog = new TextInputDialog("");
@@ -502,7 +510,7 @@ public class TargetAAController
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))
         {
-            AANode aanChild = new AANode(aan.getId(), id, name, childPos, DoubleExpression.createSafe0Percent(), AANodeType.G);
+            AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.G);
             TreeItem<AANode> child = new TreeItem<>(aanChild);
             aan.addChild(aanChild);
             item.getChildren().add(child);
@@ -526,15 +534,15 @@ public class TargetAAController
 
         AANode aan = item.getValue();
         String id = UUID.randomUUID().toString();
-        int childPos = 1;
-        Optional<Integer> currMaxChildPosition = aan
+        int listPos = 1;
+        Optional<Integer> currMaxListPosition = aan
             .children()
             .stream()
-            .map(c -> c.getChildPosition())
+            .map(c -> c.getListPosition())
             .max((i, j) -> i.compareTo(j));
-        if(currMaxChildPosition.isPresent())
+        if(currMaxListPosition.isPresent())
         {
-            childPos = currMaxChildPosition.get() + 1;
+            listPos = currMaxListPosition.get() + 1;
         }
 
         ChoiceDialog<String> inputdialog = new ChoiceDialog<>("", "EQ", "FI", "CASH");
@@ -545,7 +553,7 @@ public class TargetAAController
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))
         {
-            AANode aanChild = new AANode(aan.getId(), id, name, childPos, DoubleExpression.createSafe0Percent(), AANodeType.AC);
+            AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.AC);
             TreeItem<AANode> child = new TreeItem<>(aanChild);
             aan.addChild(aanChild);
             item.getChildren().add(child);
@@ -592,6 +600,12 @@ public class TargetAAController
             int newPos = pos-1;
             parent.getChildren().remove(item);
             parent.getChildren().add(newPos, item);
+            tt.getSelectionModel().select(item); // move selection with the row
+            // renumber children
+            for(int i=0; i<parent.getChildren().size(); i++)
+            {
+                parent.getChildren().get(i).getValue().setListPosition(i);
+            }
         }
     }
 
@@ -625,6 +639,12 @@ public class TargetAAController
             int newPos = pos+1;
             parent.getChildren().remove(item);
             parent.getChildren().add(newPos, item);
+            tt.getSelectionModel().select(item); // move selection with the row
+            // renumber children
+            for(int i=0; i<parent.getChildren().size(); i++)
+            {
+                parent.getChildren().get(i).getValue().setListPosition(i);
+            }
         }
     }
 

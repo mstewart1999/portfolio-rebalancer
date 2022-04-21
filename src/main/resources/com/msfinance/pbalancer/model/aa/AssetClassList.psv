@@ -1,0 +1,34 @@
+EQ-US-TSM|US Total Stock Market|
+EQ-US-LB|US Large-Cap Blend Stocks|
+EQ-US-LV|US Large-Cap Value Stocks|
+EQ-US-LG|US Large-Cap Growth Stocks|
+EQ-US-MB|US Mid-Cap Blend Stocks|
+EQ-US-MV|US Mid-Cap Value Stocks|
+EQ-US-MG|US Mid-Cap Growth Stocks|
+EQ-US-SB|US Small-Cap Blend Stocks|
+EQ-US-SG|US Small-Cap Value Stocks|
+EQ-US-SV|US Small-Cap Growth Stocks|
+
+EQ-ID-TSM|Intl Developed Mkts (ex-US) Stocks|
+EQ-ID-LB|Intl Developed Mkts (ex-US) Large-Cap Blend Stocks|
+EQ-ID-LV|Intl Developed Mkts (ex-US) Large-Cap Value Stocks|
+EQ-ID-SB|Intl Developed Mkts (ex-US) Small-Cap Blend Stocks|
+EQ-ID-SV|Intl Developed Mkts (ex-US) Small-Cap Value Stocks|
+EQ-IE-TSM|Intl Emerging Mkts Stocks|
+EQ-IE-LV|Intl Emerging Mkts Large-Cap Value Stocks|
+EQ-IG-TSM|Global (ex-US) Stocks|Market cap weighted combination of Developed and Emerging markets stocks (excludes US)
+EQ-TW-TSM|Total World Stocks|Market cap weighted combination of Developed and Emerging markets stocks (includes US)
+
+FI-CASH|Cash|Bank deposits,Money market funds,T-Bills|
+FI-LT-GOV|Long Term Treasury Bonds|
+FI-IT-ANY|Intermediate Term Bonds|
+FI-IT-GOV|Intermediate Term Treasury Bonds|
+FI-IT-IPS|Intermediate Term Inflation Protected Bonds (TIPS)|
+FI-IT-TBM|Intermediate Term Total Bond Market|
+FI-ST-GOV|Short Term Treasury Bonds|
+FI-XUS-IT-GOV|Intermediate Term Foreign Bonds|
+
+OTHER-COM-CCF|Commodities futures fund|
+OTHER-COM-GOLD|Gold|
+OTHER-COM-NR|Natural Resources|
+OTHER-REIT-US|US REITS|AKA Real Estate Investment Trusts|

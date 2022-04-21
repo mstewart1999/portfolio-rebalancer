@@ -1,9 +1,14 @@
 package com.msfinance.pbalancer.model.aa;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.msfinance.pbalancer.util.JSONHelper;
+import com.msfinance.pbalancer.model.InvalidDataException;
 
 public enum PredefinedAA
 {
@@ -11,42 +16,67 @@ public enum PredefinedAA
   // compare to https://portfolioslab.com/lazy-portfolios
     // https://www.portfolioeinstein.com
     // http://www.lazyportfolioetf.com
+    // https://www.optimizedportfolio.com/
     THREE_FUND(
             "Three-Fund Portfolio (60/40)",
             "https://portfoliocharts.com/portfolio/three-fund-portfolio/"
             ),
-    TSM(
-            "Total Stock Market Portfolio",
-            "https://portfoliocharts.com/portfolio/total-stock-market/"
-            ),
+
+    ALL_SEASONS(
+            "All Seasons Portfolio",
+            "https://portfoliocharts.com/portfolio/all-seasons-portfolio/"),
     CLASSIC_60_40(
             "Classic 60-40 Portfolio",
             "https://portfoliocharts.com/portfolio/classic-60-40/"
             ),
+    COFFEEHOUSE(
+            "Coffeehouse Portfolio",
+            "https://portfoliocharts.com/portfolio/coffeehouse-portfolio/"),
+    CORE_FOUR(
+            "Core Four Portfolio (Moderate Growth - Classic)",
+            "https://portfoliocharts.com/portfolio/rick-ferri-core-four/"),
+    GLOBAL_MARKET(
+            "Global Market Portfolio",
+            "https://portfoliocharts.com/portfolio/global-market-portfolio/"),
+    GOLDEN_BUTTERFLY(
+            "Golden Butterfly Portfolio",
+            "https://portfoliocharts.com/portfolio/golden-butterfly/"),
+    IDEAL_INDEX(
+            "Ideal Index Portfolio",
+            "https://portfoliocharts.com/portfolio/ideal-index-portfolio/"),
+    IVY(
+            "Ivy Portfolio",
+            "https://portfoliocharts.com/portfolio/ivy-portfolio/"),
+    LARRY(
+            "Larry Portfolio",
+            "https://portfoliocharts.com/portfolio/larry-portfolio/"),
+    MERRIMAN_ULTIMATE(
+            "Merriman Ultimate Portfolio",
+            "https://portfoliocharts.com/portfolio/merriman-ultimate/"),
+    NO_BRAINER(
+            "No-Brainer Portfolio",
+            "https://portfoliocharts.com/portfolio/no-brainer-portfolio/"),
+    PERMANENT(
+            "Permanent Portfolio",
+            "https://portfoliocharts.com/portfolio/permanent-portfolio/"),
+    PINWHEEL(
+            "Pinwheel Portfolio",
+            "https://portfoliocharts.com/portfolio/pinwheel-portfolio/"),
+    SANDWICH(
+            "Sandwich Portfolio",
+            "https://portfoliocharts.com/portfolio/sandwich-portfolio/"),
     SEVEN_TWELVE(
             "7Twelve Portfolio",
             "https://portfoliocharts.com/portfolio/7twelve-portfolio/"
             ),
-
-// TODO
-//    ALL_SEASONS,
-//    COFFEEHOUSE,
-//    CORE_FOUR,
-//    GLOBAL_MARKET,
-//    GOLDEN_BUTTERFLY,
-//    IDEAL_INDEX,
-//    IVY,
-//    LARRY,
-//    MERRIMAN_ULTIMATE,
-//    NO_BRAINER,
-//    PERMANENT,
-//    SANDWICH,
-//    SWENSEN,
-    // BUILD YOUR OWN??
+    SWENSEN(
+            "Swensen Portfolio",
+            "https://portfoliocharts.com/portfolio/swensen-portfolio/"),
+    TSM(
+            "Total Stock Market Portfolio",
+            "https://portfoliocharts.com/portfolio/total-stock-market/"
+            ),
     ;
-
-    public static final String PREDEFINED_HELP_URL = PredefinedAA.class.getResource("/help/targetAA-predefined.html").toString();
-    public static final String CUSTOM_HELP_URL = PredefinedAA.class.getResource("/help/targetAA-custom.html").toString();
 
     private String text;
     private String url;
@@ -70,17 +100,17 @@ public enum PredefinedAA
     public AssetAllocation getAA()
     {
         // lazy load, each invocation gets its own copy
-        String fileNm = this.name() + ".json";
+        String fileNm = this.name() + ".csv";
 
-        // find the predefined data file as a resource relative to AA class
-        try(InputStream in = AssetAllocation.class.getResourceAsStream(fileNm))
+        // find the predefined data file as a resource relative to this class
+        try(InputStream in = this.getClass().getResourceAsStream(fileNm))
         {
-            String content = JSONHelper.readAll(in);
-            AssetAllocation aa = JSONHelper.fromJson(content, AssetAllocation.class);
-            aa.setPredefined(this);
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            List<String> lines = br.lines().collect(Collectors.toList());
+            AssetAllocation aa = new AssetAllocation(this, lines);
             return aa;
         }
-        catch(IOException e)
+        catch(IOException|InvalidDataException|NullPointerException e)
         {
             throw new RuntimeException("Unable to load PresetAA=" + name(), e);
         }

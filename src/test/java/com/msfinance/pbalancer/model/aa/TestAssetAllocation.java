@@ -197,7 +197,7 @@ public class TestAssetAllocation
     }
 
     @Test
-    public void tErrorDuplicateChildPosition() throws Exception
+    public void tErrorDuplicateListPosition() throws Exception
     {
         InvalidDataException e = Assertions.assertThrows(InvalidDataException.class, () -> {
             aa(
@@ -207,7 +207,7 @@ public class TestAssetAllocation
             );
         });
 
-        Assertions.assertTrue(e.getMessage().contains("duplicate child.childPosition"));
+        Assertions.assertTrue(e.getMessage().contains("duplicate child.listPosition"));
     }
 
     @Test

@@ -2,29 +2,28 @@ package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.Icon;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.StateManager;
+import com.msfinance.pbalancer.controllers.cells.PortfolioGoalListCell;
+import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.service.DataFactory;
+import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -143,15 +142,15 @@ public class PortfolioController
 
 
         // TODO
-        accountsButton.setDisable(true);
+        //accountsButton.setDisable(true);
         //targetAAButton.setDisable(true);
         actualAAButton.setDisable(true);
         alertsButton.setDisable(true);
         investButton.setDisable(true);
         withdrawalButton.setDisable(true);
         rebalanceButton.setDisable(true);
-        accountsButton.setOnAction(e -> {});
-        targetAAButton.setOnAction(e -> view.getAppManager().switchView(App.TARGET_AA_VIEW));
+        accountsButton.setOnAction(e -> visitAccountList());
+        targetAAButton.setOnAction(e -> visitTargetAAList());
         actualAAButton.setOnAction(e -> {});
         alertsButton.setOnAction(e -> {});
         investButton.setOnAction(e -> {});
@@ -173,29 +172,38 @@ public class PortfolioController
 
     protected void populateData()
     {
-        try
+        Portfolio p = StateManager.currentPortfolio;
+
+        nameText.setText(p.getName());
+        goalCombo.getSelectionModel().select(p.getGoal());
+
+        if(p.getLastValue() != null)
         {
-            String id = StateManager.currentPortfolioId;
-            StateManager.currentPortfolio = DataFactory.get().getPortfolio(id);
-
-            nameText.setText(StateManager.currentPortfolio.getName());
-            goalCombo.getSelectionModel().select(StateManager.currentPortfolio.getGoal());
-
-            valueLabel.setText("$ 75.22 K"); // TODO
-            valueAsOfLabel.setText(String.format("(as of %s)", DateTimeFormatter.ISO_LOCAL_DATE.format(LocalDate.now())));
-
-            boolean infos = false;
-            boolean warns = true;
-            boolean errors = true;
-            alertsInfoIcon.setVisible(infos);
-            alertsWarnIcon.setVisible(warns);
-            alertsErrorIcon.setVisible(errors);
+            valueLabel.setText("$ " + NumberFormatHelper.prettyFormatCurrency(p.getLastValue()));
         }
-        catch (IOException e)
+        else
         {
-            LOG.error("Error reading: " + StateManager.currentPortfolioId, e);
-            view.getAppManager().showMessage("Error reading: " + StateManager.currentPortfolioId);
+            valueLabel.setText("$ 0");
         }
+        if(p.getLastValueTmstp() != null)
+        {
+            valueAsOfLabel.setText(
+                    String.format(
+                        "(as of %s)",
+                        DateTimeFormatter.ISO_LOCAL_DATE.format(
+                                p.getLastValueTmstp().toInstant().atZone(ZoneId.systemDefault()))));
+        }
+        else
+        {
+            valueAsOfLabel.setText("");
+        }
+
+        boolean infos = false;
+        boolean warns = true;
+        boolean errors = true;
+        alertsInfoIcon.setVisible(infos);
+        alertsWarnIcon.setVisible(warns);
+        alertsErrorIcon.setVisible(errors);
     }
 
     protected void updateAppBar()
@@ -203,17 +211,19 @@ public class PortfolioController
         final AppBar appBar = view.getAppManager().getAppBar();
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
-        appBar.getActionItems().add(MaterialDesignIcon.DELETE_FOREVER.button(e -> deletePortfolio()));
+        //appBar.getActionItems().add(MaterialDesignIcon.DELETE_FOREVER.button(e -> deletePortfolio()));
         appBar.setTitleText(APP_BAR_TITLE);
     }
 
     private void goBack()
     {
-        savePortfolio();
-        view.getAppManager().switchToPreviousView();
+        if(save())
+        {
+            view.getAppManager().switchToPreviousView();
+        }
     }
 
-    private void savePortfolio()
+    private boolean save()
     {
         boolean hasChanges = false;
 
@@ -241,29 +251,24 @@ public class PortfolioController
             }
             catch (IOException e)
             {
-                LOG.error("Error updating: " + StateManager.currentPortfolioId, e);
-                view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolioId);
+                LOG.error("Error updating: " + StateManager.currentPortfolio.getId(), e);
+                view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolio.getId());
+                return false;
             }
         }
+
+        return true;
     }
 
-    private void deletePortfolio()
+    private void visitAccountList()
     {
-        Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to delete this portfolio?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if(result.isPresent() && result.get() == ButtonType.OK)
-        {
-            try
-            {
-                DataFactory.get().deletePortfolio(StateManager.currentPortfolioId);
-                view.getAppManager().showMessage("Deleted: " + StateManager.currentPortfolioId);
-                view.getAppManager().switchToPreviousView();
-            }
-            catch (IOException e)
-            {
-                LOG.error("Error deleting: " + StateManager.currentPortfolioId, e);
-                view.getAppManager().showMessage("Error deleting: " + StateManager.currentPortfolioId);
-            }
-        }
+        save();
+        view.getAppManager().switchView(App.ACCOUNT_LIST_VIEW);
+    }
+
+    private void visitTargetAAList()
+    {
+        save();
+        view.getAppManager().switchView(App.TARGET_AA_VIEW);
     }
 }

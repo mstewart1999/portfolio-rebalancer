@@ -24,7 +24,7 @@ public class AANode
     private final String parentId;
     private final String id;
     private final String name;
-    private final int childPosition;
+    private int listPosition;
     private DoubleExpression percentOfParent;
     private final AANodeType type;
     private final List<PortfolioAlert> alerts;
@@ -40,12 +40,12 @@ public class AANode
         return new AANode("", ROOT_ID, "All", 1, DoubleExpression.createSafe100Percent(), AANodeType.R);
     }
 
-    public AANode(final String parentId, final String id, final String name, final int childPosition, final DoubleExpression percentOfParent, final AANodeType type)
+    public AANode(final String parentId, final String id, final String name, final int listPosition, final DoubleExpression percentOfParent, final AANodeType type)
     {
         this.parentId = Validation.assertNonNull(parentId);
         this.id = Validation.assertNonNull(id);
         this.name = Validation.assertNonNull(name);
-        this.childPosition = childPosition;
+        this.listPosition = listPosition;
         this.percentOfParent = Validation.assertNonNull(percentOfParent);
         this.type = type;
         this.alerts = new ArrayList<>();
@@ -68,9 +68,14 @@ public class AANode
         return name;
     }
 
-    public int getChildPosition()
+    public int getListPosition()
     {
-        return childPosition;
+        return listPosition;
+    }
+
+    public void setListPosition(final int listPosition)
+    {
+        this.listPosition = listPosition;
     }
 
     public DoubleExpression getPercentOfParent()
@@ -103,7 +108,8 @@ public class AANode
     @JsonIgnore
     public String getPercentOfRootAsString()
     {
-        return String.format("%6.2f", percentOfRoot*100) + "%";
+        // TODO: remove
+        return String.format("TODO %6.2f", percentOfRoot*100) + "%";
     }
 
     @JsonIgnore
@@ -176,7 +182,7 @@ public class AANode
 
     private void sortChildren()
     {
-        Collections.sort(children, Comparator.comparingInt(AANode::getChildPosition));
+        Collections.sort(children, Comparator.comparingInt(AANode::getListPosition));
     }
 
     public List<AANode> children()
@@ -267,13 +273,13 @@ public class AANode
             {
                 alerts.add(new PortfolioAlert(AA, ERROR, "leaf node must have no children"));
             }
-            if( !AssetClass.exists(name) )
+            if(AssetClass.lookup(name) == null)
             {
                 alerts.add(new PortfolioAlert(AA, WARN, "leaf node's name is not a known AssetClass"));
             }
-            if( AssetClass.UNALLOCATED.equals(name) )
+            if( AssetClass.UNDEFINED.equals(name) )
             {
-                alerts.add(new PortfolioAlert(AA, WARN, "AssetClass 'Unallocated' should be defined"));
+                alerts.add(new PortfolioAlert(AA, WARN, "AssetClass 'Undefined' should be replaced"));
             }
         }
         else
@@ -293,7 +299,7 @@ public class AANode
             }
 
             // then validate aggregate things which may add additional alerts
-            Map<Integer,List<AANode>> childPositions = new HashMap<>();
+            Map<Integer,List<AANode>> listPositions = new HashMap<>();
             Map<String,List<AANode>> childNames = new HashMap<>();
             double sumChildrenAllocation = 0.0;
             for(AANode child : children)
@@ -302,25 +308,25 @@ public class AANode
                 {
                     child.alerts.add(new PortfolioAlert(AA, ERROR, "parent/child mismatch::" + toString()));
                 }
-                if(!childPositions.containsKey(child.getChildPosition()))
+                if(!listPositions.containsKey(child.getListPosition()))
                 {
-                    childPositions.put(child.getChildPosition(), new ArrayList<>());
+                    listPositions.put(child.getListPosition(), new ArrayList<>());
                 }
                 if(!childNames.containsKey(child.getName()))
                 {
                     childNames.put(child.getName(), new ArrayList<>());
                 }
-                childPositions.get(child.getChildPosition()).add(child);
+                listPositions.get(child.getListPosition()).add(child);
                 childNames.get(child.name).add(child);
                 sumChildrenAllocation += child.getPercentOfParent().getValue();
             }
-            for(List<AANode> byChildPosition : childPositions.values())
+            for(List<AANode> byListPosition : listPositions.values())
             {
-                if(byChildPosition.size() > 1)
+                if(byListPosition.size() > 1)
                 {
-                    for(AANode c : byChildPosition)
+                    for(AANode c : byListPosition)
                     {
-                        c.alerts.add(new PortfolioAlert(AA, INFO, "duplicate child position: " + c.getChildPosition()));
+                        c.alerts.add(new PortfolioAlert(AA, INFO, "duplicate list position: " + c.getListPosition()));
                     }
                 }
             }
@@ -381,7 +387,7 @@ public class AANode
         return "AANode [parentId=" + parentId
                 + ", id=" + id
                 + ", name=" + name
-                + ", childPosition=" + childPosition
+                + ", listPosition=" + listPosition
                 + ", percentOfParent=" + percentOfParent
                 + ", type=" + type
                 //+ ", alerts=" + alerts
@@ -397,7 +403,7 @@ public class AANode
         sb.append(",");
         sb.append(getName());
         sb.append(",");
-        sb.append(getChildPosition());
+        sb.append(getListPosition());
         sb.append(",");
         sb.append(getPercentOfParent().getExpr());
         sb.append(",");

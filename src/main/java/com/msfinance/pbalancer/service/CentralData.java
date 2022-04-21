@@ -9,14 +9,14 @@ public class CentralData implements IData
 {
 
     @Override
-    public List<String> getPortfolioIds() throws IOException
+    public List<Portfolio> getPortfolios(final String profileId) throws IOException
     {
         // TODO implement server and REST call
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Portfolio getPortfolio(final String name) throws IOException
+    public Portfolio getPortfolio(final String profileId, final String id) throws IOException
     {
         // TODO implement server and REST call
         throw new UnsupportedOperationException();
@@ -30,14 +30,14 @@ public class CentralData implements IData
     }
 
     @Override
-    public void updatePortfolio(final Portfolio currentPortfolio) throws IOException
+    public void updatePortfolio(final Portfolio p) throws IOException
     {
         // TODO implement server and REST call
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void deletePortfolio(final String id) throws IOException
+    public void deletePortfolio(final Portfolio p) throws IOException
     {
         // TODO implement server and REST call
         throw new UnsupportedOperationException();

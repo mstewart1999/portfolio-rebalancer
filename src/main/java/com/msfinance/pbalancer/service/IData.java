@@ -7,9 +7,9 @@ import com.msfinance.pbalancer.model.Portfolio;
 
 public interface IData
 {
-    List<String> getPortfolioIds() throws IOException;
-    Portfolio getPortfolio(String id) throws IOException;
+    List<Portfolio> getPortfolios(String profileId) throws IOException;
+    Portfolio getPortfolio(String profileId, String id) throws IOException;
     void createPortfolio(Portfolio p) throws IOException;
-    void updatePortfolio(Portfolio currentPortfolio) throws IOException;
-    void deletePortfolio(String id) throws IOException;
+    void updatePortfolio(Portfolio p) throws IOException;
+    void deletePortfolio(Portfolio p) throws IOException;
 }

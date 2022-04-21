@@ -37,4 +37,9 @@ public class Validation
             throw new InvalidDataException("Invalid int", e);
         }
     }
+
+    public static void assertTrue(final boolean b)
+    {
+        if(!b) throw new IllegalArgumentException();
+    }
 }

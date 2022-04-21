@@ -53,6 +53,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <View fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.TargetAAController">
    <center>
@@ -120,7 +121,7 @@
                               <TableView fx:id="t" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <columns>
                                   <TableColumn editable="false" prefWidth="133.3333740234375" text="Name" />
-                                    <TableColumn editable="false" prefWidth="115.3333740234375" text="\%" />
+                                    <TableColumn id="percent" editable="false" prefWidth="115.3333740234375" text="\%" />
                                 </columns>
                               </TableView>
                            </children>
@@ -150,8 +151,14 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <RadioButton fx:id="predefinedRB" mnemonicParsing="false" text="Predefined Lazy Portfolios" GridPane.columnSpan="2" />
-            <RadioButton fx:id="customRB" mnemonicParsing="false" text="Custom Asset Allocation" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+            <RadioButton fx:id="predefinedRB" mnemonicParsing="false" text="Predefined Lazy Portfolios" GridPane.columnSpan="2">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></RadioButton>
+            <RadioButton fx:id="customRB" mnemonicParsing="false" text="Custom Asset Allocation" GridPane.columnSpan="2" GridPane.rowIndex="3">
+               <font>
+                  <Font name="System Bold" size="12.0" />
+               </font></RadioButton>
             <ComboBox fx:id="predefinedCombo" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
             <Icon fx:id="predefinedHelpIcon" content="HELP_OUTLINE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
             <Hyperlink fx:id="predefinedUrlHref" text="Details" GridPane.columnIndex="1" GridPane.rowIndex="2" />

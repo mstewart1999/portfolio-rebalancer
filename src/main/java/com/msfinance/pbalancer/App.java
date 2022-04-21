@@ -19,6 +19,7 @@ import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.charm.glisten.visual.Swatch;
 import com.msfinance.pbalancer.controllers.PortfolioListController;
+import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.views.PrimaryView;
 import com.msfinance.pbalancer.views.SecondaryView;
 
@@ -44,6 +45,11 @@ public class App extends MobileApplication
     public static final String SETTINGS_VIEW = "SETTINGS_VIEW";
 
     public static final String PORTFOLIO_VIEW = "PORTFOLIO_VIEW";
+    public static final String ACCOUNT_LIST_VIEW = "ACCOUNT_LIST_VIEW";
+    public static final String ACCOUNT_EDIT_VIEW = "ACCOUNT_EDIT_VIEW";
+    public static final String ASSET_ADD_VIEW = "ASSET_ADD_VIEW";
+    public static final String ASSET_EDIT_KNOWN_VIEW = "ASSET_EDIT_KNOWN_VIEW";
+    public static final String ASSET_EDIT_MANUAL_VIEW = "ASSET_EDIT_MANUAL_VIEW";
     public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
     public static final String WEB_VIEW = "WEB_VIEW";
 
@@ -58,23 +64,32 @@ public class App extends MobileApplication
 
         // other views
         addViewFactory(PORTFOLIO_VIEW, () -> createView("portfolio.fxml"));
+        addViewFactory(ACCOUNT_LIST_VIEW, () -> createView("accountList.fxml"));
+        addViewFactory(ACCOUNT_EDIT_VIEW, () -> createView("accountEdit.fxml"));
+        addViewFactory(ASSET_ADD_VIEW, () -> createView("assetAdd.fxml"));
+        addViewFactory(ASSET_EDIT_KNOWN_VIEW, () -> createView("assetEditKnown.fxml"));
+        addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> createView("assetEditManual.fxml"));
         addViewFactory(TARGET_AA_VIEW, () -> createView("targetAA.fxml"));
         addViewFactory(WEB_VIEW, () -> createView("webView.fxml"));
 
         buildDrawer();
 
         StateManager.reset();
+        StateManager.currentProfile = new Profile("DEFAULT"); // TODO: create new UI for add/switch profile
+        StateManager.currentProfile.setName("DEFAULT");
     }
 
     private View createView(final String fxml)
     {
         try
         {
-            View root = FXMLLoader.load(
+            FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("views/" + fxml)
                     // TODO: i18n? https://github.com/gluonhq/gluon-samples-sandbox/blob/master/HelloFXML/src/main/resources/hellofx/hello.properties
                     /*,ResourceBundle.getBundle("hellofx.hello")*/
                     );
+            View root = loader.load();
+            loader.getController(); // TODO: any value in knowing controller?  parameter passing...
             return root;
         }
         catch (IOException e)
@@ -89,8 +104,8 @@ public class App extends MobileApplication
         NavigationDrawer drawer = this.getDrawer();
 
         NavigationDrawer.Header header = new NavigationDrawer.Header(
-                "MAS Finance Tools",
-                "Portfolio Rebalancer",
+                "pBalancer",
+                "Portfolio Manager",
                 new Avatar(21, new Image(getClass().getResourceAsStream("/icon.png"))));
         drawer.setHeader(header);
 
@@ -128,6 +143,7 @@ public class App extends MobileApplication
     {
         Swatch.getDefault().assignTo(scene);
 
+        //setUserAgentStylesheet(STYLESHEET_MODENA); - not functioning
         scene.getStylesheets().add(App.class.getResource("app.css").toExternalForm());
         ((Stage) scene.getWindow()).getIcons().add(new Image(App.class.getResourceAsStream("/icon.png")));
         scene.getWindow().setWidth(800);

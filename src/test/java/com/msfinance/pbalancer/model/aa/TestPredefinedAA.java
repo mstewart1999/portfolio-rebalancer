@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.msfinance.pbalancer.model.aa.PredefinedAA;
 
-class TestPresetAA
+class TestPredefinedAA
 {
 
     @Test

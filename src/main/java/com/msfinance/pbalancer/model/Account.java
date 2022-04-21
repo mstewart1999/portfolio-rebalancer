@@ -1,6 +1,8 @@
 package com.msfinance.pbalancer.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -10,28 +12,45 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Account
 {
+    private final String portfolioId;
     private final String id;
     private String name;
     private String institution;
     private AccountType type;
+    private int listPosition;
+    private BigDecimal lastValue;
+    private Date lastValueTmstp;
 
     private List<Asset> assets;
 
-    public Account()
+    public Account(
+            final String portfolioId
+            )
     {
-        this(UUID.randomUUID().toString());
+        this(portfolioId, UUID.randomUUID().toString());
     }
 
     @JsonCreator
     public Account(
+            @JsonProperty("portfolioId") final String portfolioId,
             @JsonProperty("id") final String id
             )
     {
+        this.portfolioId = Objects.requireNonNull(portfolioId);
         this.id = Objects.requireNonNull(id);
         name = "";
         institution = "";
         type = AccountType.UNDEFINED;
+        listPosition = 0;
+        lastValue = null;
+        lastValueTmstp = null;
         assets = new ArrayList<>();
+    }
+
+    @JsonProperty
+    public String getPortfolioId()
+    {
+        return portfolioId;
     }
 
     @JsonProperty
@@ -59,6 +78,24 @@ public class Account
     }
 
     @JsonProperty
+    public int getListPosition()
+    {
+        return listPosition;
+    }
+
+    @JsonProperty
+    public BigDecimal getLastValue()
+    {
+        return lastValue;
+    }
+
+    @JsonProperty
+    public Date getLastValueTmstp()
+    {
+        return lastValueTmstp;
+    }
+
+    @JsonProperty
     public List<Asset> getAssets()
     {
         return assets;
@@ -80,6 +117,24 @@ public class Account
     public void setType(final AccountType type)
     {
         this.type = Objects.requireNonNull(type);
+    }
+
+    @JsonProperty
+    public void setListPosition(final int listPosition)
+    {
+        this.listPosition = listPosition;
+    }
+
+    @JsonProperty
+    public void setLastValue(final BigDecimal lastValue)
+    {
+        this.lastValue = lastValue;
+    }
+
+    @JsonProperty
+    public void setLastValueTmstp(final Date lastValueTmstp)
+    {
+        this.lastValueTmstp = lastValueTmstp;
     }
 
     @JsonProperty
