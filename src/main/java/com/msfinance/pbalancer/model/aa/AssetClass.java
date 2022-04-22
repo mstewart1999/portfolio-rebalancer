@@ -22,7 +22,6 @@ public class AssetClass
 
     static
     {
-        // lazy load, each invocation gets its own copy
         String fileNm = "AssetClassList.psv";
 
         // find the predefined data file as a resource relative to AA class

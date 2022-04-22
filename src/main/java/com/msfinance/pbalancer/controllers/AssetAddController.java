@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Date;
+import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +17,19 @@ import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.StateManager;
+import com.msfinance.pbalancer.controllers.cells.AssetTickerListCell;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
+import com.msfinance.pbalancer.model.aa.AssetTicker;
+import com.msfinance.pbalancer.model.aa.AssetTickerCache;
 import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.Validation;
 
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -102,7 +112,24 @@ public class AssetAddController
         priceManualPerWholeRB.setToggleGroup(priceToggleGroup);
         // no need for listener here
 
-        // TODO: tickerText auto complete
+        // tickerText auto complete
+        final Map<String,AssetTicker> tickerSuggestions = AssetTickerCache.getInstance().all();
+        AutoCompletionBinding<String> bindAutoCompletion = TextFields.bindAutoCompletion(tickerText, new TickerSuggestionProvider(tickerSuggestions));
+        AutoCompletePopup<String> tickerCompletionPopup = bindAutoCompletion.getAutoCompletionPopup();
+        tickerCompletionPopup.setSkin(new AutoCompletePopupSkin<String>(tickerCompletionPopup, new AssetTickerListCell.Factory(tickerSuggestions)));
+        tickerCompletionPopup.setPrefWidth(500);
+        tickerCompletionPopup.setMaxWidth(500);
+        tickerCompletionPopup.setWidth(500);
+
+        //tickerCompletionPopup.setMaxWidth(tickerText.getMaxWidth());
+        tickerText.textProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(final Observable observable)
+            {
+                onTickerChanged();
+            }
+        });
+        tickerText.textProperty().addListener(e -> onTickerChanged());
     }
 
 
@@ -237,6 +264,20 @@ public class AssetAddController
             autoNameLabel.setText("");
 
             manualNameText.requestFocus();
+        }
+    }
+
+    private void onTickerChanged()
+    {
+        String ticker = tickerText.getText();
+        AssetTicker t = AssetTickerCache.getInstance().lookup(ticker);
+        if(t == null)
+        {
+            autoNameLabel.setText("");
+        }
+        else
+        {
+            autoNameLabel.setText(t.getName());
         }
     }
 

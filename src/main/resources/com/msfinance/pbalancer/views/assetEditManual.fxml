@@ -98,7 +98,7 @@
                   <ComboBox fx:id="assetClassCombo" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                      <children>
-                        <Label text="All" />
+                        <Label text="Show All" />
                         <ToggleSwitch fx:id="allAssetClassesTS" />
                      </children>
                      <GridPane.margin>

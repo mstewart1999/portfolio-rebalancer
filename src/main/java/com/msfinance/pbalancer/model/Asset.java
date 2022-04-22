@@ -88,7 +88,7 @@ public class Asset
     @JsonProperty
     public String getAutoName()
     {
-        return manualName;
+        return autoName;
     }
 
     @JsonProperty

@@ -137,7 +137,7 @@
                   </ComboBox>
                   <HBox GridPane.columnIndex="1" GridPane.rowIndex="4">
                      <children>
-                        <Label text="All" />
+                        <Label text="Show All" />
                         <ToggleSwitch fx:id="allAssetClassesTS" />
                      </children>
                      <GridPane.margin>
