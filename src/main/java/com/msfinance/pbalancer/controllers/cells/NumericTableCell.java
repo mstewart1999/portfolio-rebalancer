@@ -74,7 +74,7 @@ public class NumericTableCell<T> extends TableCell<T,Number>
     {
         public UnitsFactory()
         {
-            super("#,##0.0000");
+            super("#,##0.000");
         }
     }
 }

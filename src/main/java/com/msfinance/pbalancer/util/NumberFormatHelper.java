@@ -1,17 +1,14 @@
 package com.msfinance.pbalancer.util;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 public class NumberFormatHelper
 {
+    private static BigDecimal BILLION = new BigDecimal("1000000000");
     private static BigDecimal MILLION = new BigDecimal("1000000");
     private static BigDecimal THOUSAND = new BigDecimal("1000");
-
-    public static MathContext CURRENCY2_MATH_CONTEXT = new MathContext(2);
-    public static MathContext CURRENCY3_MATH_CONTEXT = new MathContext(3);
-    public static MathContext CURRENCY4_MATH_CONTEXT = new MathContext(4);
 
 
     public static String prettyFormatCurrency(BigDecimal value)
@@ -23,13 +20,19 @@ public class NumberFormatHelper
         DecimalFormat df;
         String suffix;
         // TODO: eventually care about portfolios larger than 1B
-        if(value.doubleValue() > MILLION.doubleValue())
+        if(value.doubleValue() >= BILLION.doubleValue())
+        {
+            value = value.divide(BILLION);
+            suffix = " B";
+            df = new DecimalFormat(significantDigit4Format(value));
+        }
+        else if(value.doubleValue() >= MILLION.doubleValue())
         {
             value = value.divide(MILLION);
             suffix = " M";
             df = new DecimalFormat(significantDigit4Format(value));
         }
-        else if(value.doubleValue() > THOUSAND.doubleValue())
+        else if(value.doubleValue() >= THOUSAND.doubleValue())
         {
             value = value.divide(THOUSAND);
             suffix = " K";
@@ -48,19 +51,19 @@ public class NumberFormatHelper
 
     private static String significantDigit4Format(final BigDecimal value)
     {
-        if(value.doubleValue() > THOUSAND.doubleValue())
+        if(value.doubleValue() >= THOUSAND.doubleValue())
         {
             return "#,##0";
         }
-        else if(value.doubleValue() > 100)
+        else if(value.doubleValue() >= 100)
         {
             return "##0.0";
         }
-        else if(value.doubleValue() > 10)
+        else if(value.doubleValue() >= 10)
         {
             return "#0.00";
         }
-        else if(value.doubleValue() > 1)
+        else if(value.doubleValue() >= 1)
         {
             return "0.000";
         }
@@ -117,19 +120,19 @@ public class NumberFormatHelper
         return new DecimalFormat("#,##0.00").format(val);
     }
 
-    public static BigDecimal parseNumber2(final String val)
+    public static BigDecimal parseNumber4(final String val)
     {
-        return parseNumber(val, CURRENCY2_MATH_CONTEXT);
+        return parseNumber(val, 4);
     }
     public static BigDecimal parseNumber3(final String val)
     {
-        return parseNumber(val, CURRENCY3_MATH_CONTEXT);
+        return parseNumber(val, 3);
     }
-    public static BigDecimal parseNumber4(final String val)
+    public static BigDecimal parseNumber2(final String val)
     {
-        return parseNumber(val, CURRENCY4_MATH_CONTEXT);
+        return parseNumber(val, 2);
     }
-    public static BigDecimal parseNumber(String val, final MathContext mc)
+    private static BigDecimal parseNumber(String val, final int decimals)
     {
         if(Validation.isBlank(val))
         {
@@ -141,9 +144,11 @@ public class NumberFormatHelper
             if(val.contains(","))
             {
                 // BigDecimal does not deal with commas
+                // Europeans might cringe that this isn't localized with thousands separator
                 val = val.replace(",", "");
             }
-            return new BigDecimal(val, mc);
+            val = val.strip();
+            return new BigDecimal(val).setScale(decimals, RoundingMode.HALF_UP);
         }
         catch (NumberFormatException e)
         {
