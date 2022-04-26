@@ -100,9 +100,11 @@ public class AANode
     }
 
     @JsonIgnore
-    public String getPercentOfParentAsString()
+    public String getPercentOfParentIndentedAsString()
     {
-        return percentOfParent.getExpr();
+        int depth = getDepth();
+        String lPad = "    ".repeat(depth);
+        return lPad + percentOfParent.getExpr();
     }
 
     @JsonIgnore
@@ -378,6 +380,45 @@ public class AANode
         {
             child.computePercentOfRoot();
         }
+    }
+
+    @JsonIgnore
+    public String getPath()
+    {
+        if(isRoot())
+        {
+            return "";
+        }
+        return parent.getPath() + "/" + parent.getName();
+    }
+
+    @JsonIgnore
+    public String getPercentOfRootExprAsString()
+    {
+        if(isRoot())
+        {
+            return "";
+        }
+        String thisExpr = percentOfParent.getExpr();
+        if(thisExpr.startsWith("="))
+        {
+            thisExpr = "(" + thisExpr.substring(1) + ")";
+        }
+        if(parent.isRoot())
+        {
+            return thisExpr;
+        }
+        return parent.getPercentOfRootExprAsString() + " * " + thisExpr;
+    }
+
+    @JsonIgnore
+    public int getDepth()
+    {
+        if(isRoot())
+        {
+            return 0;
+        }
+        return parent.getDepth() + 1;
     }
 
 

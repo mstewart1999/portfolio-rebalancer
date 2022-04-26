@@ -49,10 +49,57 @@
 .table-view .column-header .label {
   /*-fx-font-family: monospace;*/
   -fx-font-weight: bold;
-  /*
-  -fx-font-size: 12pt;
-  -fx-text-fill: blue;
-  -fx-background-color: yellow;
-  */
   -fx-alignment: center-left;
 }
+
+
+/* https://edencoding.com/style-tableview-javafx/ */
+/*
+.table-view .column-header-background{
+    -fx-background-color: linear-gradient(to bottom, #1D86D944, #239DFF44);
+    -fx-background-radius: 7px 7px 0px 0px;
+    -fx-background-insets: 0 11px 0 0;
+    -fx-padding: 0 0 5px 0;
+}
+*/
+.table-view .column-header {
+/*    -fx-background-color: transparent;*/
+    -fx-background-color: linear-gradient(to bottom, -primary-swatch-300, -primary-swatch-100);
+    -fx-background-radius: 7px 7px 0px 0px;
+    -fx-background-insets: 0 5px 0 0;
+    -fx-padding: 5px;
+    
+    -fx-border-color: black;
+    -fx-border-radius: 7px 7px 0px 0px;
+    -fx-border-insets: 0 5px 0 0;
+    -fx-border-width: 1px;
+}
+.table-view .column-header-background .filler {
+    -fx-background-color: transparent;
+}
+
+/* see modena.css: https://gist.github.com/maxd/63691840fc372f22f470 */
+.tree-table-view .column-header { 
+    -fx-background-color: linear-gradient(to bottom, -primary-swatch-300, -primary-swatch-100);
+    -fx-background-radius: 7px 7px 0px 0px;
+    -fx-background-insets: 0 5px 0 0;
+    -fx-padding: 5px;
+    
+    -fx-border-color: black;
+    -fx-border-radius: 7px 7px 0px 0px;
+    -fx-border-insets: 0 5px 0 0;
+    -fx-border-width: 1px;
+}
+.tree-table-view .column-header .label { 
+  -fx-font-weight: bold;
+  -fx-alignment: center-left;
+}
+
+
+/* container of buttons */
+/* https://docs.gluonhq.com/charm/4.4.1/#_swatches */
+.pb-toolbox {
+  -fx-padding: 8px;
+  -fx-background-color: linear-gradient(to bottom right, -primary-swatch-200, -alternate-swatch-100);
+}
+

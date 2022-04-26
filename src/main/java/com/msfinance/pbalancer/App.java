@@ -20,6 +20,7 @@ import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.charm.glisten.visual.Swatch;
 import com.msfinance.pbalancer.controllers.PortfolioListController;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.aa.AssetTickerCache;
 import com.msfinance.pbalancer.views.PrimaryView;
 import com.msfinance.pbalancer.views.SecondaryView;
 
@@ -77,6 +78,9 @@ public class App extends MobileApplication
         StateManager.reset();
         StateManager.currentProfile = new Profile("DEFAULT"); // TODO: create new UI for add/switch profile
         StateManager.currentProfile.setName("DEFAULT");
+
+        // TODO: progress bar
+        AssetTickerCache.getInstance();
     }
 
     private View createView(final String fxml)

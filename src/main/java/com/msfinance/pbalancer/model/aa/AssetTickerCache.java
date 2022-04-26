@@ -69,16 +69,17 @@ public class AssetTickerCache
         Map<String,AssetTicker> newKnown = new TreeMap<>();
 
         Path p = Paths.get("./data", MFLIST_FILE_NAME);
+        String url = MFLIST_URL;
         if(!FileUtil.isNewerThanDays(p, 7))
         {
             try
             {
-                FtpDownload.download(p, MFLIST_URL);
-                LOG.info("Downloaded: " + MFLIST_URL);
+                FtpDownload.download(p, url);
+                LOG.info("Downloaded: " + url);
             }
             catch (IOException e)
             {
-                LOG.error("Error Downloading: " + MFLIST_URL, e);
+                LOG.error("Error Downloading: " + url, e);
             }
         }
         try
@@ -92,6 +93,7 @@ public class AssetTickerCache
                 .map(a -> a.toTicker())
                 .forEach(t -> newKnown.put(t.getSymbol(), t))
                 ;
+            LOG.info("Loaded: " + p);
         }
         catch(IOException|NullPointerException|ArrayIndexOutOfBoundsException e)
         {
@@ -99,16 +101,17 @@ public class AssetTickerCache
         }
 
         p = Paths.get("./data", NASDAQ_FILE_NAME);
+        url = NASDAQ_URL;
         if(!FileUtil.isNewerThanDays(p, 7))
         {
             try
             {
-                FtpDownload.download(p, NASDAQ_URL);
-                LOG.info("Downloaded: " + NASDAQ_URL);
+                FtpDownload.download(p, url);
+                LOG.info("Downloaded: " + url);
             }
             catch (IOException e)
             {
-                LOG.error("Error Downloading: " + NASDAQ_URL, e);
+                LOG.error("Error Downloading: " + url, e);
             }
         }
         try
@@ -122,6 +125,7 @@ public class AssetTickerCache
                 .map(a -> a.toTicker())
                 .forEach(t -> newKnown.put(t.getSymbol(), t))
                 ;
+            LOG.info("Loaded: " + p);
         }
         catch(IOException|NullPointerException|ArrayIndexOutOfBoundsException e)
         {
@@ -130,16 +134,17 @@ public class AssetTickerCache
 
 
         p = Paths.get("./data", OTHER_FILE_NAME);
+        url = OTHER_URL;
         if(!FileUtil.isNewerThanDays(p, 7))
         {
             try
             {
-                FtpDownload.download(p, OTHER_URL);
-                LOG.info("Downloaded: " + OTHER_URL);
+                FtpDownload.download(p, url);
+                LOG.info("Downloaded: " + url);
             }
             catch (IOException e)
             {
-                LOG.error("Error Downloading: " + OTHER_URL, e);
+                LOG.error("Error Downloading: " + url, e);
             }
         }
         try
@@ -153,6 +158,7 @@ public class AssetTickerCache
                 .map(a -> a.toTicker())
                 .forEach(t -> newKnown.put(t.getSymbol(), t))
                 ;
+            LOG.info("Loaded: " + p);
         }
         catch(IOException|NullPointerException|ArrayIndexOutOfBoundsException e)
         {

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.model.aa.AANode;
 import com.msfinance.pbalancer.model.aa.AANodeType;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
+import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.aa.DoubleExpression;
 import com.msfinance.pbalancer.model.aa.PredefinedAA;
 import com.msfinance.pbalancer.service.DataFactory;
@@ -55,6 +57,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 
 public class TargetAAController
 {
@@ -159,8 +162,8 @@ public class TargetAAController
 
         tt.getColumns().get(0).setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         TreeTableColumn<AANode,String> ttCol1 = (TreeTableColumn<AANode,String>) tt.getColumns().get(1);
-        ttCol1.setCellValueFactory(new TreeItemPropertyValueFactory<>("percentOfParentAsString"));
-        ttCol1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+    ttCol1.setCellValueFactory(new TreeItemPropertyValueFactory<>("percentOfParentIndentedAsString"));
+    ttCol1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
         TreeTableColumn<AANode,List<PortfolioAlert>> ttCol2 = (TreeTableColumn<AANode,List<PortfolioAlert>>) tt.getColumns().get(2);
         ttCol2.setCellValueFactory(new TreeItemPropertyValueFactory<>("alerts"));
         ttCol2.setCellFactory(new AAAlertsTreeTableCell.Factory());
@@ -168,10 +171,12 @@ public class TargetAAController
         ttCol1.setEditable(true);
         ttCol1.setOnEditCommit(e -> onCommitPercentOfParent(e));
 
-        t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
-        TableColumn<AANode,Double> tcol1 = (TableColumn<AANode, Double>) t.getColumns().get(1);
-        tcol1.setCellValueFactory(new PropertyValueFactory<>("percentOfRoot"));
-        tcol1.setCellFactory(new PercentTableCell.Factory<AANode>());
+        t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("path"));
+        t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
+        TableColumn<AANode,Double> tcol2 = (TableColumn<AANode, Double>) t.getColumns().get(2);
+        tcol2.setCellValueFactory(new PropertyValueFactory<>("percentOfRoot"));
+        tcol2.setCellFactory(new PercentTableCell.Factory<AANode>());
+        t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("percentOfRootExprAsString"));
 
         tt.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
             @Override
@@ -224,6 +229,8 @@ public class TargetAAController
             customizePane.setVisible(true);
             tt.setEditable(true);
         }
+
+        onAASelectionChanged();
     }
 
     private void onPredefinedAASelection()
@@ -274,6 +281,8 @@ public class TargetAAController
         tt.setRoot(convertToUI(StateManager.currentAssetAllocation.getRoot()));
         expandAll(tt.getRoot());
         tt.refresh();
+
+        onAASelectionChanged();
     }
     private void populateFlatView()
     {
@@ -349,6 +358,7 @@ public class TargetAAController
     {
         if(predefinedRB.isSelected())
         {
+            save();
             StateManager.currentUrl = HelpUrls.TARGET_AA_PREDEFINED_HELP_URL;
             view.getAppManager().switchView(App.WEB_VIEW);
         }
@@ -358,6 +368,7 @@ public class TargetAAController
     {
         if(customRB.isSelected())
         {
+            save();
             StateManager.currentUrl = HelpUrls.TARGET_AA_CUSTOM_HELP_URL;
             view.getAppManager().switchView(App.WEB_VIEW);
         }
@@ -369,6 +380,7 @@ public class TargetAAController
         {
             if(predefinedCombo.getSelectionModel().getSelectedItem() != null)
             {
+                save();
                 // TODO: try to open system browser for this one!  page is too complicated and makes it buggy
                 PredefinedAA p = predefinedCombo.getSelectionModel().getSelectedItem();
                 StateManager.currentUrl = p.getUrl();
@@ -504,8 +516,10 @@ public class TargetAAController
 
         TextInputDialog inputdialog = new TextInputDialog("");
         inputdialog.setContentText("Name: ");
-        inputdialog.setHeaderText("Enter a name for the group");
-        inputdialog.setTitle("Add Group");
+        inputdialog.setHeaderText("Enter a name for the category");
+        inputdialog.setTitle("Add Category");
+        inputdialog.initOwner(view.getScene().getWindow());
+        inputdialog.initModality(Modality.WINDOW_MODAL);
         inputdialog.showAndWait();
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))
@@ -545,10 +559,15 @@ public class TargetAAController
             listPos = currMaxListPosition.get() + 1;
         }
 
-        ChoiceDialog<String> inputdialog = new ChoiceDialog<>("", "EQ", "FI", "CASH");
+        List<String> choices = AssetClass.list().stream()
+                .map(ac -> ac.getCode())
+                .collect(Collectors.toList());
+        ChoiceDialog<String> inputdialog = new ChoiceDialog<>("", choices);
         inputdialog.setContentText("Name: ");
-        inputdialog.setHeaderText("Choose the asset class");
-        inputdialog.setTitle("Add Asset");
+        inputdialog.setHeaderText("Choose the holding (asset class)");
+        inputdialog.setTitle("Add Holding");
+        inputdialog.initOwner(view.getScene().getWindow());
+        inputdialog.initModality(Modality.WINDOW_MODAL);
         inputdialog.showAndWait();
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))

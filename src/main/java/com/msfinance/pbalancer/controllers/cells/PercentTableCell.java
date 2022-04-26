@@ -23,11 +23,12 @@ public class PercentTableCell<T> extends TableCell<T,Double>
         if(value == null)
         {
             setText("");
+            setAlignment(Pos.TOP_RIGHT);
         }
         else
         {
             setText(String.format(format, value.doubleValue()*100) + " %");
-            setAlignment(Pos.CENTER_RIGHT);
+            setAlignment(Pos.TOP_RIGHT); // CENTER_RIGHT seems more appropriate, but doesn't align with other cells
         }
     }
 

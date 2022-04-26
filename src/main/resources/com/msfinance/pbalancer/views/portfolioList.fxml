@@ -94,7 +94,7 @@
       </GridPane>
    </top>
    <right>
-      <VBox spacing="8.0" BorderPane.alignment="CENTER">
+      <VBox spacing="12.0" styleClass="pb-toolbox" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="addButton" alignment="CENTER" defaultButton="true" mnemonicParsing="false" text="Add">
                <padding>

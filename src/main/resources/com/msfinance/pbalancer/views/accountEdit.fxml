@@ -69,7 +69,7 @@
       </AnchorPane>
    </center>
    <right>
-      <VBox spacing="8.0" BorderPane.alignment="CENTER">
+      <VBox spacing="12.0" styleClass="pb-toolbox" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="addButton" mnemonicParsing="false" text="Add">
                <tooltip>
