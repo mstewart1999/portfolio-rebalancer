@@ -502,7 +502,6 @@ public class TargetAAController
         Validation.assertNonNull(item);
 
         AANode aan = item.getValue();
-        String id = UUID.randomUUID().toString();
         int listPos = 1;
         Optional<Integer> currMaxListPosition = aan
             .children()
@@ -524,15 +523,19 @@ public class TargetAAController
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))
         {
+            String id = UUID.randomUUID().toString();
             AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.G);
-            TreeItem<AANode> child = new TreeItem<>(aanChild);
+            aanChild.setParent(aan);
             aan.addChild(aanChild);
+
+            TreeItem<AANode> child = new TreeItem<>(aanChild);
             item.getChildren().add(child);
 
             try
             {
                 tt.getRoot().getValue().validate();
                 tt.refresh();
+                populateFlatView();
             }
             catch (InvalidDataException e)
             {
@@ -547,7 +550,6 @@ public class TargetAAController
         Validation.assertNonNull(item);
 
         AANode aan = item.getValue();
-        String id = UUID.randomUUID().toString();
         int listPos = 1;
         Optional<Integer> currMaxListPosition = aan
             .children()
@@ -572,15 +574,19 @@ public class TargetAAController
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))
         {
+            String id = UUID.randomUUID().toString();
             AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.AC);
-            TreeItem<AANode> child = new TreeItem<>(aanChild);
+            aanChild.setParent(aan);
             aan.addChild(aanChild);
+
+            TreeItem<AANode> child = new TreeItem<>(aanChild);
             item.getChildren().add(child);
 
             try
             {
                 tt.getRoot().getValue().validate();
                 tt.refresh();
+                populateFlatView();
             }
             catch (InvalidDataException e)
             {
