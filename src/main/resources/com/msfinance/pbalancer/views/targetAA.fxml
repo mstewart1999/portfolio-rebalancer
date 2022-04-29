@@ -63,11 +63,11 @@
               <tabs>
                 <Tab closable="false" text="Nested">
                   <content>
-                    <AnchorPane minHeight="100.0" minWidth="100.0" prefHeight="100.0" prefWidth="100.0">
+                    <AnchorPane minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0">
                            <children>
-                              <BorderPane prefHeight="100.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <BorderPane minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <center>
-                                    <TreeTableView fx:id="tt" editable="true">
+                                    <TreeTableView fx:id="tt" editable="true" minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0">
                                       <columns>
                                         <TreeTableColumn editable="false" prefWidth="200.0" sortable="false" text="Category/Holding" />
                                           <TreeTableColumn prefWidth="110.0" sortable="false" text="\% of Category" />
@@ -76,41 +76,45 @@
                                     </TreeTableView>
                                  </center>
                                  <right>
-                                    <VBox fx:id="customizePane" spacing="12.0" styleClass="pb-toolbox" BorderPane.alignment="TOP_CENTER">
-                                       <children>
-                                          <Button fx:id="addGroupButton" mnemonicParsing="false" text="Category">
-                                             <tooltip>
-                                                <Tooltip text="Add a group node to the selected item" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="addAssetButton" mnemonicParsing="false" text="Holding">
-                                             <tooltip>
-                                                <Tooltip text="Add an asset node to the selected item" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="upButton" mnemonicParsing="false" text="Up">
-                                             <tooltip>
-                                                <Tooltip text="Move selected item up" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="downButton" mnemonicParsing="false" text="Down">
-                                             <tooltip>
-                                                <Tooltip text="Move selected item down" />
-                                             </tooltip>
-                                          </Button>
-                                          <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
-                                             <tooltip>
-                                                <Tooltip text="Delete selected item" />
-                                             </tooltip>
-                                          </Button>
-                                       </children>
+                                    <AnchorPane BorderPane.alignment="TOP_CENTER">
                                        <BorderPane.margin>
                                           <Insets />
                                        </BorderPane.margin>
-                                       <padding>
-                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-                                       </padding>
-                                    </VBox>
+                                       <children>
+                                          <VBox fx:id="customizePane" spacing="12.0" styleClass="pb-toolbox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <Button fx:id="addGroupButton" mnemonicParsing="false" text="Category">
+                                                   <tooltip>
+                                                      <Tooltip text="Add a group node to the selected item" />
+                                                   </tooltip>
+                                                </Button>
+                                                <Button fx:id="addAssetButton" mnemonicParsing="false" text="Holding">
+                                                   <tooltip>
+                                                      <Tooltip text="Add an asset node to the selected item" />
+                                                   </tooltip>
+                                                </Button>
+                                                <Button fx:id="upButton" mnemonicParsing="false" text="Up">
+                                                   <tooltip>
+                                                      <Tooltip text="Move selected item up" />
+                                                   </tooltip>
+                                                </Button>
+                                                <Button fx:id="downButton" mnemonicParsing="false" text="Down">
+                                                   <tooltip>
+                                                      <Tooltip text="Move selected item down" />
+                                                   </tooltip>
+                                                </Button>
+                                                <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
+                                                   <tooltip>
+                                                      <Tooltip text="Delete selected item" />
+                                                   </tooltip>
+                                                </Button>
+                                             </children>
+                                             <padding>
+                                                <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                             </padding>
+                                          </VBox>
+                                       </children>
+                                    </AnchorPane>
                                  </right>
                               </BorderPane>
                            </children>

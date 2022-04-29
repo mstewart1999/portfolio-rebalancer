@@ -162,8 +162,8 @@ public class TargetAAController
 
         tt.getColumns().get(0).setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         TreeTableColumn<AANode,String> ttCol1 = (TreeTableColumn<AANode,String>) tt.getColumns().get(1);
-    ttCol1.setCellValueFactory(new TreeItemPropertyValueFactory<>("percentOfParentIndentedAsString"));
-    ttCol1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+        ttCol1.setCellValueFactory(new TreeItemPropertyValueFactory<>("percentOfParentIndentedAsString"));
+        ttCol1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
         TreeTableColumn<AANode,List<PortfolioAlert>> ttCol2 = (TreeTableColumn<AANode,List<PortfolioAlert>>) tt.getColumns().get(2);
         ttCol2.setCellValueFactory(new TreeItemPropertyValueFactory<>("alerts"));
         ttCol2.setCellFactory(new AAAlertsTreeTableCell.Factory());

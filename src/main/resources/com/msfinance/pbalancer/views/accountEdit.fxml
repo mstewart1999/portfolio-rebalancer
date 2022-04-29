@@ -55,11 +55,11 @@
          <children>
             <TableView fx:id="t" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columns>
-                <TableColumn editable="false" prefWidth="133.3333740234375" sortable="false" text="Symbol" />
-                  <TableColumn editable="false" prefWidth="75.0" sortable="false" text="Name" />
-                  <TableColumn editable="false" prefWidth="150.0" sortable="false" text="Asset Class" />
-                  <TableColumn editable="false" prefWidth="75.0" sortable="false" text="Units" />
-                  <TableColumn id="value" editable="false" prefWidth="115.3333740234375" sortable="false" text="\$" />
+                <TableColumn editable="false" prefWidth="90.0" sortable="false" text="Symbol" />
+                  <TableColumn editable="false" prefWidth="250.0" sortable="false" text="Name" />
+                  <TableColumn editable="false" prefWidth="120.0" sortable="false" text="Asset Class" />
+                  <TableColumn id="unitsCol" editable="false" prefWidth="100.0" sortable="false" text="Units" />
+                  <TableColumn id="valueCol" editable="false" prefWidth="115.3333740234375" sortable="false" text="\$" />
               </columns>
             </TableView>
          </children>
@@ -69,43 +69,53 @@
       </AnchorPane>
    </center>
    <right>
-      <VBox spacing="12.0" styleClass="pb-toolbox" BorderPane.alignment="CENTER">
+      <AnchorPane BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="addButton" mnemonicParsing="false" text="Add">
-               <tooltip>
-                  <Tooltip text="Add an asset node to the selected item" />
-               </tooltip>
-            </Button>
-            <Button fx:id="editButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="View/Edit">
-               <tooltip>
-                  <Tooltip text="Add an asset node to the selected item" />
-               </tooltip>
-            </Button>
-            <Button fx:id="upButton" mnemonicParsing="false" text="Up">
-               <tooltip>
-                  <Tooltip text="Move selected item up" />
-               </tooltip>
-            </Button>
-            <Button fx:id="downButton" mnemonicParsing="false" text="Down">
-               <tooltip>
-                  <Tooltip text="Move selected item down" />
-               </tooltip>
-            </Button>
-            <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
-               <tooltip>
-                  <Tooltip text="Delete selected item" />
-               </tooltip>
-            </Button>
-            <Button fx:id="refreshButton" layoutX="10.0" layoutY="132.0" mnemonicParsing="false" text="Refresh Prices">
-               <tooltip>
-                  <Tooltip text="Delete selected item" />
-               </tooltip>
-            </Button>
+            <VBox spacing="12.0" styleClass="pb-toolbox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Button fx:id="addButton" mnemonicParsing="false" text="Add">
+                     <tooltip>
+                        <Tooltip text="Add an asset node to the selected item" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="editButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="View/Edit">
+                     <tooltip>
+                        <Tooltip text="Add an asset node to the selected item" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="upButton" mnemonicParsing="false" text="Up">
+                     <tooltip>
+                        <Tooltip text="Move selected item up" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="downButton" mnemonicParsing="false" text="Down">
+                     <tooltip>
+                        <Tooltip text="Move selected item down" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
+                     <tooltip>
+                        <Tooltip text="Delete selected item" />
+                     </tooltip>
+                  </Button>
+                  <Button fx:id="refreshButton" layoutX="10.0" layoutY="132.0" mnemonicParsing="false" text="Refresh Prices">
+                     <tooltip>
+                        <Tooltip text="Delete selected item" />
+                     </tooltip>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </VBox>
          </children>
          <padding>
             <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
          </padding>
-      </VBox>
+      </AnchorPane>
    </right>
    <top>
       <GridPane BorderPane.alignment="CENTER">

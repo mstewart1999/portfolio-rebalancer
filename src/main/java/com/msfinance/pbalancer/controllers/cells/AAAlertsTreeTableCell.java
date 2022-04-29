@@ -14,6 +14,8 @@ import com.msfinance.pbalancer.model.aa.AANode;
 
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
 public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAlert>>
@@ -28,7 +30,7 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
         {
             setText("");
             setGraphic(null);
-            this.getStyleClass().clear();
+//            this.getStyleClass().clear();
         }
         else
         {
@@ -37,24 +39,27 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
             List<PortfolioAlert> infoAlerts = alerts.stream().filter(a -> a.level() == INFO).collect(Collectors.toList());
             List<PortfolioAlert> activeAlerts = Collections.emptyList();
 
-            this.getStyleClass().clear();
+//            this.getStyleClass().clear();
             if(errorAlerts.size() > 0)
             {
                 activeAlerts = errorAlerts;
                 setGraphic(MaterialDesignIcon.ERROR.graphic());
-                this.getStyleClass().add("has-error-alert");
+                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/error48.png"))));
+//                this.getStyleClass().add("has-error-alert");
             }
             else if(warnAlerts.size() > 0)
             {
                 activeAlerts = warnAlerts;
                 setGraphic(MaterialDesignIcon.WARNING.graphic());
-                this.getStyleClass().add("has-warn-alert");
+                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/warn48.png"))));
+//                this.getStyleClass().add("has-warn-alert");
             }
             else if(infoAlerts.size() > 0)
             {
                 activeAlerts = infoAlerts;
                 setGraphic(MaterialDesignIcon.INFO.graphic());
-                this.getStyleClass().add("has-info-alert");
+                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/info48.png"))));
+//                this.getStyleClass().add("has-info-alert");
             }
 
             StringBuilder sb = new StringBuilder();
