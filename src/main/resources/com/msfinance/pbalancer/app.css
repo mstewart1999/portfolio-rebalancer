@@ -2,39 +2,34 @@
   -pb-error-color: #FF5050;
   -pb-warn-color: #FFFF50;
   -pb-info-color: #5050FF;
+  
+  -pb-gray-100: #F5F5F5;
+  -pb-gray-200: #EEEEEE;
 }
+
 
 /*
-.tree-table-cell {
-  -fx-min-height: 30px;
-  -fx-font-family: monospace;
-}
-.table-cell {
-  -fx-min-height: 30px;
-  -fx-font-family: monospace;
-}
-
-
-// TODO: these seem to not work properly
 .tree-table-row-cell {
   -fx-background-color: white;
 }
-.tree-table-row-cell .table-cell {
+*/
+.tree-table-row-cell .tree-table-cell {
   -fx-border-width: 0.5px;
   -fx-border-color: gray gray gray gray;
 }
 .tree-table-row-cell:empty {
   -fx-background-color: transparent;
 }
-.tree-table-row-cell:empty .table-cell {
+.tree-table-row-cell:empty .tree-table-cell {
   -fx-border-width: 0px;
 }
-*/
 
 
+/*
 .table-row-cell {
   -fx-background-color: white;
 }
+*/
 .table-row-cell .table-cell {
   -fx-border-width: 0.5px;
   -fx-border-color: gray gray gray gray;
@@ -47,11 +42,22 @@
 }
 
 .table-view .column-header .label {
-  /*-fx-font-family: monospace;*/
+  -fx-text-fill: black;
+  -fx-font-size: 14px;
   -fx-font-weight: bold;
   -fx-alignment: center-left;
 }
 
+.table-view {
+  -fx-border-color: black;
+  -fx-border-width: 1px;
+  -fx-effect: dropshadow(three-pass-box,-elevation-shadow-color, 2, 0, 0, 1);
+}
+.tree-table-view {
+  -fx-border-color: black;
+  -fx-border-width: 1px;
+  -fx-effect: dropshadow(three-pass-box,-elevation-shadow-color, 2, 0, 0, 1);
+}
 
 /* https://edencoding.com/style-tableview-javafx/ */
 /*
@@ -90,7 +96,9 @@
     -fx-border-insets: 0 5px 0 0;
     -fx-border-width: 1px;
 }
-.tree-table-view .column-header .label { 
+.tree-table-view .column-header .label {
+  -fx-text-fill: black;
+  -fx-font-size: 14px;
   -fx-font-weight: bold;
   -fx-alignment: center-left;
 }
@@ -100,6 +108,10 @@
 /* https://docs.gluonhq.com/charm/4.4.1/#_swatches */
 .pb-toolbox {
   -fx-padding: 8px;
-  -fx-background-color: linear-gradient(to bottom right, -primary-swatch-200, -alternate-swatch-100);
+  -fx-background-color: linear-gradient(to bottom right, -pb-gray-100, -pb-gray-200);
+
+  -fx-border-color: black;
+  -fx-border-width: 1px;
+  -fx-effect: dropshadow(three-pass-box,-elevation-shadow-color, 2, 0, 0, 1);
 }
 
