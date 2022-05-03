@@ -32,9 +32,8 @@ public class AssetAllocation
         setNodeCsvs(nodeCsvs);
     }
 
-    public AssetAllocation() throws InvalidDataException
+    public AssetAllocation()
     {
-//        this(PredefinedAA.THREE_FUND, PredefinedAA.THREE_FUND.getAA().getNodeCsvs());
         setPredefined(null);
         // make a dummy AA
         this.root = AANode.createRoot();

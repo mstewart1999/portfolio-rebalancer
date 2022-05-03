@@ -1,11 +1,8 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,20 +40,11 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-public class PortfolioListController
+public class PortfolioListController extends BaseController<Profile,Profile>
 {
     private static final Logger LOG = LoggerFactory.getLogger(PortfolioListController.class);
 
     public static final String APP_BAR_TITLE = "Portfolio List";
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-    @FXML
-    private View view;
 
     @FXML
     private Label nameLabel;
@@ -86,11 +74,17 @@ public class PortfolioListController
     private Button refreshButton;
 
 
+    private boolean positionsDirty;
+
+
+    public PortfolioListController()
+    {
+        super(BounceInRightTransition::new);
+    }
+
     @FXML
     void initialize() throws IOException
     {
-        // indicates fxml naming mismatch
-        Validation.assertNonNull(view);
         Validation.assertNonNull(nameLabel);
         Validation.assertNonNull(totalValueLabel);
         Validation.assertNonNull(t);
@@ -100,20 +94,6 @@ public class PortfolioListController
         Validation.assertNonNull(downButton);
         Validation.assertNonNull(deleteButton);
         Validation.assertNonNull(refreshButton);
-
-        // critical to get proper scrollbar behavior
-        view.setMinSize(100, 100);
-        view.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-        ((AnchorPane)t.getParent()).setPrefSize(20, 20);
-        t.setPrefSize(20, 20);
-
-        view.setShowTransitionFactory(BounceInRightTransition::new);
-        view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
-
-        view.setOnShowing(e -> {
-            populateData();
-            updateAppBar();
-        });
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
         TableColumn<Portfolio,PortfolioGoal> tCol1 = (TableColumn<Portfolio,PortfolioGoal>) t.getColumns().get(1);
@@ -158,30 +138,45 @@ public class PortfolioListController
         refreshButton.setOnAction(e -> onRefresh());
     }
 
-    protected void populateData()
+    @Override
+    public void initializeApp(final App app, final View root)
     {
-        try
-        {
-            List<Portfolio> items = DataFactory.get().getPortfolios(StateManager.currentProfile.getId());
-            items.sort(Comparator.comparing(Portfolio::getName));
+        super.initializeApp(app, root);
 
-            nameLabel.setText(StateManager.currentProfile.getName());
-            populateTotalValue();
+//        // UGGG: major flaw, this never gets called from drawer, or on first init
+//        getRoot().setOnShowing(e -> {
+//            call(StateManager.currentProfile, null, null);
+//        });
+    }
 
-            t.getSelectionModel().clearSelection();
-            t.setItems(FXCollections.observableList( items ));
+    @Override
+    protected void doSizing()
+    {
+        super.doSizing();
+        // critical to get proper scrollbar behavior
+        getRoot().setMinSize(100, 100);
+        getRoot().setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        ((AnchorPane)t.getParent()).setPrefSize(20, 20);
+        t.setPrefSize(20, 20);
+    }
 
-        }
-        catch (IOException e)
-        {
-            LOG.error("Error loading portfolios", e);
-            view.getAppManager().showMessage("Error loading portfolios");
-        }
+    @Override
+    protected void populateData(final Profile profile)
+    {
+        List<Portfolio> items = profile.getPortfolios();
+
+        nameLabel.setText(profile.getName());
+        populateTotalValue();
+
+        t.getSelectionModel().clearSelection();
+        t.setItems(FXCollections.observableList( items ));
+        t.refresh();
+        positionsDirty = false;
     }
 
     private void populateTotalValue()
     {
-        Profile p = StateManager.currentProfile;
+        Profile p = getIn();
         if(p.getLastValue() != null)
         {
             totalValueLabel.setText("$ " + NumberFormatHelper.prettyFormatCurrency(p.getLastValue()));
@@ -192,10 +187,10 @@ public class PortfolioListController
         }
     }
 
-    protected void updateAppBar()
+    @Override
+    protected void updateAppBar(final AppBar appBar)
     {
-        final AppBar appBar = view.getAppManager().getAppBar();
-        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> view.getAppManager().getDrawer().open()));
+        appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> getApp().showDrawer()));
         appBar.getActionItems().clear();
 // TODO
 //        appBar.getActionItems().add(MaterialDesignIcon.ADD_CIRCLE.button(e -> addPortfolio()));
@@ -219,19 +214,24 @@ public class PortfolioListController
 
     private boolean save()
     {
-        Portfolio p = StateManager.currentPortfolio;
-        try
+        // NOTE: any changes to table data, other than "positions" has already been saved
+        if(positionsDirty)
         {
-            DataFactory.get().createPortfolio(p);
-            StateManager.currentPortfolio = p;
-            return true;
+            try
+            {
+                for(Portfolio p : getIn().getPortfolios())
+                {
+                    DataFactory.get().updatePortfolio(p);
+                }
+            }
+            catch (IOException e)
+            {
+                LOG.error("Error updating portfolio positions for profile: " + getIn().getId(), e);
+                getApp().showMessage("Error updating portfolio positions");
+                return false;
+            }
         }
-        catch (IOException e)
-        {
-            LOG.error("Error creating portfolio: " + p.getId(), e);
-            view.getAppManager().showMessage("Error creating portfolio: " + p.getId());
-            return false;
-        }
+        return true;
     }
 
     private void onAdd()
@@ -247,16 +247,42 @@ public class PortfolioListController
             listPosition = currMaxListPosition.get() + 1;
         }
 
-        Portfolio item = new Portfolio(StateManager.currentProfile.getId());
+        Portfolio item = new Portfolio(getIn().getId());
         item.setName("");
         item.setListPosition(listPosition);
-        t.getItems().add(item);
-
-        StateManager.currentPortfolio = item;
-        if(save())
+        // link into hierarchy
+        item.setProfile(getIn());
+        getIn().getPortfolios().add(item);
+        try
         {
-            view.getAppManager().switchView(App.PORTFOLIO_VIEW); // TODO: ViewStackPolicy.USE
+            DataFactory.get().createPortfolio(item);
         }
+        catch (IOException e)
+        {
+            LOG.error("Error creating portfolio: " + item.getId(), e);
+            getApp().showMessage("Error creating portfolio");
+        }
+
+        getApp().<Portfolio,Portfolio>mySwitchView(App.PORTFOLIO_VIEW, item,
+                p -> {
+                    t.refresh();
+                    populateTotalValue();
+                },
+                () -> {
+                    // remove it upon cancel
+                    getIn().getPortfolios().remove(item);
+                    t.refresh();
+
+                    try
+                    {
+                        DataFactory.get().deletePortfolio(item);
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.error("Error deleting portfolio: " + item.getId(), e);
+                        getApp().showMessage("Error deleting portfolio");
+                    }
+                });
     }
 
     private void onEdit()
@@ -264,9 +290,14 @@ public class PortfolioListController
         Portfolio item = t.getSelectionModel().getSelectedItem();
         Validation.assertNonNull(item);
 
-        StateManager.currentPortfolio = item;
-        //save();
-        view.getAppManager().switchView(App.PORTFOLIO_VIEW);
+        getApp().<Portfolio,Portfolio>mySwitchView(App.PORTFOLIO_VIEW, item,
+                p -> {
+                    t.refresh();
+                    populateTotalValue();
+                },
+                () -> {
+                    // no-op
+                });
     }
 
     private void onUp()
@@ -299,6 +330,9 @@ public class PortfolioListController
             {
                 t.getItems().get(i).setListPosition(i);
             }
+
+            positionsDirty = true;
+            save();
         }
     }
 
@@ -332,6 +366,9 @@ public class PortfolioListController
             {
                 t.getItems().get(i).setListPosition(i);
             }
+
+            positionsDirty = true;
+            save();
         }
     }
 
@@ -347,19 +384,30 @@ public class PortfolioListController
             try
             {
                 DataFactory.get().deletePortfolio(item);
-                view.getAppManager().showMessage("Deleted: " + item.getId());
+                getApp().showMessage("Deleted portfolio");
             }
             catch (IOException e)
             {
-                LOG.error("Error deleting: " + StateManager.currentPortfolio.getId(), e);
-                view.getAppManager().showMessage("Error deleting: " + item.getId());
+                LOG.error("Error deleting portfolio: " + item.getId(), e);
+                getApp().showMessage("Error deleting portfolio: " + item.getId());
             }
 
             t.getItems().remove(item);
-
             t.refresh();
-            StateManager.recalculateProfileValue();
+
+            StateManager.recalculateProfileValue(getIn());
+
             populateTotalValue();
+
+            try
+            {
+                DataFactory.get().updateProfile(getIn());
+            }
+            catch (IOException e)
+            {
+                LOG.error("Error updating totals for profile: " + getIn().getId(), e);
+                getApp().showMessage("Error updating totals for profile: " + item.getId());
+            }
         }
     }
 

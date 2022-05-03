@@ -8,7 +8,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.util.Validation;
 
 public class Account
 {
@@ -21,6 +23,7 @@ public class Account
     private BigDecimal lastValue;
     private Date lastValueTmstp;
 
+    private Portfolio portfolio;
     private List<Asset> assets;
 
     public Account(
@@ -44,6 +47,7 @@ public class Account
         listPosition = 0;
         lastValue = null;
         lastValueTmstp = null;
+        portfolio = null;
         assets = new ArrayList<>();
     }
 
@@ -95,7 +99,13 @@ public class Account
         return lastValueTmstp;
     }
 
-    @JsonProperty
+    @JsonIgnore
+    public Portfolio getPortfolio()
+    {
+        return portfolio;
+    }
+
+    @JsonIgnore
     public List<Asset> getAssets()
     {
         return assets;
@@ -137,7 +147,14 @@ public class Account
         this.lastValueTmstp = lastValueTmstp;
     }
 
-    @JsonProperty
+    @JsonIgnore
+    public void setPortfolio(final Portfolio portfolio)
+    {
+        Validation.assertTrue(this.portfolioId.equals(portfolio.getId()));
+        this.portfolio = portfolio;
+    }
+
+    @JsonIgnore
     public void setAssets(final List<Asset> assets)
     {
         this.assets = Objects.requireNonNull(assets);

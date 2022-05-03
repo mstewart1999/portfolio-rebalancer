@@ -1,12 +1,9 @@
 package com.msfinance.pbalancer.controllers;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.ToggleSwitch;
@@ -14,38 +11,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
-import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.aa.AssetClass;
-import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
-public class AssetEditManualController
+public class AssetEditManualController extends BaseController<Asset,Asset>
 {
     private static final Logger LOG = LoggerFactory.getLogger(AssetEditManualController.class);
     public static final String APP_BAR_TITLE = "Edit Manual Asset";
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-
-    @FXML
-    private View view;
 
     @FXML
     private ToggleSwitch allAssetClassesTS;
@@ -71,11 +58,24 @@ public class AssetEditManualController
     @FXML
     private Label valuePerWholeContentLabel;
 
+    @FXML
+    private ButtonBar buttonBar;
+
+    @FXML
+    private Button cancelBtn;
+
+    @FXML
+    private Button saveBtn;
+
+
+    public AssetEditManualController()
+    {
+        super(null);
+    }
 
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(view);
         Validation.assertNonNull(allAssetClassesTS);
         Validation.assertNonNull(assetClassCombo);
         Validation.assertNonNull(manualNameLabel);
@@ -84,27 +84,30 @@ public class AssetEditManualController
         Validation.assertNonNull(valuePerUnitText);
         Validation.assertNonNull(valuePerWholeLabelLabel);
         Validation.assertNonNull(valuePerWholeContentLabel);
-
-        //view.setShowTransitionFactory(BounceInRightTransition::new);
-        view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
-
-        view.setOnShowing(e -> {
-            populateData();
-            updateAppBar();
-        });
+        Validation.assertNonNull(buttonBar);
+        Validation.assertNonNull(cancelBtn);
+        Validation.assertNonNull(saveBtn);
 
         allAssetClassesTS.selectedProperty().addListener(e -> populateAssetClasses());
         assetClassCombo.setEditable(true); // allow entry of item not in list
 
         unitsText.textProperty().addListener((observable, oldValue, newValue) -> onValueChanged());
         valuePerUnitText.textProperty().addListener((observable, oldValue, newValue) -> onValueChanged());
+
+        ButtonBar.setButtonData(cancelBtn, ButtonData.CANCEL_CLOSE);
+        ButtonBar.setButtonData(saveBtn, ButtonData.FINISH);
+        cancelBtn.setGraphic(MaterialDesignIcon.CANCEL.graphic());
+        saveBtn.setGraphic(MaterialDesignIcon.SAVE.graphic());
+
+        cancelBtn.setOnAction(e -> onCancel());
+        saveBtn.setOnAction(e -> onSave());
     }
 
 
-    protected void populateData()
+    @Override
+    protected void populateData(final Asset asset)
     {
-        AssetAllocation aa = StateManager.currentPortfolio.getTargetAA();
-        Asset asset = StateManager.currentAsset;
+        AssetAllocation aa = asset.getAccount().getPortfolio().getTargetAA();
         Validation.assertNull(asset.getTicker());
         Validation.assertNonNull(asset.getManualName());
         Validation.assertTrue((asset.getPricingType() == PricingType.MANUAL_PER_UNIT) || (asset.getPricingType() == PricingType.MANUAL_PER_WHOLE));
@@ -167,7 +170,7 @@ public class AssetEditManualController
         }
         else
         {
-            AssetAllocation aa = StateManager.currentPortfolio.getTargetAA();
+            AssetAllocation aa = getIn().getAccount().getPortfolio().getTargetAA();
             if(aa != null)
             {
                 assetClasses = aa.getRoot().allLeaves()
@@ -183,56 +186,48 @@ public class AssetEditManualController
     }
 
 
-    protected void updateAppBar()
+    @Override
+    protected void updateAppBar(final AppBar appBar)
     {
-        final AppBar appBar = view.getAppManager().getAppBar();
-        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
+        //appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.getActionItems().add(MaterialDesignIcon.HELP.button(e -> visitHelp()));
         appBar.setTitleText(APP_BAR_TITLE);
     }
 
-    private void goBack()
+    private void onCancel()
+    {
+        returnFailure();
+    }
+
+    private void onSave()
     {
         if(save())
         {
-            view.getAppManager().switchToPreviousView();
+            returnSuccess(getIn());
         }
     }
 
     private boolean save()
     {
-        try
-        {
-            Asset asset = StateManager.currentAsset;
-            asset.setAssetClass(assetClassCombo.getValue());
-            asset.setUnits(NumberFormatHelper.parseNumber3(unitsText.getText()));
+        Asset asset = getIn();
+        asset.setAssetClass(assetClassCombo.getValue());
+        asset.setUnits(NumberFormatHelper.parseNumber3(unitsText.getText()));
 
-            if(asset.getPricingType() == PricingType.MANUAL_PER_UNIT)
-            {
-                asset.setManualValue(NumberFormatHelper.parseNumber4(valuePerUnitText.getText()));
-                asset.setManualValueTmstp(new Date());
-            }
-            else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
-            {
-                asset.setManualValue(NumberFormatHelper.parseNumber2(valuePerUnitText.getText()));
-                asset.setManualValueTmstp(new Date());
-            }
-            // TODO: better validation and error msg UX
-            StateManager.recalculateAccountValue();
-            StateManager.recalculatePortfolioValue();
-            StateManager.recalculateProfileValue();
-
-            AssetClass.add(asset.getAssetClass());
-            DataFactory.get().updatePortfolio(StateManager.currentPortfolio);
-            return true;
-        }
-        catch (IOException e)
+        if(asset.getPricingType() == PricingType.MANUAL_PER_UNIT)
         {
-            LOG.error("Error updating: " + StateManager.currentPortfolio.getId(), e);
-            view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolio.getId());
-            return false;
+            asset.setManualValue(NumberFormatHelper.parseNumber4(valuePerUnitText.getText()));
+            asset.setManualValueTmstp(new Date());
         }
+        else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
+        {
+            asset.setManualValue(NumberFormatHelper.parseNumber2(valuePerUnitText.getText()));
+            asset.setManualValueTmstp(new Date());
+        }
+        // TODO: better validation and error msg UX
+
+        AssetClass.add(asset.getAssetClass());
+        return true;
     }
 
     private void onValueChanged()
@@ -246,7 +241,6 @@ public class AssetEditManualController
 
     private void visitHelp()
     {
-        StateManager.currentUrl = HelpUrls.ASSET_EDIT_MANUAL_HELP_URL;
-        view.getAppManager().switchView(App.WEB_VIEW);
+        getApp().<String,Void>mySwitchView(App.WEB_VIEW, HelpUrls.ASSET_EDIT_MANUAL_HELP_URL);
     }
 }

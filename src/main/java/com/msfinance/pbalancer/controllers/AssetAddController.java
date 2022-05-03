@@ -1,11 +1,8 @@
 package com.msfinance.pbalancer.controllers;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.Date;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
@@ -13,16 +10,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
-import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AssetTickerListCell;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.aa.AssetTicker;
 import com.msfinance.pbalancer.model.aa.AssetTickerCache;
-import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -31,26 +25,19 @@ import impl.org.controlsfx.skin.AutoCompletePopupSkin;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 
-public class AssetAddController
+public class AssetAddController extends BaseController<Asset,Asset>
 {
     private static final Logger LOG = LoggerFactory.getLogger(AssetAddController.class);
     public static final String APP_BAR_TITLE = "Add Asset";
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-
-    @FXML
-    private View view;
 
     @FXML
     private Label autoNameLabel;
@@ -79,11 +66,24 @@ public class AssetAddController
     @FXML
     private TextField tickerText;
 
+    @FXML
+    private ButtonBar buttonBar;
+
+    @FXML
+    private Button cancelBtn;
+
+    @FXML
+    private Button nextBtn;
+
+
+    public AssetAddController()
+    {
+        super(null);
+    }
 
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(view);
         Validation.assertNonNull(autoNameLabel);
         Validation.assertNonNull(manualNameRB);
         Validation.assertNonNull(manualNamePanel);
@@ -93,14 +93,9 @@ public class AssetAddController
         Validation.assertNonNull(tickerRB);
         Validation.assertNonNull(tickerPanel);
         Validation.assertNonNull(tickerText);
-
-        //view.setShowTransitionFactory(BounceInRightTransition::new);
-        view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
-
-        view.setOnShowing(e -> {
-            populateData();
-            updateAppBar();
-        });
+        Validation.assertNonNull(buttonBar);
+        Validation.assertNonNull(cancelBtn);
+        Validation.assertNonNull(nextBtn);
 
         ToggleGroup nameToggleGroup = new ToggleGroup();
         tickerRB.setToggleGroup(nameToggleGroup);
@@ -130,13 +125,20 @@ public class AssetAddController
             }
         });
         tickerText.textProperty().addListener(e -> onTickerChanged());
+
+        ButtonBar.setButtonData(cancelBtn, ButtonData.CANCEL_CLOSE);
+        ButtonBar.setButtonData(nextBtn, ButtonData.NEXT_FORWARD);
+        cancelBtn.setGraphic(MaterialDesignIcon.CANCEL.graphic());
+        nextBtn.setGraphic(MaterialDesignIcon.FORWARD.graphic());
+
+        cancelBtn.setOnAction(e -> onCancel());
+        nextBtn.setOnAction(e -> onNext());
     }
 
 
-    protected void populateData()
+    @Override
+    protected void populateData(final Asset asset)
     {
-        Asset asset = StateManager.currentAsset;
-
         // NOTE: we expect all of these to be blank for an "add", but do this anyway
         tickerText.setText(asset.getTicker());
         autoNameLabel.setText(asset.getAutoName());
@@ -168,80 +170,91 @@ public class AssetAddController
             // default to ticker entry, it should be the majority
             tickerRB.setSelected(true);
         }
+
+        // TODO: enable/disable based on qty of data entry
+        //nextBtn.setDisable(true);
     }
 
 
-    protected void updateAppBar()
+    @Override
+    protected void updateAppBar(final AppBar appBar)
     {
-        final AppBar appBar = view.getAppManager().getAppBar();
-        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
+        //appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.getActionItems().add(MaterialDesignIcon.HELP.button(e -> visitHelp()));
         appBar.setTitleText(APP_BAR_TITLE);
     }
 
 
-    private void goBack()
+    private void onCancel()
+    {
+        returnFailure();
+    }
+
+    private void onNext()
     {
         if(save())
         {
-            view.getAppManager().switchToPreviousView();
+            if(tickerRB.isSelected())
+            {
+                getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_KNOWN_VIEW, getIn(),
+                        a -> returnSuccess(a),
+                        () -> returnFailure());
+            }
+            if(manualNameRB.isSelected())
+            {
+                getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_MANUAL_VIEW, getIn(),
+                        a ->  returnSuccess(a),
+                        () -> returnFailure());
+            }
         }
     }
 
     private boolean save()
     {
-        try
+        Asset asset = getIn();
+
+        if(tickerRB.isSelected())
         {
-            Asset asset = StateManager.currentAsset;
-
-            if(tickerRB.isSelected())
-            {
-                asset.setTicker(tickerText.getText());
-                asset.setAutoName(autoNameLabel.getText());
-                asset.setManualName(null);
-                asset.setPricingType(PricingType.AUTO_PER_UNIT);
-                asset.setUnits(null);
-                asset.setManualValue(null);
-                asset.setManualValueTmstp(null);
-                asset.setLastAutoValue( new BigDecimal("1.00") ); // TODO
-                asset.setLastAutoValueTmstp(new Date()); // TODO: somehow get this from the api, probably close of prior business day
-            }
-            if(manualNameRB.isSelected())
-            {
-                asset.setTicker(null);
-                asset.setAutoName(null);
-                asset.setManualName(manualNameText.getText());
-                if(!priceManualPerUnitRB.isSelected() && !priceManualPerWholeRB.isSelected())
-                {
-                    // TODO: better validation and error msg UX
-                    view.getAppManager().showMessage("Please select a pricing type for manual assets.");
-                    return false;
-                }
-                else if(priceManualPerUnitRB.isSelected())
-                {
-                    asset.setPricingType(PricingType.MANUAL_PER_UNIT);
-                }
-                else if(priceManualPerWholeRB.isSelected())
-                {
-                    asset.setPricingType(PricingType.MANUAL_PER_WHOLE);
-                }
-                asset.setUnits(null);
-                asset.setManualValue(null);
-                asset.setManualValueTmstp(null);
-                asset.setLastAutoValue(null);
-                asset.setLastAutoValueTmstp(null);
-            }
-
-            DataFactory.get().updatePortfolio(StateManager.currentPortfolio);
+            asset.setTicker(tickerText.getText());
+            asset.setAutoName(autoNameLabel.getText());
+            asset.setManualName(null);
+            asset.setPricingType(PricingType.AUTO_PER_UNIT);
+            asset.setUnits(null);
+            asset.setManualValue(null);
+            asset.setManualValueTmstp(null);
+            asset.setLastAutoValue( new BigDecimal("1.00") ); // TODO
+            asset.setLastAutoValueTmstp(new Date()); // TODO: somehow get this from the api, probably close of prior business day
             return true;
         }
-        catch (IOException e)
+        if(manualNameRB.isSelected())
         {
-            LOG.error("Error updating: " + StateManager.currentPortfolio.getId(), e);
-            view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolio.getId());
-            return false;
+            asset.setTicker(null);
+            asset.setAutoName(null);
+            asset.setManualName(manualNameText.getText());
+            if(!priceManualPerUnitRB.isSelected() && !priceManualPerWholeRB.isSelected())
+            {
+                // TODO: better validation and error msg UX
+                getApp().showMessage("Please select a pricing type for manual assets.");
+                return false;
+            }
+            else if(priceManualPerUnitRB.isSelected())
+            {
+                asset.setPricingType(PricingType.MANUAL_PER_UNIT);
+            }
+            else if(priceManualPerWholeRB.isSelected())
+            {
+                asset.setPricingType(PricingType.MANUAL_PER_WHOLE);
+            }
+            asset.setUnits(null);
+            asset.setManualValue(null);
+            asset.setManualValueTmstp(null);
+            asset.setLastAutoValue(null);
+            asset.setLastAutoValueTmstp(null);
+            return true;
         }
+
+        return false;
     }
 
     private void onNameTypeChange()
@@ -283,8 +296,7 @@ public class AssetAddController
 
     private void visitHelp()
     {
-        StateManager.currentUrl = HelpUrls.ASSET_ADD_HELP_URL;
-        view.getAppManager().switchView(App.WEB_VIEW);
+        getApp().<String,Void>mySwitchView(App.WEB_VIEW, HelpUrls.ASSET_ADD_HELP_URL);
     }
 
 }

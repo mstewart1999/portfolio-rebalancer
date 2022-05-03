@@ -2,18 +2,15 @@ package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.StateManager;
@@ -44,20 +41,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-public class AccountListController
+public class AccountListController extends BaseController<Portfolio,Portfolio>
 {
     private static final Logger LOG = LoggerFactory.getLogger(AccountListController.class);
     public static final String APP_BAR_TITLE = "Account List";
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-
-    @FXML
-    private View view;
 
     @FXML
     private Label nameLabel;
@@ -86,10 +73,18 @@ public class AccountListController
     @FXML
     private Button refreshButton;
 
+
+    private boolean positionsDirty;
+
+
+    public AccountListController()
+    {
+        super(null);
+    }
+
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(view);
         Validation.assertNonNull(nameLabel);
         Validation.assertNonNull(totalValueLabel);
         Validation.assertNonNull(t);
@@ -99,20 +94,6 @@ public class AccountListController
         Validation.assertNonNull(downButton);
         Validation.assertNonNull(deleteButton);
         Validation.assertNonNull(refreshButton);
-
-        // critical to get proper scrollbar behavior
-        view.setMinSize(100, 100);
-        view.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-        ((AnchorPane)t.getParent()).setPrefSize(20, 20);
-        t.setPrefSize(20, 20);
-
-        //view.setShowTransitionFactory(BounceInRightTransition::new);
-        view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
-
-        view.setOnShowing(e -> {
-            populateData();
-            updateAppBar();
-        });
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
         t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("institution"));
@@ -160,19 +141,32 @@ public class AccountListController
     }
 
 
-    protected void populateData()
+    @Override
+    protected void doSizing()
     {
-        Portfolio p = StateManager.currentPortfolio;
+        super.doSizing();
+        // critical to get proper scrollbar behavior
+        getRoot().setMinSize(100, 100);
+        getRoot().setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        ((AnchorPane)t.getParent()).setPrefSize(20, 20);
+        t.setPrefSize(20, 20);
+    }
+
+    @Override
+    protected void populateData(final Portfolio p)
+    {
         nameLabel.setText( p.getName() );
         populateTotalValue();
 
+        t.getSelectionModel().clearSelection();
         t.setItems( FXCollections.observableList( p.getAccounts() ) );
         t.refresh();
+        positionsDirty = false;
     }
 
     private void populateTotalValue()
     {
-        Portfolio p = StateManager.currentPortfolio;
+        Portfolio p = getIn();
         if(p.getLastValue() != null)
         {
             totalValueLabel.setText("$ " + NumberFormatHelper.prettyFormatCurrency(p.getLastValue()));
@@ -184,9 +178,9 @@ public class AccountListController
     }
 
 
-    protected void updateAppBar()
+    @Override
+    protected void updateAppBar(final AppBar appBar)
     {
-        final AppBar appBar = view.getAppManager().getAppBar();
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.setTitleText(APP_BAR_TITLE);
@@ -196,30 +190,32 @@ public class AccountListController
     {
         if(save())
         {
-            view.getAppManager().switchToPreviousView();
+            returnSuccess(getIn());
         }
     }
 
     private boolean save()
     {
-        try
-        {
-            // NOTE: since the table uses an "observable" list which links directly to data model,
-            // this isn't necessary
-            //List<Account> list = new ArrayList<>(t.getItems());
-            //StateManager.currentPortfolio.setAccounts(list);
-            StateManager.recalculatePortfolioValue();
-            StateManager.recalculateProfileValue();
+        // NOTE: any changes to table data, other than "positions" has already been saved
+        // anything else about the portfolio is modified on a different screen
 
-            DataFactory.get().updatePortfolio(StateManager.currentPortfolio);
-            return true;
-        }
-        catch (IOException e)
+        if(positionsDirty)
         {
-            LOG.error("Error updating: " + StateManager.currentPortfolio.getId(), e);
-            view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolio.getId());
-            return false;
+            try
+            {
+                for(Account a : getIn().getAccounts())
+                {
+                    DataFactory.get().updateAccount(a);
+                }
+            }
+            catch (IOException e)
+            {
+                LOG.error("Error updating account positions for portfolio: " + getIn().getId(), e);
+                getApp().showMessage("Error updating account positions");
+                return false;
+            }
         }
+        return true;
     }
 
     private void onSelectionChanged()
@@ -248,16 +244,44 @@ public class AccountListController
             listPosition = currMaxListPosition.get() + 1;
         }
 
-        Account item = new Account(StateManager.currentPortfolio.getId());
+        Account item = new Account(getIn().getId());
         item.setName("");
         item.setInstitution("");
         item.setType(AccountType.UNDEFINED);
         item.setListPosition(listPosition);
-        t.getItems().add(item);
+        // link into hierarchy
+        item.setPortfolio(getIn());
+        getIn().getAccounts().add(item);
+        try
+        {
+            DataFactory.get().createAccount(item);
+        }
+        catch (IOException e)
+        {
+            LOG.error("Error creating account: " + item.getId(), e);
+            getApp().showMessage("Error creating account");
+        }
 
-        StateManager.currentAccount = item;
-        save();
-        view.getAppManager().switchView(App.ACCOUNT_EDIT_VIEW);
+        getApp().<Account,Account>mySwitchView(App.ACCOUNT_EDIT_VIEW, item,
+                a -> {
+                    t.refresh();
+                    populateTotalValue();
+                },
+                () -> {
+                    // remove it upon cancel
+                    getIn().getAccounts().remove(item);
+                    t.refresh();
+
+                    try
+                    {
+                        DataFactory.get().deleteAccount(item);
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.error("Error deleting account: " + item.getId(), e);
+                        getApp().showMessage("Error deleting account");
+                    }
+                });
     }
 
     private void onEdit()
@@ -265,9 +289,14 @@ public class AccountListController
         Account item = t.getSelectionModel().getSelectedItem();
         Validation.assertNonNull(item);
 
-        StateManager.currentAccount = item;
-        save();
-        view.getAppManager().switchView(App.ACCOUNT_EDIT_VIEW);
+        getApp().<Account,Account>mySwitchView(App.ACCOUNT_EDIT_VIEW, item,
+                a -> {
+                    t.refresh();
+                    populateTotalValue();
+                },
+                () -> {
+                    // no-op
+                });
     }
 
     private void onUp()
@@ -300,6 +329,8 @@ public class AccountListController
             {
                 t.getItems().get(i).setListPosition(i);
             }
+
+            positionsDirty = true;
         }
     }
 
@@ -333,6 +364,8 @@ public class AccountListController
             {
                 t.getItems().get(i).setListPosition(i);
             }
+
+            positionsDirty = true;
         }
     }
 
@@ -345,11 +378,35 @@ public class AccountListController
         Optional<ButtonType> result = alert.showAndWait();
         if(result.isPresent() && result.get() == ButtonType.OK)
         {
-            t.getItems().remove(item);
+            try
+            {
+                DataFactory.get().deleteAccount(item);
+                getApp().showMessage("Deleted account");
+            }
+            catch (IOException e)
+            {
+                LOG.error("Error deleting account: " + item.getId(), e);
+                getApp().showMessage("Error deleting account: " + item.getId());
+            }
 
+            t.getItems().remove(item);
             t.refresh();
-            StateManager.recalculatePortfolioValue();
+
+            StateManager.recalculatePortfolioValue(getIn());
+            StateManager.recalculateProfileValue(getIn().getProfile());
+
             populateTotalValue();
+
+            try
+            {
+                DataFactory.get().updatePortfolio(getIn());
+                DataFactory.get().updateProfile(getIn().getProfile());
+            }
+            catch (IOException e)
+            {
+                LOG.error("Error updating totals for portfolio: " + getIn().getId(), e);
+                getApp().showMessage("Error updating totals for portfolio: " + item.getId());
+            }
         }
     }
 

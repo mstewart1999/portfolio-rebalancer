@@ -1,6 +1,8 @@
 package com.msfinance.pbalancer;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +11,6 @@ import com.gluonhq.attach.lifecycle.LifecycleService;
 import com.gluonhq.attach.util.Platform;
 import com.gluonhq.attach.util.Services;
 import com.gluonhq.charm.glisten.application.AppManager;
-import com.gluonhq.charm.glisten.application.MobileApplication;
 import com.gluonhq.charm.glisten.application.ViewStackPolicy;
 import com.gluonhq.charm.glisten.control.Avatar;
 import com.gluonhq.charm.glisten.control.NavigationDrawer;
@@ -18,18 +19,23 @@ import com.gluonhq.charm.glisten.control.NavigationDrawer.ViewItem;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.gluonhq.charm.glisten.visual.Swatch;
+import com.msfinance.pbalancer.controllers.BaseController;
+import com.msfinance.pbalancer.controllers.BaseController.FailureCallback;
+import com.msfinance.pbalancer.controllers.BaseController.SuccessCallback;
 import com.msfinance.pbalancer.controllers.PortfolioListController;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.aa.AssetTickerCache;
+import com.msfinance.pbalancer.service.ProfileDataCache;
 import com.msfinance.pbalancer.views.PrimaryView;
 import com.msfinance.pbalancer.views.SecondaryView;
 
+import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-public class App extends MobileApplication
+public class App extends Application
 {
     private static final Logger LOG;
     static
@@ -54,36 +60,63 @@ public class App extends MobileApplication
     public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
     public static final String WEB_VIEW = "WEB_VIEW";
 
+
+    private final AppManager appManager = AppManager.initialize(this::postInit);
+
+    private final Map<String,View> viewByKey = new HashMap<>();
+    private final Map<String,BaseController<?,?>> controllerByKey = new HashMap<>();
+
     @Override
     public void init()
     {
+        LOG.info("App.init()");
+
+        // eagerly create all view
+        createView(PORTFOLIO_LIST_VIEW, "portfolioList.fxml");
+        createView(PORTFOLIO_VIEW, "portfolio.fxml");
+        createView(ACCOUNT_LIST_VIEW, "accountList.fxml");
+        createView(ACCOUNT_EDIT_VIEW, "accountEdit.fxml");
+        createView(ASSET_ADD_VIEW, "assetAdd.fxml");
+        createView(ASSET_EDIT_KNOWN_VIEW, "assetEditKnown.fxml");
+        createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
+        createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
+        createView(TARGET_AA_VIEW, "targetAA.fxml");
+        //createView(WEB_VIEW, "webView.fxml");
+
         // TODO: if first time, show a welcome screen as "HOME"?
         // views in drawer
-        addViewFactory(PORTFOLIO_LIST_VIEW, () -> createView("portfolioList.fxml"));
-        addViewFactory(ABOUT_VIEW, PrimaryView::new);
-        addViewFactory(SETTINGS_VIEW, SecondaryView::new);
+        appManager.addViewFactory(PORTFOLIO_LIST_VIEW, () -> viewByKey.get(PORTFOLIO_LIST_VIEW));
+        appManager.addViewFactory(ABOUT_VIEW, PrimaryView::new);
+        appManager.addViewFactory(SETTINGS_VIEW, SecondaryView::new);
 
         // other views
-        addViewFactory(PORTFOLIO_VIEW, () -> createView("portfolio.fxml"));
-        addViewFactory(ACCOUNT_LIST_VIEW, () -> createView("accountList.fxml"));
-        addViewFactory(ACCOUNT_EDIT_VIEW, () -> createView("accountEdit.fxml"));
-        addViewFactory(ASSET_ADD_VIEW, () -> createView("assetAdd.fxml"));
-        addViewFactory(ASSET_EDIT_KNOWN_VIEW, () -> createView("assetEditKnown.fxml"));
-        addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> createView("assetEditManual.fxml"));
-        addViewFactory(TARGET_AA_VIEW, () -> createView("targetAA.fxml"));
-        addViewFactory(WEB_VIEW, () -> createView("webView.fxml"));
+        appManager.addViewFactory(PORTFOLIO_VIEW, () -> viewByKey.get(PORTFOLIO_VIEW));
+        appManager.addViewFactory(ACCOUNT_LIST_VIEW, () -> viewByKey.get(ACCOUNT_LIST_VIEW));
+        appManager.addViewFactory(ACCOUNT_EDIT_VIEW, () -> viewByKey.get(ACCOUNT_EDIT_VIEW));
+        appManager.addViewFactory(ASSET_ADD_VIEW, () -> viewByKey.get(ASSET_ADD_VIEW));
+        appManager.addViewFactory(ASSET_EDIT_KNOWN_VIEW, () -> viewByKey.get(ASSET_EDIT_KNOWN_VIEW));
+        appManager.addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> viewByKey.get(ASSET_EDIT_MANUAL_VIEW));
+        appManager.addViewFactory(TARGET_AA_VIEW, () -> viewByKey.get(TARGET_AA_VIEW));
+        appManager.addViewFactory(WEB_VIEW, () -> createView(WEB_VIEW, "webView.fxml"));
 
         buildDrawer();
 
-        StateManager.reset();
-        StateManager.currentProfile = new Profile("DEFAULT"); // TODO: create new UI for add/switch profile
-        StateManager.currentProfile.setName("DEFAULT");
+        // TODO: create new UI for add/switch profile
+        try
+        {
+            ProfileDataCache.switchProfile(Profile.DEFAULT);
+        }
+        catch (IOException e)
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         // TODO: progress bar
         AssetTickerCache.getInstance();
     }
 
-    private View createView(final String fxml)
+    private View createView(final String key, final String fxml)
     {
         try
         {
@@ -93,7 +126,13 @@ public class App extends MobileApplication
                     /*,ResourceBundle.getBundle("hellofx.hello")*/
                     );
             View root = loader.load();
-            loader.getController(); // TODO: any value in knowing controller?  parameter passing...
+            Object controller = loader.getController();
+            if(controller instanceof BaseController<?,?> bc)
+            {
+                bc.initializeApp(this, root);
+                controllerByKey.put(key, bc);
+            }
+            viewByKey.put(key, root);
             return root;
         }
         catch (IOException e)
@@ -105,7 +144,7 @@ public class App extends MobileApplication
 
     private void buildDrawer()
     {
-        NavigationDrawer drawer = this.getDrawer();
+        NavigationDrawer drawer = appManager.getDrawer();
 
         NavigationDrawer.Header header = new NavigationDrawer.Header(
                 "pBalancer",
@@ -143,9 +182,32 @@ public class App extends MobileApplication
     }
 
     @Override
-    public void postInit(final Scene scene)
+    public void start(final Stage stage)
     {
-        Swatch.getDefault().assignTo(scene);
+        LOG.info("App.start() - begin");
+        appManager.start(stage);
+        // postInit is called here by appManager
+
+        // UGGG: major flaw, this never gets called from drawer, or on first init
+        this.<Profile,Profile>mySwitchView(PORTFOLIO_LIST_VIEW, ProfileDataCache.get().getProfile(),
+                p -> {
+                    // TODO: recalculate profile value, save profile
+                },
+                () -> {
+                    // no-op
+                });
+
+        LOG.info("App.start() - end");
+    }
+
+    private void postInit(final Scene scene)
+    {
+        LOG.info("App.postInit()");
+        //Swatch.getDefault().assignTo(scene);
+        Swatch.LIGHT_GREEN.assignTo(scene);
+        // hex #85bb65 (also known as Dollar bill)
+        // 52.2% red, 73.3% green and 39.6% blue
+//        new Color(0.522, 0.733, 0.396, 1.0);
 
         //setUserAgentStylesheet(STYLESHEET_MODENA); - not functioning
         scene.getStylesheets().add(App.class.getResource("app.css").toExternalForm());
@@ -153,6 +215,47 @@ public class App extends MobileApplication
         scene.getWindow().setWidth(800);
         scene.getWindow().setHeight(600);
         scene.getWindow().centerOnScreen();
+    }
+
+
+    public void mySwitchToPreviousView()
+    {
+        appManager.switchToPreviousView();
+    }
+
+    public void mySwitchView(final String key)
+    {
+        mySwitchView(key, null, null, null);
+    }
+
+    public <IN,OUT> void mySwitchView(final String key, final IN in)
+    {
+        mySwitchView(key, in, null, null);
+    }
+
+    public <IN,OUT> void mySwitchView(final String key, final IN in, final SuccessCallback<OUT> successCallback, final FailureCallback failureCallback)
+    {
+        appManager.switchView(key);
+        BaseController<IN,OUT> bc = (BaseController<IN, OUT>) controllerByKey.get(key);
+        if(bc != null)
+        {
+            bc.call(in, successCallback, failureCallback);
+        }
+        else
+        {
+            throw new RuntimeException("No controller for " + key);
+        }
+    }
+
+
+    public void showMessage(final String msg)
+    {
+        appManager.showMessage(msg);
+    }
+
+    public void showDrawer()
+    {
+        appManager.getDrawer().open();
     }
 
     public static void main(final String args[])

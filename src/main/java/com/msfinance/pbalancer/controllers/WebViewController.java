@@ -1,66 +1,53 @@
 package com.msfinance.pbalancer.controllers;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gluonhq.charm.glisten.animation.WobbleTransition;
 import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
-import javafx.scene.layout.Region;
 import javafx.scene.web.WebView;
 
-public class WebViewController
+public class WebViewController extends BaseController<String,Void>
 {
     private static final Logger LOG = LoggerFactory.getLogger(WebViewController.class);
     public static final String APP_BAR_TITLE = "Help";
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-    @FXML
-    private View view;
 
     @FXML
     private WebView web;
 
 
 
+    public WebViewController()
+    {
+        super(WobbleTransition::new);
+    }
+
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(view);
         Validation.assertNonNull(web);
 
-        // critical to get proper scrollbar behavior
-        view.setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
-
-        //view.setShowTransitionFactory(BounceInRightTransition::new);
-        view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
-
-        view.setOnShowing(e -> {
-            populateData();
-            updateAppBar();
-        });
+        String ua = web.getEngine().userAgentProperty().get();
+        // ex: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/612.1 (KHTML, like Gecko) JavaFX/17 Safari/612.1"
+        ua = ua.replaceFirst(" JavaFX/\\d* ", " ");
+        //System.out.println(ua);
+        web.getEngine().userAgentProperty().set(ua);
     }
 
-    protected void populateData()
+    @Override
+    protected void populateData(final String in)
     {
-        web.getEngine().load(StateManager.currentUrl);
+        web.getEngine().load(in);
+        //web.getEngine().load("https://duckduckgo.com/?t=ffab&q=what+is+my+user+agent&ia=answer");
     }
 
-    protected void updateAppBar()
+    @Override
+    protected void updateAppBar(final AppBar appBar)
     {
-        final AppBar appBar = view.getAppManager().getAppBar();
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.setTitleText(APP_BAR_TITLE);
@@ -68,7 +55,7 @@ public class WebViewController
 
     private void goBack()
     {
-        view.getAppManager().switchToPreviousView();
+        returnSuccess(null);
     }
 
 }

@@ -4,33 +4,51 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
-import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 
 public class StateManager
 {
-    public static Profile currentProfile;
-    public static Portfolio currentPortfolio;
-    public static Account currentAccount;
-    public static Asset currentAsset;
-    public static AssetAllocation currentAssetAllocation;
-    public static String currentUrl;
+    private static final Logger LOG = LoggerFactory.getLogger(StateManager.class);
 
-    public static void reset()
+    /**
+     * Do a fully bottom up recalculation of all totals.
+     * Log any discrepancies, but do not persist here.
+     * @param currentProfile
+     */
+    public static void recalculateRecursive(final Profile currentProfile)
     {
-        currentProfile = null;
-        currentPortfolio = null;
-        currentAccount = null;
-        currentAsset = null;
-        currentAssetAllocation = null;
-        currentUrl = null;
+        if(currentProfile != null)
+        {
+            for(Portfolio p : currentProfile.getPortfolios())
+            {
+                for(Account ac : p.getAccounts())
+                {
+                    for(Asset as : ac.getAssets())
+                    {
+                        // no-op
+                    }
+                    recalculateAccountValue(ac, true);
+                }
+                recalculatePortfolioValue(p, true);
+            }
+            recalculateProfileValue(currentProfile, true);
+        }
     }
 
-    public static void recalculateProfileValue()
+
+    public static void recalculateProfileValue(final Profile currentProfile)
+    {
+        recalculateProfileValue(currentProfile, false);
+    }
+
+    public static void recalculateProfileValue(final Profile currentProfile, final boolean logChanges)
     {
         if(currentProfile != null)
         {
@@ -40,8 +58,12 @@ public class StateManager
                     .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2));
             if(sum.isPresent())
             {
+                if(logChanges && !sum.get().equals(currentProfile.getLastValue()))
+                {
+                    LOG.debug("Profile value changed by recalculation: old={} new={}", currentProfile.getLastValue(), sum.get());
+                }
                 currentProfile.setLastValue(sum.get());
-                currentProfile.setLastValueTmstp(new Date());
+                currentProfile.setLastValueTmstp(new Date()); // TODO
             }
             else
             {
@@ -51,7 +73,12 @@ public class StateManager
         }
     }
 
-    public static void recalculatePortfolioValue()
+    public static void recalculatePortfolioValue(final Portfolio currentPortfolio)
+    {
+        recalculatePortfolioValue(currentPortfolio, false);
+    }
+
+    public static void recalculatePortfolioValue(final Portfolio currentPortfolio, final boolean logChanges)
     {
         if(currentPortfolio != null)
         {
@@ -61,8 +88,12 @@ public class StateManager
                     .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2));
             if(sum.isPresent())
             {
+                if(logChanges && !sum.get().equals(currentPortfolio.getLastValue()))
+                {
+                    LOG.debug("Portfolio value changed by recalculation: old={} new={}", currentPortfolio.getLastValue(), sum.get());
+                }
                 currentPortfolio.setLastValue(sum.get());
-                currentPortfolio.setLastValueTmstp(new Date());
+                currentPortfolio.setLastValueTmstp(new Date()); // TODO
             }
             else
             {
@@ -72,7 +103,12 @@ public class StateManager
         }
     }
 
-    public static void recalculateAccountValue()
+    public static void recalculateAccountValue(final Account currentAccount)
+    {
+        recalculateAccountValue(currentAccount, false);
+    }
+
+    public static void recalculateAccountValue(final Account currentAccount, final boolean logChanges)
     {
         if(currentAccount != null)
         {
@@ -82,8 +118,12 @@ public class StateManager
                     .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2));
             if(sum.isPresent())
             {
+                if(logChanges && !sum.get().equals(currentAccount.getLastValue()))
+                {
+                    LOG.debug("Account value changed by recalculation: old={} new={}", currentAccount.getLastValue(), sum.get());
+                }
                 currentAccount.setLastValue(sum.get());
-                currentAccount.setLastValueTmstp(new Date());
+                currentAccount.setLastValueTmstp(new Date()); // TODO
             }
             else
             {

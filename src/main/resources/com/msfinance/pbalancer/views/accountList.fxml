@@ -47,13 +47,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<View fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.AccountListController">
+<View maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.AccountListController">
    <center>
       <AnchorPane>
          <children>
             <TableView fx:id="t" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columns>
-                <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Name" />
+                <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Account Name" />
                   <TableColumn editable="false" prefWidth="100.0" sortable="false" text="Institution" />
                   <TableColumn editable="false" prefWidth="100.0" sortable="false" text="Acct Type" />
                   <TableColumn id="value" editable="false" prefWidth="200.0" sortable="false" text="\$" />

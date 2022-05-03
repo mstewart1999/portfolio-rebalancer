@@ -46,7 +46,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<View fx:id="view" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.PortfolioListController">
+<View maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.PortfolioListController">
    <top>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
@@ -131,7 +131,7 @@
          <children>
             <TableView fx:id="t" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <columns>
-                <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Name" />
+                <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Portfolio Name" />
                 <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Goal" />
                   <TableColumn id="value" editable="false" prefWidth="200.0" sortable="false" text="\$" />
               </columns>

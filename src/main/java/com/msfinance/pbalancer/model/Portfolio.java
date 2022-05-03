@@ -8,8 +8,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
+import com.msfinance.pbalancer.util.Validation;
 
 public class Portfolio
 {
@@ -21,6 +23,7 @@ public class Portfolio
     private BigDecimal lastValue;
     private Date lastValueTmstp;
 
+    private Profile profile;
     private List<Account> accounts;
     private AssetAllocation targetAA;
 
@@ -44,15 +47,9 @@ public class Portfolio
         goal = PortfolioGoal.Other;
         lastValue = null;
         lastValueTmstp = null;
+        profile = null;
         accounts = new ArrayList<>();
-        try
-        {
-            targetAA = new AssetAllocation();
-        }
-        catch (InvalidDataException e)
-        {
-            throw new RuntimeException(e);
-        }
+        targetAA = new AssetAllocation();
     }
 
     @JsonProperty
@@ -97,7 +94,13 @@ public class Portfolio
         return lastValueTmstp;
     }
 
-    @JsonProperty
+    @JsonIgnore
+    public Profile getProfile()
+    {
+        return profile;
+    }
+
+    @JsonIgnore
     public List<Account> getAccounts()
     {
         return accounts;
@@ -139,13 +142,20 @@ public class Portfolio
         this.lastValueTmstp = lastValueTmstp;
     }
 
-    @JsonProperty
+    @JsonIgnore
+    public void setProfile(final Profile profile)
+    {
+        Validation.assertTrue(this.profileId.equals(profile.getId()));
+        this.profile = profile;
+    }
+
+    @JsonIgnore
     public void setAccounts(final List<Account> accounts)
     {
         this.accounts = Objects.requireNonNull(accounts);
     }
 
-    @JsonProperty
+    @JsonIgnore
     public void setTargetAA(final AssetAllocation targetAA)
     {
         this.targetAA = Objects.requireNonNull(targetAA);

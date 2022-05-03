@@ -1,11 +1,8 @@
 package com.msfinance.pbalancer.controllers;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -14,10 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.Icon;
-import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
-import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AAAlertsTreeTableCell;
 import com.msfinance.pbalancer.controllers.cells.PercentTableCell;
 import com.msfinance.pbalancer.controllers.cells.PredefinedAAListCell;
@@ -29,7 +24,6 @@ import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.aa.DoubleExpression;
 import com.msfinance.pbalancer.model.aa.PredefinedAA;
-import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -59,16 +53,10 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
-public class TargetAAController
+public class TargetAAController extends BaseController<AssetAllocation,AssetAllocation>
 {
     private static final Logger LOG = LoggerFactory.getLogger(TargetAAController.class);
     public static final String APP_BAR_TITLE = "Target Asset Allocation";
-
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
     @FXML
     private RadioButton customRB;
@@ -101,9 +89,6 @@ public class TargetAAController
     private TableView<AANode> t;
 
     @FXML
-    private View view;
-
-    @FXML
     private VBox customizePane;
     @FXML
     private Button addGroupButton;
@@ -116,10 +101,17 @@ public class TargetAAController
     @FXML
     private Button deleteButton;
 
+    private AssetAllocation working;
+
+
+    public TargetAAController()
+    {
+        super(null);
+    }
+
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(view);
         Validation.assertNonNull(predefinedRB);
         Validation.assertNonNull(customRB);
         Validation.assertNonNull(customHelpIcon);
@@ -136,14 +128,6 @@ public class TargetAAController
         Validation.assertNonNull(upButton);
         Validation.assertNonNull(downButton);
         Validation.assertNonNull(deleteButton);
-
-        //view.setShowTransitionFactory(BounceInRightTransition::new);
-        view.getStylesheets().add(location.toExternalForm().replace(".fxml", ".css"));
-
-        view.setOnShowing(e -> {
-            populateData();
-            updateAppBar();
-        });
 
         ToggleGroup toggleGroup = new ToggleGroup();
         predefinedRB.setToggleGroup(toggleGroup);
@@ -242,26 +226,23 @@ public class TargetAAController
                 try
                 {
                     PredefinedAA paa = predefinedCombo.getSelectionModel().getSelectedItem();
-                    // copy to current state
-                    AssetAllocation aa = new AssetAllocation(paa, paa.getAA().getNodeCsvs());
-                    StateManager.currentPortfolio.setTargetAA(aa);
-                    // repopulate
-                    populateData();
+                    // copy to current state, repopulate gui
+                    populateData( new AssetAllocation(paa, paa.getAA().getNodeCsvs()) );
                 }
                 catch (InvalidDataException e)
                 {
                     LOG.error("Unable to build PredefinedAA", e);
-                    view.getAppManager().showMessage("Unable to build PredefinedAA");
+                    getApp().showMessage("Unable to build PredefinedAA");
                 }
             }
         }
     }
 
-    protected void populateData()
+    @Override
+    protected void populateData(final AssetAllocation aa)
     {
-        StateManager.currentAssetAllocation = StateManager.currentPortfolio.getTargetAA();
-
-        PredefinedAA p = StateManager.currentAssetAllocation.getPredefined();
+        working = aa;
+        PredefinedAA p = working.getPredefined();
         if(p != null)
         {
             predefinedRB.setSelected(true);
@@ -272,13 +253,14 @@ public class TargetAAController
             customRB.setSelected(true);
         }
 
-        populateNestedView();
+        populateNestedView(working);
         populateFlatView();
     }
 
-    private void populateNestedView()
+    private void populateNestedView(final AssetAllocation aa)
     {
-        tt.setRoot(convertToUI(StateManager.currentAssetAllocation.getRoot()));
+        tt.getSelectionModel().clearSelection();
+        tt.setRoot(convertToUI(aa.getRoot()));
         expandAll(tt.getRoot());
         tt.refresh();
 
@@ -286,14 +268,16 @@ public class TargetAAController
     }
     private void populateFlatView()
     {
-        t.setItems( FXCollections.observableList( tt.getRoot().getValue().allLeaves() ) );
+        AANode rootNode = tt.getRoot().getValue(); // get this from tree table for convenience
+        t.getSelectionModel().clearSelection();
+        t.setItems( FXCollections.observableList( rootNode.allLeaves() ) );
         t.refresh();
     }
 
 
-    protected void updateAppBar()
+    @Override
+    protected void updateAppBar(final AppBar appBar)
     {
-        final AppBar appBar = view.getAppManager().getAppBar();
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.setTitleText(APP_BAR_TITLE);
@@ -303,7 +287,7 @@ public class TargetAAController
     {
         if(save())
         {
-            view.getAppManager().switchToPreviousView();
+            returnSuccess(working);
         }
     }
 
@@ -317,8 +301,7 @@ public class TargetAAController
                 // create a copy
                 try
                 {
-                    AssetAllocation aa = new AssetAllocation(paa, paa.getAA().getNodeCsvs());
-                    StateManager.currentPortfolio.setTargetAA(aa);
+                    working = new AssetAllocation(paa, paa.getAA().getNodeCsvs());
                 }
                 catch (InvalidDataException e)
                 {
@@ -330,37 +313,24 @@ public class TargetAAController
         {
             try
             {
-                AssetAllocation aa = new AssetAllocation(null, convertFromUIToNodeCsvs(tt.getRoot()));
-                StateManager.currentPortfolio.setTargetAA(aa);
+                working = new AssetAllocation(null, convertFromUIToNodeCsvs(tt.getRoot()));
             }
             catch (InvalidDataException e)
             {
                 // TODO: stop "back" operation, figure out how to depict errors on UI
                 LOG.error("Invalid target asset allocation edits", e);
-                view.getAppManager().showMessage("Invalid target asset allocation edits");
+                getApp().showMessage("Invalid target asset allocation edits");
                 return false;
             }
         }
-        try
-        {
-            DataFactory.get().updatePortfolio(StateManager.currentPortfolio);
-            return true;
-        }
-        catch (IOException e)
-        {
-            LOG.error("Error updating: " + StateManager.currentPortfolio.getId(), e);
-            view.getAppManager().showMessage("Error updating: " + StateManager.currentPortfolio.getId());
-            return false;
-        }
+        return true;
     }
 
     private void visitPredefinedHelp()
     {
         if(predefinedRB.isSelected())
         {
-            save();
-            StateManager.currentUrl = HelpUrls.TARGET_AA_PREDEFINED_HELP_URL;
-            view.getAppManager().switchView(App.WEB_VIEW);
+            getApp().<String,Void>mySwitchView(App.WEB_VIEW, HelpUrls.TARGET_AA_PREDEFINED_HELP_URL);
         }
     }
 
@@ -368,9 +338,7 @@ public class TargetAAController
     {
         if(customRB.isSelected())
         {
-            save();
-            StateManager.currentUrl = HelpUrls.TARGET_AA_CUSTOM_HELP_URL;
-            view.getAppManager().switchView(App.WEB_VIEW);
+            getApp().<String,Void>mySwitchView(App.WEB_VIEW, HelpUrls.TARGET_AA_CUSTOM_HELP_URL);
         }
     }
 
@@ -380,11 +348,9 @@ public class TargetAAController
         {
             if(predefinedCombo.getSelectionModel().getSelectedItem() != null)
             {
-                save();
                 // TODO: try to open system browser for this one!  page is too complicated and makes it buggy
                 PredefinedAA p = predefinedCombo.getSelectionModel().getSelectedItem();
-                StateManager.currentUrl = p.getUrl();
-                view.getAppManager().switchView(App.WEB_VIEW);
+                getApp().<String,Void>mySwitchView(App.WEB_VIEW, p.getUrl());
             }
         }
     }
@@ -492,7 +458,7 @@ public class TargetAAController
         catch (InvalidDataException ex)
         {
             // warn user and discard edit
-            view.getAppManager().showMessage("Invalid data");
+            getApp().showMessage("Invalid data");
         }
     }
 
@@ -517,7 +483,7 @@ public class TargetAAController
         inputdialog.setContentText("Name: ");
         inputdialog.setHeaderText("Enter a name for the category");
         inputdialog.setTitle("Add Category");
-        inputdialog.initOwner(view.getScene().getWindow());
+        inputdialog.initOwner(getRoot().getScene().getWindow());
         inputdialog.initModality(Modality.WINDOW_MODAL);
         inputdialog.showAndWait();
         String name = inputdialog.getResult();
@@ -568,7 +534,7 @@ public class TargetAAController
         inputdialog.setContentText("Name: ");
         inputdialog.setHeaderText("Choose the holding (asset class)");
         inputdialog.setTitle("Add Holding");
-        inputdialog.initOwner(view.getScene().getWindow());
+        inputdialog.initOwner(getRoot().getScene().getWindow());
         inputdialog.initModality(Modality.WINDOW_MODAL);
         inputdialog.showAndWait();
         String name = inputdialog.getResult();

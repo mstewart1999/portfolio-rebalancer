@@ -60,24 +60,15 @@
 }
 
 /* https://edencoding.com/style-tableview-javafx/ */
-/*
-.table-view .column-header-background{
-    -fx-background-color: linear-gradient(to bottom, #1D86D944, #239DFF44);
-    -fx-background-radius: 7px 7px 0px 0px;
-    -fx-background-insets: 0 11px 0 0;
-    -fx-padding: 0 0 5px 0;
-}
-*/
 .table-view .column-header {
-/*    -fx-background-color: transparent;*/
     -fx-background-color: linear-gradient(to bottom, -primary-swatch-300, -primary-swatch-100);
     -fx-background-radius: 7px 7px 0px 0px;
-    -fx-background-insets: 0 5px 0 0;
+    -fx-background-insets: 0 3px 0 0;
     -fx-padding: 5px;
-    
-    -fx-border-color: black;
+
+    -fx-border-color: transparent -primary-swatch-900 -primary-swatch-900 transparent;
     -fx-border-radius: 7px 7px 0px 0px;
-    -fx-border-insets: 0 5px 0 0;
+    -fx-border-insets: 0 3px 0 0;
     -fx-border-width: 1px;
 }
 .table-view .column-header-background .filler {
@@ -88,12 +79,12 @@
 .tree-table-view .column-header { 
     -fx-background-color: linear-gradient(to bottom, -primary-swatch-300, -primary-swatch-100);
     -fx-background-radius: 7px 7px 0px 0px;
-    -fx-background-insets: 0 5px 0 0;
+    -fx-background-insets: 0 3px 0 0;
     -fx-padding: 5px;
     
-    -fx-border-color: black;
+    -fx-border-color: transparent -primary-swatch-900 -primary-swatch-900 transparent;
     -fx-border-radius: 7px 7px 0px 0px;
-    -fx-border-insets: 0 5px 0 0;
+    -fx-border-insets: 0 3px 0 0;
     -fx-border-width: 1px;
 }
 .tree-table-view .column-header .label {
@@ -115,3 +106,6 @@
   -fx-effect: dropshadow(three-pass-box,-elevation-shadow-color, 2, 0, 0, 1);
 }
 
+.pb-toolbox .button {
+  -fx-max-width: 500px;
+}

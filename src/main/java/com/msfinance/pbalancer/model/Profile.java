@@ -8,14 +8,18 @@ import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Profile
 {
+    public static final String DEFAULT = "DEFAULT";
+
     private final String id;
     private String name;
     private BigDecimal lastValue;
     private Date lastValueTmstp;
+
     private List<Portfolio> portfolios;
 
     public Profile()
@@ -59,7 +63,7 @@ public class Profile
         return lastValueTmstp;
     }
 
-    @JsonProperty
+    @JsonIgnore
     public List<Portfolio> getPortfolios()
     {
         return portfolios;
@@ -83,7 +87,7 @@ public class Profile
         this.lastValueTmstp = lastValueTmstp;
     }
 
-    @JsonProperty
+    @JsonIgnore
     public void setPortfolios(final List<Portfolio> portfolios)
     {
         this.portfolios = portfolios;

@@ -2,15 +2,14 @@ package com.msfinance.pbalancer.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.util.Validation;
 
 public class Asset
 {
@@ -30,7 +29,8 @@ public class Asset
     private BigDecimal lastAutoValue;
     private Date lastAutoValueTmstp;
 
-    private List<Asset> assets;
+    private Account account;
+    //private List<Basis> basis;
 
     public Asset(
             final String accountId
@@ -58,7 +58,8 @@ public class Asset
         manualValueTmstp = null;
         lastAutoValue = null;
         lastAutoValueTmstp = null;
-        assets = new ArrayList<>();
+        account = null;
+        //basis = new ArrayList<>();
     }
 
     @JsonProperty
@@ -139,11 +140,17 @@ public class Asset
         return lastAutoValueTmstp;
     }
 
-    @JsonProperty
-    public List<Asset> getAssets()
+    @JsonIgnore
+    public Account getAccount()
     {
-        return assets;
+        return account;
     }
+
+//    @JsonIgnore
+//    public List<Basis> getBasis()
+//    {
+//        return basis;
+//    }
 
     @JsonProperty
     public void setTicker(final String ticker)
@@ -211,11 +218,18 @@ public class Asset
         this.lastAutoValueTmstp = lastAutoValueTmstp;
     }
 
-    @JsonProperty
-    public void setAssets(final List<Asset> assets)
+    @JsonIgnore
+    public void setAccount(final Account account)
     {
-        this.assets = Objects.requireNonNull(assets);
+        Validation.assertTrue(this.accountId.equals(account.getId()));
+        this.account = account;
     }
+
+//    @JsonIgnore
+//    public void setBasis(final List<Basis> basis)
+//    {
+//        this.basis = Objects.requireNonNull(basis);
+//    }
 
     @JsonIgnore
     public String getBestName()
