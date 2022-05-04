@@ -19,6 +19,7 @@ import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.Institution;
 import com.msfinance.pbalancer.service.DataFactory;
+import com.msfinance.pbalancer.util.FXUtil;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -139,6 +140,7 @@ public class AccountEditController extends BaseController<Account,Account>
                 onEdit();
             }
         });
+        FXUtil.autoFitTable(t);
 
 
         addButton.setGraphic(MaterialDesignIcon.ADD.graphic());

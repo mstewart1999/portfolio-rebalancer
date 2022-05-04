@@ -4,9 +4,7 @@
 
 .table-view .column-header#unitsCol .label {
   -fx-alignment: center-right;
-  -fx-padding: 0px 20px 0px 20px; /* avoid overlap with sort indicator */
 }
 .table-view .column-header#valueCol .label {
   -fx-alignment: center-right;
-  -fx-padding: 0px 20px 0px 20px; /* avoid overlap with sort indicator */
 }

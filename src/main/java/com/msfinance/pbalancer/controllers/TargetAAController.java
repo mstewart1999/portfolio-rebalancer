@@ -24,6 +24,7 @@ import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.aa.DoubleExpression;
 import com.msfinance.pbalancer.model.aa.PredefinedAA;
+import com.msfinance.pbalancer.util.FXUtil;
 import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -176,6 +177,8 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
                 onAASelectionChanged();
             }
         });
+        FXUtil.autoFitTable(tt);
+        FXUtil.autoFitTable(t);
 
         addGroupButton.setGraphic(MaterialDesignIcon.ADD.graphic());
         addAssetButton.setGraphic(MaterialDesignIcon.ADD.graphic());
@@ -443,16 +446,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
             item.getValue().setPercentOfParentAsString(expr);
 
             // changing a group node will effect all children
-            try
-            {
-                e.getTreeTableView().getRoot().getValue().validate();
-                e.getTreeTableView().refresh();
-            }
-            catch (InvalidDataException ex)
-            {
-                // ignore;
-            }
-
+            validateAndRefresh(e.getTreeTableView());
             populateFlatView();
         }
         catch (InvalidDataException ex)
@@ -497,16 +491,8 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
             TreeItem<AANode> child = new TreeItem<>(aanChild);
             item.getChildren().add(child);
 
-            try
-            {
-                tt.getRoot().getValue().validate();
-                tt.refresh();
-                populateFlatView();
-            }
-            catch (InvalidDataException e)
-            {
-                // ignore;
-            }
+            validateAndRefresh(tt);
+            populateFlatView();
         }
     }
 
@@ -548,16 +534,8 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
             TreeItem<AANode> child = new TreeItem<>(aanChild);
             item.getChildren().add(child);
 
-            try
-            {
-                tt.getRoot().getValue().validate();
-                tt.refresh();
-                populateFlatView();
-            }
-            catch (InvalidDataException e)
-            {
-                // ignore;
-            }
+            validateAndRefresh(tt);
+            populateFlatView();
         }
     }
 
@@ -650,15 +628,26 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
             aan.getParent().removeChild(aan);
             item.getParent().getChildren().remove(item);
 
-            try
-            {
-                tt.getRoot().getValue().validate();
-                tt.refresh();
-            }
-            catch (InvalidDataException e)
-            {
-                // ignore;
-            }
+            validateAndRefresh(tt);
+            populateFlatView();
+        }
+    }
+
+    private static void validateAndRefresh(final TreeTableView<AANode> tt)
+    {
+        try
+        {
+            TreeItem<AANode> root = tt.getRoot();
+            root.getValue().validate();
+            // trigger column auto-resize
+            tt.setRoot(null);
+            tt.setRoot(root);
+
+            tt.refresh();
+        }
+        catch (InvalidDataException ex)
+        {
+            // ignore;
         }
     }
 }

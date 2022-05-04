@@ -21,6 +21,7 @@ import com.msfinance.pbalancer.model.AccountType;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.service.DataFactory;
+import com.msfinance.pbalancer.util.FXUtil;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -123,6 +124,7 @@ public class AccountListController extends BaseController<Portfolio,Portfolio>
                 onEdit();
             }
         });
+        FXUtil.autoFitTable(t);
 
 
         addButton.setGraphic(MaterialDesignIcon.ADD.graphic());
