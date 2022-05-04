@@ -8,9 +8,7 @@ public class DataFactory
     {
         if(Platform.isDesktop()) // TODO: preference
         {
-            // https://stackoverflow.com/questions/14288185/detecting-windows-or-linux
-            String osName = System.getProperty("os.name").toLowerCase(); // "windows 11"
-            if(osName.contains("win"))
+            if(org.controlsfx.tools.Platform.getCurrent() == org.controlsfx.tools.Platform.WINDOWS)
             {
                 return new WinLocalData();
             }
