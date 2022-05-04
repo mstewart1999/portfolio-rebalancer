@@ -241,7 +241,7 @@ public abstract class LocalData implements IData
     public void deleteAccount(final Account a) throws IOException
     {
         String profileId = a.getPortfolio().getProfileId();
-        Path path = getDataDir().resolve(profileId).resolve(PORTFOLIO_DIR).resolve(a.getId() + SUFFIX);
+        Path path = getDataDir().resolve(profileId).resolve(ACCOUNT_DIR).resolve(a.getId() + SUFFIX);
         Files.deleteIfExists(path);
     }
 
@@ -318,7 +318,7 @@ public abstract class LocalData implements IData
     public void deleteAsset(final Asset a) throws IOException
     {
         String profileId = a.getAccount().getPortfolio().getProfileId();
-        Path path = getDataDir().resolve(profileId).resolve(PORTFOLIO_DIR).resolve(a.getId() + SUFFIX);
+        Path path = getDataDir().resolve(profileId).resolve(ASSET_DIR).resolve(a.getId() + SUFFIX);
         Files.deleteIfExists(path);
     }
 
