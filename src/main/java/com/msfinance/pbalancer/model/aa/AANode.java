@@ -344,7 +344,7 @@ public class AANode
             }
             if( !Validation.almostEqual(1.0, sumChildrenAllocation, 0.0001) )
             {
-                this.alerts.add(new PortfolioAlert(AA, WARN, "all children's sum(percent) not 100%"));
+                this.alerts.add(new PortfolioAlert(AA, WARN, "all children must sum to 100% (currently " + Math.round(sumChildrenAllocation*100) + "%)"));
             }
         }
 
@@ -360,7 +360,7 @@ public class AANode
                     .reduce(0.0, Double::sum);
                 if(!Validation.almostEqual(1.0, total, 0.0001))
                 {
-                    alerts.add(new PortfolioAlert(AA, WARN, "sum of leaves not 100%"));
+                    alerts.add(new PortfolioAlert(AA, WARN, "sum of leaves must be 100% (currently " + Math.round(total*100) + "%)"));
                 }
             }
         }
