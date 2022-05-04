@@ -2,20 +2,6 @@
 
 }
 
-.has-error-alert {
-  -fx-background-color: -pb-error-color;
-  -fx-text-fill: black;
-}
-.has-warn-alert {
-  -fx-background-color: -pb-warn-color;
-  -fx-text-fill: black;
-
-}
-.has-info-alert {
-  -fx-background-color: -pb-info-color;
-  -fx-text-fill: black;
-}
-
 .table-view .column-header#percent .label {
   -fx-alignment: center-right;
 }

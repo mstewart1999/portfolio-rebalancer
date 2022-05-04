@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.model.aa.AANode;
 
@@ -30,7 +29,6 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
         {
             setText("");
             setGraphic(null);
-//            this.getStyleClass().clear();
         }
         else
         {
@@ -39,27 +37,23 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
             List<PortfolioAlert> infoAlerts = alerts.stream().filter(a -> a.level() == INFO).collect(Collectors.toList());
             List<PortfolioAlert> activeAlerts = Collections.emptyList();
 
-//            this.getStyleClass().clear();
             if(errorAlerts.size() > 0)
             {
                 activeAlerts = errorAlerts;
-                setGraphic(MaterialDesignIcon.ERROR.graphic());
+                //setGraphic(MaterialDesignIcon.ERROR.graphic());
                 setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/error48.png"))));
-//                this.getStyleClass().add("has-error-alert");
             }
             else if(warnAlerts.size() > 0)
             {
                 activeAlerts = warnAlerts;
-                setGraphic(MaterialDesignIcon.WARNING.graphic());
+                //setGraphic(MaterialDesignIcon.WARNING.graphic());
                 setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/warn48.png"))));
-//                this.getStyleClass().add("has-warn-alert");
             }
             else if(infoAlerts.size() > 0)
             {
                 activeAlerts = infoAlerts;
-                setGraphic(MaterialDesignIcon.INFO.graphic());
+                //setGraphic(MaterialDesignIcon.INFO.graphic());
                 setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/info48.png"))));
-//                this.getStyleClass().add("has-info-alert");
             }
 
             StringBuilder sb = new StringBuilder();
