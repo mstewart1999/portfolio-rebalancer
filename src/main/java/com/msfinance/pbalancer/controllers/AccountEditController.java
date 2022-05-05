@@ -1,6 +1,7 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
+import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AccountTypeListCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
@@ -79,9 +81,6 @@ public class AccountEditController extends BaseController<Account,Account>
 
     @FXML
     private Button refreshButton;
-
-
-    private boolean positionsDirty;
 
 
     public AccountEditController()
@@ -181,8 +180,6 @@ public class AccountEditController extends BaseController<Account,Account>
         t.getSelectionModel().clearSelection();
         t.setItems( FXCollections.observableList( acct.getAssets() ) );
         t.refresh();
-
-        positionsDirty = false;
     }
 
     private void populateTotalValue()
@@ -217,38 +214,21 @@ public class AccountEditController extends BaseController<Account,Account>
     private boolean save()
     {
         Account acct = getIn();
+        acct.setName( nameText.getText() );
+        acct.setInstitution( institutionCombo.getValue() );
+        acct.setType( typeCombo.getValue() );
+        acct.markDirty();
+
         try
         {
             // NOTE: any changes to table data, other than "positions" has already been saved
-            acct.setName( nameText.getText() );
-            acct.setInstitution( institutionCombo.getValue() );
-            acct.setType( typeCombo.getValue() );
-
-            DataFactory.get().updateAccount(acct);
+            PersistManager.persistAll(acct.getPortfolio().getProfile());
         }
         catch (IOException e)
         {
             LOG.error("Error updating account: " + getIn().getId(), e);
             getApp().showMessage("Error updating account");
             return false;
-        }
-
-        if(positionsDirty)
-        {
-            try
-            {
-                for(Asset a : getIn().getAssets())
-                {
-                    DataFactory.get().updateAsset(a);
-                }
-                positionsDirty = false;
-            }
-            catch (IOException e)
-            {
-                LOG.error("Error updating asset positions for account: " + getIn().getId(), e);
-                getApp().showMessage("Error updating asset positions");
-                return false;
-            }
         }
         return true;
     }
@@ -281,9 +261,10 @@ public class AccountEditController extends BaseController<Account,Account>
 
         Asset item = new Asset(getIn().getId());
         item.setListPosition(listPosition);
+        item.markDirty();
         // link into hierarchy
         item.setAccount(getIn());
-        getIn().getAssets().add(item);
+        t.getItems().add(item);
         // wait until success to persist - this is different from many screens
 
         getApp().<Asset,Asset>mySwitchView(App.ASSET_ADD_VIEW, item,
@@ -297,9 +278,8 @@ public class AccountEditController extends BaseController<Account,Account>
                     try
                     {
                         DataFactory.get().createAsset(a);
-                        DataFactory.get().updateAccount(a.getAccount());
-                        DataFactory.get().updatePortfolio(a.getAccount().getPortfolio());
-                        DataFactory.get().updateProfile(a.getAccount().getPortfolio().getProfile());
+                        a.markClean();
+                        PersistManager.persistAll(a.getAccount().getPortfolio().getProfile());
                         getApp().showMessage("Created Asset");
                     }
                     catch (IOException e)
@@ -309,8 +289,8 @@ public class AccountEditController extends BaseController<Account,Account>
                     }
                 },
                 () -> {
-                    // remove it upon cancel
-                    getIn().getAssets().remove(item);
+                    // remove it upon cancel, but it hasn't been persisted yet
+                    t.getItems().remove(item);
                     t.refresh();
                 });
     }
@@ -318,7 +298,7 @@ public class AccountEditController extends BaseController<Account,Account>
     private void onEdit()
     {
         Asset item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         if(item.getPricingType() == PricingType.AUTO_PER_UNIT)
         {
@@ -332,10 +312,7 @@ public class AccountEditController extends BaseController<Account,Account>
                         populateTotalValue();
                         try
                         {
-                            DataFactory.get().updateAsset(a);
-                            DataFactory.get().updateAccount(a.getAccount());
-                            DataFactory.get().updatePortfolio(a.getAccount().getPortfolio());
-                            DataFactory.get().updateProfile(a.getAccount().getPortfolio().getProfile());
+                            PersistManager.persistAll(a.getAccount().getPortfolio().getProfile());
                             getApp().showMessage("Updated Asset");
                         }
                         catch (IOException e)
@@ -360,10 +337,7 @@ public class AccountEditController extends BaseController<Account,Account>
                         populateTotalValue();
                         try
                         {
-                            DataFactory.get().updateAsset(a);
-                            DataFactory.get().updateAccount(a.getAccount());
-                            DataFactory.get().updatePortfolio(a.getAccount().getPortfolio());
-                            DataFactory.get().updateProfile(a.getAccount().getPortfolio().getProfile());
+                            PersistManager.persistAll(a.getAccount().getPortfolio().getProfile());
                             getApp().showMessage("Updated Asset");
                         }
                         catch (IOException e)
@@ -381,7 +355,7 @@ public class AccountEditController extends BaseController<Account,Account>
     private void onUp()
     {
         Asset item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         if(t.getItems().size() > 1)
         {
@@ -406,17 +380,20 @@ public class AccountEditController extends BaseController<Account,Account>
             // renumber list
             for(int i=0; i<t.getItems().size(); i++)
             {
-                t.getItems().get(i).setListPosition(i);
+                if(t.getItems().get(i).getListPosition() != i)
+                {
+                    t.getItems().get(i).setListPosition(i);
+                    t.getItems().get(i).markDirty();
+                }
             }
-
-            positionsDirty = true;
+            // persist changes on "back"
         }
     }
 
     private void onDown()
     {
         Asset item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         if(t.getItems().size() > 1)
         {
@@ -441,17 +418,20 @@ public class AccountEditController extends BaseController<Account,Account>
             // renumber list
             for(int i=0; i<t.getItems().size(); i++)
             {
-                t.getItems().get(i).setListPosition(i);
+                if(t.getItems().get(i).getListPosition() != i)
+                {
+                    t.getItems().get(i).setListPosition(i);
+                    t.getItems().get(i).markDirty();
+                }
             }
-
-            positionsDirty = true;
+            // persist changes on "back"
         }
     }
 
     private void onDelete()
     {
         Asset item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         // TODO: android book suggests not to do confirmations, but allow "undo"
         Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to delete this asset?");
@@ -480,54 +460,33 @@ public class AccountEditController extends BaseController<Account,Account>
 
             try
             {
-                DataFactory.get().updateAccount(getIn());
-                DataFactory.get().updatePortfolio(getIn().getPortfolio());
-                DataFactory.get().updateProfile(getIn().getPortfolio().getProfile());
+                PersistManager.persistAll(getIn().getPortfolio().getProfile());
             }
             catch (IOException e)
             {
                 LOG.error("Error updating totals for account: " + getIn().getId(), e);
                 getApp().showMessage("Error updating totals for account: " + item.getId());
             }
-
         }
     }
 
     private void onRefresh()
     {
-//        Map<String,BigDecimal> priceUpdates = new HashMap<>();
-//        for(Asset asset : t.getItems())
-//        {
-//            priceUpdates.put(asset.ticker(), BigDecimal.ZERO);
-//        }
-//        // TODO: implement pricing API, update data model
-//        for(Asset asset : acct.getAssets())
-//        {
-//            BigDecimal newPrice = priceUpdates.get(asset.ticker());
-//            if(newPrice.doubleValue() > 0.0)
-//            {
-//                //asset.setPrice(newPrice);
-//            }
-//        }
-        // TODO: update totalValueLabel, update portfolio object
+        Account in = getIn();
+        Collection<Asset> updated = StateManager.refreshPrices(in);
 
-        Alert alert = new Alert(AlertType.INFORMATION, "This feature may be available to subscribers only.");
-        Optional<ButtonType> result = alert.showAndWait();
-        /*
-        if(result.isPresent() && result.get() == ButtonType.OK)
+        t.refresh();
+        populateTotalValue();
+        getApp().showMessage(String.format("Updated prices for %s assets", updated.size()));
+
+        try
         {
-            try
-            {
-                DataFactory.get().deletePortfolio(StateManager.currentPortfolioId);
-                view.getAppManager().showMessage("Deleted: " + StateManager.currentPortfolioId);
-                view.getAppManager().switchToPreviousView();
-            }
-            catch (IOException e)
-            {
-                LOG.error("Error deleting: " + StateManager.currentPortfolioId, e);
-                view.getAppManager().showMessage("Error deleting: " + StateManager.currentPortfolioId);
-            }
+            PersistManager.persistAll(in.getPortfolio().getProfile());
         }
-        */
+        catch (IOException e)
+        {
+            LOG.error("Error updating assets for account: " + in.getId(), e);
+            getApp().showMessage("Error updating assets");
+        }
     }
 }

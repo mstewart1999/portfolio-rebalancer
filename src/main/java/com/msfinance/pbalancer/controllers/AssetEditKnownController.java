@@ -186,6 +186,8 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
         Asset asset = getIn();
         asset.setAssetClass(assetClassCombo.getValue());
         asset.setUnits(NumberFormatHelper.parseNumber3(unitsText.getText()));
+        asset.markDirty();
+
         // TODO: better validation and error msg UX
 
         AssetClass.add(asset.getAssetClass());

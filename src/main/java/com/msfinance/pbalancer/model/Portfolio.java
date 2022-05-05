@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.util.Validation;
 
-public class Portfolio
+public class Portfolio implements IPersistable
 {
     private final String profileId;
     private final String id;
@@ -26,6 +26,9 @@ public class Portfolio
     private Profile profile;
     private List<Account> accounts;
     private AssetAllocation targetAA;
+
+    private boolean dirty = false;
+
 
     public Portfolio(
             final String profileId
@@ -161,4 +164,23 @@ public class Portfolio
         this.targetAA = Objects.requireNonNull(targetAA);
     }
 
+
+    @Override
+    public void markDirty()
+    {
+        this.dirty = true;
+    }
+
+    @Override
+    public void markClean()
+    {
+        this.dirty = false;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isDirty()
+    {
+        return this.dirty;
+    }
 }

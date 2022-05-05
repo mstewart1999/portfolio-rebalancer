@@ -459,7 +459,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private void onAddGroup()
     {
         TreeItem<AANode> item = tt.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         AANode aan = item.getValue();
         int listPos = 1;
@@ -499,7 +499,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private void onAddAsset()
     {
         TreeItem<AANode> item = tt.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         AANode aan = item.getValue();
         int listPos = 1;
@@ -542,8 +542,8 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private void onUp()
     {
         TreeItem<AANode> item = tt.getSelectionModel().getSelectedItem();
+        if(item == null) return;
         TreeItem<AANode> parent = item.getParent();
-        Validation.assertNonNull(item);
 
         if(parent == null)
         {
@@ -581,8 +581,8 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private void onDown()
     {
         TreeItem<AANode> item = tt.getSelectionModel().getSelectedItem();
+        if(item == null) return;
         TreeItem<AANode> parent = item.getParent();
-        Validation.assertNonNull(item);
 
         if(parent == null)
         {
@@ -620,7 +620,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private void onDelete()
     {
         TreeItem<AANode> item = tt.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         AANode aan = item.getValue();
         if(aan.getParent() != null)

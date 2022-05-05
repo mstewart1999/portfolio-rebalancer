@@ -1,7 +1,5 @@
 package com.msfinance.pbalancer.controllers;
 
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.Map;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -12,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
+import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AssetTickerListCell;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
@@ -216,22 +215,53 @@ public class AssetAddController extends BaseController<Asset,Asset>
 
         if(tickerRB.isSelected())
         {
-            asset.setTicker(tickerText.getText());
-            asset.setAutoName(autoNameLabel.getText());
+            asset.setTicker(tickerText.getText().trim().toUpperCase());
+            asset.setAutoName(autoNameLabel.getText().trim());
             asset.setManualName(null);
             asset.setPricingType(PricingType.AUTO_PER_UNIT);
             asset.setUnits(null);
             asset.setManualValue(null);
             asset.setManualValueTmstp(null);
-            asset.setLastAutoValue( new BigDecimal("1.00") ); // TODO
-            asset.setLastAutoValueTmstp(new Date()); // TODO: somehow get this from the api, probably close of prior business day
+            asset.markDirty();
+
+            if(Validation.isBlank(asset.getTicker()))
+            {
+                getApp().showMessage("Ticker required");
+                return false;
+            }
+            if(Validation.isBlank(asset.getAutoName()))
+            {
+                AssetTicker found = AssetTickerCache.getInstance().lookup(asset.getTicker());
+                if(found == null)
+                {
+                    getApp().showMessage("Ticker selection required");
+                    return false;
+                }
+                // quirk of autosuggest widget - you can enter exactly the right value but make no selection
+                asset.setAutoName(found.getName());
+                asset.markDirty();
+            }
+
+            if(!StateManager.refreshPrice(asset))
+            {
+                getApp().showMessage("Error getting asset price per unit");
+                return false;
+            }
+
             return true;
         }
         if(manualNameRB.isSelected())
         {
             asset.setTicker(null);
             asset.setAutoName(null);
-            asset.setManualName(manualNameText.getText());
+            asset.setManualName(manualNameText.getText().trim());
+            asset.markDirty();
+
+            if(Validation.isBlank(asset.getManualName()))
+            {
+                getApp().showMessage("Name required");
+                return false;
+            }
             if(!priceManualPerUnitRB.isSelected() && !priceManualPerWholeRB.isSelected())
             {
                 // TODO: better validation and error msg UX

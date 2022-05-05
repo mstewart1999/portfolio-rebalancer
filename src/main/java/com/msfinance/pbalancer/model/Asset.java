@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msfinance.pbalancer.util.Validation;
 
-public class Asset
+public class Asset implements IPersistable
 {
     public enum PricingType { MANUAL_PER_UNIT, MANUAL_PER_WHOLE, AUTO_PER_UNIT }
 
@@ -31,6 +31,9 @@ public class Asset
 
     private Account account;
     //private List<Basis> basis;
+
+    private boolean dirty = false;
+
 
     public Asset(
             final String accountId
@@ -230,6 +233,27 @@ public class Asset
 //    {
 //        this.basis = Objects.requireNonNull(basis);
 //    }
+
+
+    @Override
+    public void markDirty()
+    {
+        this.dirty = true;
+    }
+
+    @Override
+    public void markClean()
+    {
+        this.dirty = false;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isDirty()
+    {
+        return this.dirty;
+    }
+
 
     @JsonIgnore
     public String getBestName()

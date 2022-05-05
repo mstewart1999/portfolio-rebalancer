@@ -1,0 +1,70 @@
+package com.msfinance.pbalancer.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.msfinance.pbalancer.model.PriceResult;
+
+public class MockPricing implements IPricing
+{
+    private static Map<String,PriceResult> mockData = new HashMap<>();
+    static
+    {
+        Date when = new Date(LocalDate.parse("2022-05-04").atTime(16, 0).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli());
+
+        mockData.put("$CASH", new PriceResult("$CASH", new BigDecimal("1.00"), when)); // TBD
+
+        mockData.put("VTAPX", new PriceResult("VTAPX", new BigDecimal("25.29"), when));
+        mockData.put("VTABX", new PriceResult("VTABX", new BigDecimal("20.30"), when));
+        mockData.put("VSBSX", new PriceResult("VSBSX", new BigDecimal("19.63"), when));
+        mockData.put("AVUV", new PriceResult("AVUV", new BigDecimal("77.16"), when));
+        mockData.put("AVDV", new PriceResult("AVDV", new BigDecimal("59.19"), when));
+        mockData.put("AVES", new PriceResult("AVES", new BigDecimal("46.27"), when));
+        mockData.put("VXUS", new PriceResult("VXUS", new BigDecimal("55.68"), when));
+
+        mockData.put("VWLUX", new PriceResult("VWLUX", new BigDecimal("10.79"), when));
+        mockData.put("VTSAX", new PriceResult("VTSAX", new BigDecimal("101.94"), when));
+        mockData.put("VTIAX", new PriceResult("VTIAX", new BigDecimal("30.16"), when));
+        mockData.put("VSIAX", new PriceResult("VSIAX", new BigDecimal("72.18"), when));
+        mockData.put("LUV", new PriceResult("LUV", new BigDecimal("47.32"), when));
+
+        mockData.put("VAIPX", new PriceResult("VAIPX", new BigDecimal("26.47"), when));
+        mockData.put("VWETX", new PriceResult("VWETX", new BigDecimal("8.66"), when));
+        mockData.put("FNDF", new PriceResult("FNDF", new BigDecimal("30.70"), when));
+
+        mockData.put("COF", new PriceResult("COF", new BigDecimal("128.98"), when));
+        mockData.put("VTIP", new PriceResult("VTIP", new BigDecimal("50.38"), when));
+
+        mockData.put("IWN", new PriceResult("IWN", new BigDecimal("150.72"), when));
+        mockData.put("VEU", new PriceResult("VEU", new BigDecimal("53.72"), when));
+        mockData.put("VSS", new PriceResult("VSS", new BigDecimal("113.86"), when));
+        mockData.put("VWO", new PriceResult("VWO", new BigDecimal("43.08"), when));
+        mockData.put("VTI", new PriceResult("VTI", new BigDecimal("208.42"), when));
+
+        // experimental proxy asset
+        mockData.put("P-VEA",            new PriceResult("P-VEA",            new BigDecimal("17.111"), when));
+        mockData.put("P-VEA-2021-11-01", new PriceResult("P-VEA-2021-11-01", new BigDecimal("20.253"), when));
+        mockData.put("VEA",              new PriceResult("VEA",              new BigDecimal("44.71"), when));
+        mockData.put("VEA-2021-11-01",   new PriceResult("VEA-2021-11-01",  new BigDecimal("52.92"), when));
+    }
+
+    @Override
+    public Map<String,PriceResult> getMostRecentEOD(final Collection<String> tickers)
+    {
+        Map<String,PriceResult> out = new HashMap<>();
+        for(String ticker : tickers)
+        {
+            if(mockData.containsKey(ticker))
+            {
+                out.put(ticker, mockData.get(ticker));
+            }
+        }
+        return out;
+    }
+
+}

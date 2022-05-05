@@ -42,4 +42,21 @@ public class Validation
     {
         if(!b) throw new IllegalArgumentException();
     }
+
+    public static <T> boolean isSame(final T o1, final T o2)
+    {
+        if((o1 == null) && (o2 == null))
+        {
+            return true;
+        }
+        if(o1 == null)
+        {
+            return false;
+        }
+        if(o2 == null)
+        {
+            return false;
+        }
+        return o1.equals(o2);
+    }
 }

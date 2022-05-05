@@ -11,11 +11,11 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.Icon;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
+import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.controllers.cells.PortfolioGoalListCell;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
-import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -205,15 +205,13 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private boolean save()
     {
-        boolean hasChanges = false;
-
         Portfolio p = getIn();
         String oldName = p.getName();
         String newName = nameText.getText();
         if(!oldName.equals(newName))
         {
             p.setName(newName);
-            hasChanges = true;
+            p.markDirty();
         }
 
         PortfolioGoal oldGoal = p.getGoal();
@@ -221,21 +219,18 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         if(oldGoal != newGoal)
         {
             p.setGoal(newGoal);
-            hasChanges = true;
+            p.markDirty();
         }
 
-        if(hasChanges)
+        try
         {
-            try
-            {
-                DataFactory.get().updatePortfolio(p);
-            }
-            catch (IOException e)
-            {
-                LOG.error("Error updating portfolio: " + p.getId(), e);
-                getApp().showMessage("Error updating portfolio");
-                return false;
-            }
+            PersistManager.persistAll(p.getProfile());
+        }
+        catch (IOException e)
+        {
+            LOG.error("Error updating portfolio: " + p.getId(), e);
+            getApp().showMessage("Error updating portfolio");
+            return false;
         }
 
         return true;
@@ -257,10 +252,11 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         getApp().<AssetAllocation,AssetAllocation>mySwitchView(App.TARGET_AA_VIEW, getIn().getTargetAA(),
                 aa -> {
                     getIn().setTargetAA(aa);
+                    getIn().markDirty();
 
                     try
                     {
-                        DataFactory.get().updatePortfolio(getIn());
+                        PersistManager.persistAll(getIn().getProfile());
                     }
                     catch (IOException e)
                     {

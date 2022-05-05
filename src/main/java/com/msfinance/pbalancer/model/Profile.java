@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Profile
+public class Profile implements IPersistable
 {
     public static final String DEFAULT = "DEFAULT";
 
@@ -19,6 +19,8 @@ public class Profile
     private String name;
     private BigDecimal lastValue;
     private Date lastValueTmstp;
+
+    private boolean dirty = false;
 
     private List<Portfolio> portfolios;
 
@@ -93,5 +95,24 @@ public class Profile
         this.portfolios = portfolios;
     }
 
+
+    @Override
+    public void markDirty()
+    {
+        this.dirty = true;
+    }
+
+    @Override
+    public void markClean()
+    {
+        this.dirty = false;
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean isDirty()
+    {
+        return this.dirty;
+    }
 }
 

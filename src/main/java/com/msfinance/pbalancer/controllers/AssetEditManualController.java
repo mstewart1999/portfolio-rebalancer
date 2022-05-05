@@ -139,6 +139,8 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerUnitLabel.setText("Value per Share ($)");
             valuePerWholeLabelLabel.setVisible(true);
             valuePerWholeContentLabel.setVisible(true);
+
+            unitsText.requestFocus();
         }
         else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
         {
@@ -152,8 +154,9 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerUnitLabel.setText("Value ($)");
             valuePerWholeLabelLabel.setVisible(false);
             valuePerWholeContentLabel.setVisible(false);
+
+            valuePerUnitText.requestFocus();
         }
-        valuePerUnitText.requestFocus();
     }
 
     protected void populateAssetClasses()
@@ -224,6 +227,8 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             asset.setManualValue(NumberFormatHelper.parseNumber2(valuePerUnitText.getText()));
             asset.setManualValueTmstp(new Date());
         }
+        asset.markDirty();
+
         // TODO: better validation and error msg UX
 
         AssetClass.add(asset.getAssetClass());

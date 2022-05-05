@@ -1,6 +1,7 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,9 +14,11 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
+import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
 import com.msfinance.pbalancer.controllers.cells.PortfolioGoalTableCell;
+import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.model.Profile;
@@ -73,9 +76,6 @@ public class PortfolioListController extends BaseController<Profile,Profile>
 
     @FXML
     private Button refreshButton;
-
-
-    private boolean positionsDirty;
 
 
     public PortfolioListController()
@@ -173,7 +173,6 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         t.getSelectionModel().clearSelection();
         t.setItems(FXCollections.observableList( items ));
         t.refresh();
-        positionsDirty = false;
     }
 
     private void populateTotalValue()
@@ -217,21 +216,15 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private boolean save()
     {
         // NOTE: any changes to table data, other than "positions" has already been saved
-        if(positionsDirty)
+        try
         {
-            try
-            {
-                for(Portfolio p : getIn().getPortfolios())
-                {
-                    DataFactory.get().updatePortfolio(p);
-                }
-            }
-            catch (IOException e)
-            {
-                LOG.error("Error updating portfolio positions for profile: " + getIn().getId(), e);
-                getApp().showMessage("Error updating portfolio positions");
-                return false;
-            }
+            PersistManager.persistAll(getIn());
+        }
+        catch (IOException e)
+        {
+            LOG.error("Error updating portfolio positions for profile: " + getIn().getId(), e);
+            getApp().showMessage("Error updating portfolio positions");
+            return false;
         }
         return true;
     }
@@ -252,12 +245,15 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         Portfolio item = new Portfolio(getIn().getId());
         item.setName("");
         item.setListPosition(listPosition);
+        item.markDirty();
         // link into hierarchy
         item.setProfile(getIn());
-        getIn().getPortfolios().add(item);
+        t.getItems().add(item);
+
         try
         {
             DataFactory.get().createPortfolio(item);
+            item.markClean();
         }
         catch (IOException e)
         {
@@ -272,7 +268,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
                 },
                 () -> {
                     // remove it upon cancel
-                    getIn().getPortfolios().remove(item);
+                    t.getItems().remove(item);
                     t.refresh();
 
                     try
@@ -290,7 +286,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private void onEdit()
     {
         Portfolio item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         getApp().<Portfolio,Portfolio>mySwitchView(App.PORTFOLIO_VIEW, item,
                 p -> {
@@ -305,7 +301,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private void onUp()
     {
         Portfolio item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         if(t.getItems().size() > 1)
         {
@@ -330,10 +326,14 @@ public class PortfolioListController extends BaseController<Profile,Profile>
             // renumber list
             for(int i=0; i<t.getItems().size(); i++)
             {
-                t.getItems().get(i).setListPosition(i);
+                if(t.getItems().get(i).getListPosition() != i)
+                {
+                    t.getItems().get(i).setListPosition(i);
+                    t.getItems().get(i).markDirty();
+                }
             }
 
-            positionsDirty = true;
+            // unlike other screens, there is no "back" - so save immediately
             save();
         }
     }
@@ -341,7 +341,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private void onDown()
     {
         Portfolio item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         if(t.getItems().size() > 1)
         {
@@ -366,10 +366,14 @@ public class PortfolioListController extends BaseController<Profile,Profile>
             // renumber list
             for(int i=0; i<t.getItems().size(); i++)
             {
-                t.getItems().get(i).setListPosition(i);
+                if(t.getItems().get(i).getListPosition() != i)
+                {
+                    t.getItems().get(i).setListPosition(i);
+                    t.getItems().get(i).markDirty();
+                }
             }
 
-            positionsDirty = true;
+            // unlike other screens, there is no "back" - so save immediately
             save();
         }
     }
@@ -377,7 +381,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private void onDelete()
     {
         Portfolio item = t.getSelectionModel().getSelectedItem();
-        Validation.assertNonNull(item);
+        if(item == null) return;
 
         Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to delete this portfolio?");
         Optional<ButtonType> result = alert.showAndWait();
@@ -403,7 +407,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
 
             try
             {
-                DataFactory.get().updateProfile(getIn());
+                PersistManager.persistAll(getIn());
             }
             catch (IOException e)
             {
@@ -415,7 +419,21 @@ public class PortfolioListController extends BaseController<Profile,Profile>
 
     private void onRefresh()
     {
-        Alert alert = new Alert(AlertType.INFORMATION, "This feature may be available to subscribers only.");
-        Optional<ButtonType> result = alert.showAndWait();
+        Profile in = getIn();
+        Collection<Asset> updated = StateManager.refreshPrices(in);
+
+        t.refresh();
+        populateTotalValue();
+        getApp().showMessage(String.format("Updated prices for %s assets", updated.size()));
+
+        try
+        {
+            PersistManager.persistAll(in);
+        }
+        catch (IOException e)
+        {
+            LOG.error("Error updating assets for profile: " + in.getId(), e);
+            getApp().showMessage("Error updating assets");
+        }
     }
 }
