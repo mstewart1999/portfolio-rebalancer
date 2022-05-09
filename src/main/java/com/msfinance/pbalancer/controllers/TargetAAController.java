@@ -69,9 +69,6 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private Label customLabel;
 
     @FXML
-    private Button customResetButton;
-
-    @FXML
     private RadioButton predefinedRB;
 
     @FXML
@@ -101,6 +98,9 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private Button downButton;
     @FXML
     private Button deleteButton;
+    @FXML
+    private Button resetButton;
+
 
     private AssetAllocation working;
 
@@ -117,7 +117,6 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         Validation.assertNonNull(customRB);
         Validation.assertNonNull(customHelpIcon);
         Validation.assertNonNull(customLabel);
-        Validation.assertNonNull(customResetButton);
         Validation.assertNonNull(predefinedCombo);
         Validation.assertNonNull(predefinedHelpIcon);
         Validation.assertNonNull(predefinedUrlHref);
@@ -129,6 +128,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         Validation.assertNonNull(upButton);
         Validation.assertNonNull(downButton);
         Validation.assertNonNull(deleteButton);
+        Validation.assertNonNull(resetButton);
 
         ToggleGroup toggleGroup = new ToggleGroup();
         predefinedRB.setToggleGroup(toggleGroup);
@@ -143,7 +143,6 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         predefinedHelpIcon.setOnMouseClicked(e -> visitPredefinedHelp());
         predefinedUrlHref.setOnAction(e -> visitPredefinedUrl());
         customHelpIcon.setOnMouseClicked(e -> visitCustomHelp());
-        customResetButton.setOnAction(e -> resetAA());
 
         tt.getColumns().get(0).setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         TreeTableColumn<AANode,String> ttCol1 = (TreeTableColumn<AANode,String>) tt.getColumns().get(1);
@@ -185,12 +184,15 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         upButton.setGraphic(MaterialDesignIcon.ARROW_UPWARD.graphic());
         downButton.setGraphic(MaterialDesignIcon.ARROW_DOWNWARD.graphic());
         deleteButton.setGraphic(MaterialDesignIcon.DELETE_FOREVER.graphic());
+        resetButton.setGraphic(MaterialDesignIcon.DELETE_SWEEP.graphic());
+
 
         addGroupButton.setOnAction(e -> onAddGroup());
         addAssetButton.setOnAction(e -> onAddAsset());
         upButton.setOnAction(e -> onUp());
         downButton.setOnAction(e -> onDown());
         deleteButton.setOnAction(e -> onDelete());
+        resetButton.setOnAction(e -> resetAA());
     }
 
     private void onAATypeChange()
@@ -202,18 +204,17 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
 
         customHelpIcon.setVisible(customRB.isSelected());
         customLabel.setVisible(customRB.isSelected());
-        customResetButton.setVisible(customRB.isSelected());
 
         predefinedCombo.getSelectionModel().clearSelection();
 
         if(predefinedRB.isSelected())
         {
-            customizePane.setVisible(false);
+            customizePane.setDisable(true);
             tt.setEditable(false);
         }
         if(customRB.isSelected())
         {
-            customizePane.setVisible(true);
+            customizePane.setDisable(false);
             tt.setEditable(true);
         }
 
@@ -250,10 +251,12 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         {
             predefinedRB.setSelected(true);
             predefinedCombo.getSelectionModel().select(p);
+            customizePane.setDisable(true);
         }
         else
         {
             customRB.setSelected(true);
+            customizePane.setDisable(false);
         }
 
         populateNestedView(working);

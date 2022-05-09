@@ -77,6 +77,9 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     @FXML
     private Button refreshButton;
 
+    @FXML
+    private Label statusLabel;
+
 
     public PortfolioListController()
     {
@@ -95,6 +98,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         Validation.assertNonNull(downButton);
         Validation.assertNonNull(deleteButton);
         Validation.assertNonNull(refreshButton);
+        Validation.assertNonNull(statusLabel);
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
         TableColumn<Portfolio,PortfolioGoal> tCol1 = (TableColumn<Portfolio,PortfolioGoal>) t.getColumns().get(1);
@@ -168,11 +172,12 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         List<Portfolio> items = profile.getPortfolios();
 
         nameLabel.setText(profile.getName());
-        populateTotalValue();
 
         t.getSelectionModel().clearSelection();
         t.setItems(FXCollections.observableList( items ));
         t.refresh();
+
+        populateTotalValue();
     }
 
     private void populateTotalValue()
@@ -186,6 +191,8 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         {
             totalValueLabel.setText("0");
         }
+
+        statusLabel.setText(String.format("Total Portfolios: %,d", t.getItems().size()));
     }
 
     @Override

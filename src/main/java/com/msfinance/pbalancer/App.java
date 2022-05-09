@@ -55,6 +55,7 @@ public class App extends Application
     public static final String ACCOUNT_LIST_VIEW = "ACCOUNT_LIST_VIEW";
     public static final String ACCOUNT_EDIT_VIEW = "ACCOUNT_EDIT_VIEW";
     public static final String ASSET_ADD_VIEW = "ASSET_ADD_VIEW";
+    public static final String ASSET_EDIT_PROXY_VIEW = "ASSET_EDIT_PROXY_VIEW";
     public static final String ASSET_EDIT_KNOWN_VIEW = "ASSET_EDIT_KNOWN_VIEW";
     public static final String ASSET_EDIT_MANUAL_VIEW = "ASSET_EDIT_MANUAL_VIEW";
     public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
@@ -77,6 +78,7 @@ public class App extends Application
         createView(ACCOUNT_LIST_VIEW, "accountList.fxml");
         createView(ACCOUNT_EDIT_VIEW, "accountEdit.fxml");
         createView(ASSET_ADD_VIEW, "assetAdd.fxml");
+        createView(ASSET_EDIT_PROXY_VIEW, "assetEditProxy.fxml");
         createView(ASSET_EDIT_KNOWN_VIEW, "assetEditKnown.fxml");
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
@@ -94,6 +96,7 @@ public class App extends Application
         appManager.addViewFactory(ACCOUNT_LIST_VIEW, () -> viewByKey.get(ACCOUNT_LIST_VIEW));
         appManager.addViewFactory(ACCOUNT_EDIT_VIEW, () -> viewByKey.get(ACCOUNT_EDIT_VIEW));
         appManager.addViewFactory(ASSET_ADD_VIEW, () -> viewByKey.get(ASSET_ADD_VIEW));
+        appManager.addViewFactory(ASSET_EDIT_PROXY_VIEW, () -> viewByKey.get(ASSET_EDIT_PROXY_VIEW));
         appManager.addViewFactory(ASSET_EDIT_KNOWN_VIEW, () -> viewByKey.get(ASSET_EDIT_KNOWN_VIEW));
         appManager.addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> viewByKey.get(ASSET_EDIT_MANUAL_VIEW));
         appManager.addViewFactory(TARGET_AA_VIEW, () -> viewByKey.get(TARGET_AA_VIEW));
@@ -213,7 +216,7 @@ public class App extends Application
         scene.getStylesheets().add(App.class.getResource("app.css").toExternalForm());
         ((Stage) scene.getWindow()).getIcons().add(new Image(App.class.getResourceAsStream("/icon.png")));
         scene.getWindow().setWidth(800);
-        scene.getWindow().setHeight(600);
+        scene.getWindow().setHeight(900);
         scene.getWindow().centerOnScreen();
     }
 

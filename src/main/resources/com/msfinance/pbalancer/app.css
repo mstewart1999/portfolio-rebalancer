@@ -5,6 +5,8 @@
   
   -pb-gray-100: #F5F5F5;
   -pb-gray-200: #EEEEEE;
+  -pb-gray-300: #DDDDDD;
+  -pb-gray-400: #CCCCCC;
 }
 
 
@@ -99,7 +101,7 @@
 /* https://docs.gluonhq.com/charm/4.4.1/#_swatches */
 .pb-toolbox {
   -fx-padding: 8px;
-  -fx-background-color: linear-gradient(to bottom right, -pb-gray-100, -pb-gray-200);
+  -fx-background-color: -pb-gray-300;
 
   -fx-border-color: black;
   -fx-border-width: 1px;
@@ -109,3 +111,13 @@
 .pb-toolbox .button {
   -fx-max-width: 500px;
 }
+
+.pb-statusbox {
+  -fx-padding: 4px;
+  -fx-background-color: -pb-gray-200;
+
+  -fx-border-color: -pb-gray-400;
+  -fx-border-width: 1px;
+  -fx-effect: innershadow(three-pass-box,-elevation-shadow-color, 2, 0, 0, 1);
+}
+

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 public class AssetClass
 {
     public static final String UNDEFINED = "Undefined";
+    public static final String CASH = "FI-CASH";
 
     private static final Map<String,AssetClass> KNOWN = new HashMap<>();
     private static final List<AssetClass> KNOWN_LIST = new ArrayList<>();

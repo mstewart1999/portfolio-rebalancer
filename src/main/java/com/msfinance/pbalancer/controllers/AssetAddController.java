@@ -1,5 +1,6 @@
 package com.msfinance.pbalancer.controllers;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -14,6 +15,7 @@ import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AssetTickerListCell;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
+import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.aa.AssetTicker;
 import com.msfinance.pbalancer.model.aa.AssetTickerCache;
 import com.msfinance.pbalancer.util.HelpUrls;
@@ -21,12 +23,14 @@ import com.msfinance.pbalancer.util.Validation;
 
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import impl.org.controlsfx.skin.AutoCompletePopupSkin;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -39,31 +43,45 @@ public class AssetAddController extends BaseController<Asset,Asset>
     public static final String APP_BAR_TITLE = "Add Asset";
 
     @FXML
-    private Label autoNameLabel;
+    private RadioButton publicRB;
 
     @FXML
-    private Pane manualNamePanel;
+    private RadioButton privateRB;
 
     @FXML
-    private RadioButton manualNameRB;
+    private RadioButton propertyRB;
 
     @FXML
-    private TextField manualNameText;
+    private RadioButton cashRB;
+
 
     @FXML
-    private RadioButton priceManualPerUnitRB;
+    private Pane publicPanel2;
 
     @FXML
-    private RadioButton priceManualPerWholeRB;
+    private Pane privatePanel2;
 
     @FXML
-    private Pane tickerPanel;
+    private Pane propertyPanel2;
 
-    @FXML
-    private RadioButton tickerRB;
 
     @FXML
     private TextField tickerText;
+
+    @FXML
+    private Label autoNameLabel;
+
+
+    @FXML
+    private TextField privateNameText;
+
+    @FXML
+    private CheckBox proxyCB;
+
+
+    @FXML
+    private TextField propertyNameText;
+
 
     @FXML
     private ButtonBar buttonBar;
@@ -83,28 +101,28 @@ public class AssetAddController extends BaseController<Asset,Asset>
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(autoNameLabel);
-        Validation.assertNonNull(manualNameRB);
-        Validation.assertNonNull(manualNamePanel);
-        Validation.assertNonNull(manualNameText);
-        Validation.assertNonNull(priceManualPerUnitRB);
-        Validation.assertNonNull(priceManualPerWholeRB);
-        Validation.assertNonNull(tickerRB);
-        Validation.assertNonNull(tickerPanel);
+        Validation.assertNonNull(publicRB);
+        Validation.assertNonNull(privateRB);
+        Validation.assertNonNull(propertyRB);
+        Validation.assertNonNull(cashRB);
+        Validation.assertNonNull(publicPanel2);
+        Validation.assertNonNull(privatePanel2);
+        Validation.assertNonNull(propertyPanel2);
         Validation.assertNonNull(tickerText);
+        Validation.assertNonNull(autoNameLabel);
+        Validation.assertNonNull(privateNameText);
+        Validation.assertNonNull(proxyCB);
+        Validation.assertNonNull(propertyNameText);
         Validation.assertNonNull(buttonBar);
         Validation.assertNonNull(cancelBtn);
         Validation.assertNonNull(nextBtn);
 
         ToggleGroup nameToggleGroup = new ToggleGroup();
-        tickerRB.setToggleGroup(nameToggleGroup);
-        manualNameRB.setToggleGroup(nameToggleGroup);
-        nameToggleGroup.selectedToggleProperty().addListener(e -> onNameTypeChange());
-
-        ToggleGroup priceToggleGroup = new ToggleGroup();
-        priceManualPerUnitRB.setToggleGroup(priceToggleGroup);
-        priceManualPerWholeRB.setToggleGroup(priceToggleGroup);
-        // no need for listener here
+        publicRB.setToggleGroup(nameToggleGroup);
+        privateRB.setToggleGroup(nameToggleGroup);
+        propertyRB.setToggleGroup(nameToggleGroup);
+        cashRB.setToggleGroup(nameToggleGroup);
+        nameToggleGroup.selectedToggleProperty().addListener(e -> onTypeChange());
 
         // tickerText auto complete
         final Map<String,AssetTicker> tickerSuggestions = AssetTickerCache.getInstance().all();
@@ -138,40 +156,16 @@ public class AssetAddController extends BaseController<Asset,Asset>
     @Override
     protected void populateData(final Asset asset)
     {
-        // NOTE: we expect all of these to be blank for an "add", but do this anyway
-        tickerText.setText(asset.getTicker());
-        autoNameLabel.setText(asset.getAutoName());
-        manualNameText.setText(asset.getManualName());
+        // just assume all of these to are blank for an "add"
+        tickerText.setText("");
+        autoNameLabel.setText("");
+        privateNameText.setText("");
+        proxyCB.setSelected(false);
+        propertyNameText.setText("");
 
-        if(asset.getPricingType() == PricingType.MANUAL_PER_UNIT)
-        {
-            priceManualPerUnitRB.setSelected(true);
-        }
-        else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
-        {
-            priceManualPerWholeRB.setSelected(true);
-        }
-        else
-        {
-            // leave unselected
-        }
-
-        if(asset.getTicker() != null)
-        {
-            tickerRB.setSelected(true);
-        }
-        else if(asset.getManualName() != null)
-        {
-            manualNameRB.setSelected(true);
-        }
-        else
-        {
-            // default to ticker entry, it should be the majority
-            tickerRB.setSelected(true);
-        }
-
-        // TODO: enable/disable based on qty of data entry
-        //nextBtn.setDisable(true);
+        // default to ticker entry, it should be the majority
+        publicRB.setSelected(true);
+        Platform.runLater(() -> tickerText.requestFocus());
     }
 
 
@@ -194,13 +188,34 @@ public class AssetAddController extends BaseController<Asset,Asset>
     {
         if(save())
         {
-            if(tickerRB.isSelected())
+            if(publicRB.isSelected())
             {
                 getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_KNOWN_VIEW, getIn(),
                         a -> returnSuccess(a),
                         () -> returnFailure());
             }
-            if(manualNameRB.isSelected())
+            if(privateRB.isSelected())
+            {
+                if(proxyCB.isSelected())
+                {
+                    getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_PROXY_VIEW, getIn(),
+                            a ->  returnSuccess(a),
+                            () -> returnFailure());
+                }
+                else
+                {
+                    getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_MANUAL_VIEW, getIn(),
+                            a ->  returnSuccess(a),
+                            () -> returnFailure());
+                }
+            }
+            if(propertyRB.isSelected())
+            {
+                getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_MANUAL_VIEW, getIn(),
+                        a ->  returnSuccess(a),
+                        () -> returnFailure());
+            }
+            if(cashRB.isSelected())
             {
                 getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_MANUAL_VIEW, getIn(),
                         a ->  returnSuccess(a),
@@ -213,7 +228,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
     {
         Asset asset = getIn();
 
-        if(tickerRB.isSelected())
+        if(publicRB.isSelected())
         {
             asset.setTicker(tickerText.getText().trim().toUpperCase());
             asset.setAutoName(autoNameLabel.getText().trim());
@@ -250,64 +265,114 @@ public class AssetAddController extends BaseController<Asset,Asset>
 
             return true;
         }
-        if(manualNameRB.isSelected())
+        if(privateRB.isSelected())
         {
             asset.setTicker(null);
             asset.setAutoName(null);
-            asset.setManualName(manualNameText.getText().trim());
-            asset.markDirty();
-
-            if(Validation.isBlank(asset.getManualName()))
-            {
-                getApp().showMessage("Name required");
-                return false;
-            }
-            if(!priceManualPerUnitRB.isSelected() && !priceManualPerWholeRB.isSelected())
-            {
-                // TODO: better validation and error msg UX
-                getApp().showMessage("Please select a pricing type for manual assets.");
-                return false;
-            }
-            else if(priceManualPerUnitRB.isSelected())
-            {
-                asset.setPricingType(PricingType.MANUAL_PER_UNIT);
-            }
-            else if(priceManualPerWholeRB.isSelected())
-            {
-                asset.setPricingType(PricingType.MANUAL_PER_WHOLE);
-            }
+            asset.setManualName(privateNameText.getText().trim());
+            asset.setPricingType(PricingType.MANUAL_PER_UNIT);
             asset.setUnits(null);
             asset.setManualValue(null);
             asset.setManualValueTmstp(null);
             asset.setLastAutoValue(null);
             asset.setLastAutoValueTmstp(null);
+            asset.setAssetClass(null);
+            asset.markDirty();
+
+            if(proxyCB.isSelected())
+            {
+                //TODO;
+            }
+
+            if(Validation.isBlank(asset.getManualName()))
+            {
+                getApp().showMessage("Private asset name required");
+                return false;
+            }
+
+            return true;
+        }
+        if(propertyRB.isSelected())
+        {
+            asset.setTicker(null);
+            asset.setAutoName(null);
+            asset.setManualName(propertyNameText.getText().trim());
+            asset.setPricingType(PricingType.MANUAL_PER_WHOLE);
+            asset.setUnits(BigDecimal.ONE);
+            asset.setManualValue(null);
+            asset.setManualValueTmstp(null);
+            asset.setLastAutoValue(null);
+            asset.setLastAutoValueTmstp(null);
+            asset.setAssetClass(null);
+            asset.markDirty();
+
+            if(Validation.isBlank(asset.getManualName()))
+            {
+                getApp().showMessage("Property name required");
+                return false;
+            }
+
+            return true;
+        }
+        if(cashRB.isSelected())
+        {
+            asset.setTicker(null);
+            asset.setAutoName(null);
+            asset.setManualName(Asset.CASH);
+            asset.setPricingType(PricingType.FIXED_PER_UNIT);
+            asset.setUnits(null);
+            asset.setManualValue(BigDecimal.ONE);
+            asset.setManualValueTmstp(null);
+            asset.setLastAutoValue(null);
+            asset.setLastAutoValueTmstp(null);
+            asset.setAssetClass(AssetClass.CASH);
+            asset.markDirty();
             return true;
         }
 
         return false;
     }
 
-    private void onNameTypeChange()
+    private void onTypeChange()
     {
-        if(tickerRB.isSelected())
+        publicPanel2.managedProperty().bind(publicPanel2.visibleProperty());
+        privatePanel2.managedProperty().bind(privatePanel2.visibleProperty());
+        propertyPanel2.managedProperty().bind(propertyPanel2.visibleProperty());
+
+        if(publicRB.isSelected())
         {
-            tickerPanel.setVisible(true);
-            manualNamePanel.setVisible(false);
+            publicPanel2.setVisible(true);
+            privatePanel2.setVisible(false);
+            propertyPanel2.setVisible(false);
 
-            manualNameText.setText("");
-
-            tickerText.requestFocus();
+            Platform.runLater(() -> tickerText.requestFocus());
         }
-        if(manualNameRB.isSelected())
+        if(privateRB.isSelected())
         {
-            tickerPanel.setVisible(false);
-            manualNamePanel.setVisible(true);
+            publicPanel2.setVisible(false);
+            privatePanel2.setVisible(true);
+            propertyPanel2.setVisible(false);
 
-            tickerText.setText("");
-            autoNameLabel.setText("");
-
-            manualNameText.requestFocus();
+            Platform.runLater(() -> privateNameText.requestFocus());
         }
+        if(propertyRB.isSelected())
+        {
+            publicPanel2.setVisible(false);
+            privatePanel2.setVisible(false);
+            propertyPanel2.setVisible(true);
+
+            Platform.runLater(() -> propertyNameText.requestFocus());
+        }
+        if(cashRB.isSelected())
+        {
+            publicPanel2.setVisible(false);
+            privatePanel2.setVisible(false);
+            propertyPanel2.setVisible(false);
+        }
+
+        publicPanel2.getParent().requestLayout();
+        privatePanel2.getParent().requestLayout();
+        propertyPanel2.getParent().requestLayout();
     }
 
     private void onTickerChanged()

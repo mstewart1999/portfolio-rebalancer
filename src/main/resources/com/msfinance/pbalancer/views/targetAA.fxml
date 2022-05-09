@@ -85,12 +85,12 @@
                                              <children>
                                                 <Button fx:id="addGroupButton" mnemonicParsing="false" text="Category">
                                                    <tooltip>
-                                                      <Tooltip text="Add a group node to the selected item" />
+                                                      <Tooltip text="Add a subcategory node to the selected category" />
                                                    </tooltip>
                                                 </Button>
                                                 <Button fx:id="addAssetButton" mnemonicParsing="false" text="Holding">
                                                    <tooltip>
-                                                      <Tooltip text="Add an asset node to the selected item" />
+                                                      <Tooltip text="Add an asset-class node to the selected category" />
                                                    </tooltip>
                                                 </Button>
                                                 <Button fx:id="upButton" mnemonicParsing="false" text="Up">
@@ -106,6 +106,11 @@
                                                 <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
                                                    <tooltip>
                                                       <Tooltip text="Delete selected item" />
+                                                   </tooltip>
+                                                </Button>
+                                                <Button fx:id="resetButton" mnemonicParsing="false" text="Reset">
+                                                   <tooltip>
+                                                      <Tooltip text="Clear entire asset allocation" />
                                                    </tooltip>
                                                 </Button>
                                              </children>
@@ -155,34 +160,51 @@
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" minWidth="50.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <RadioButton fx:id="predefinedRB" mnemonicParsing="false" text="Predefined Lazy Portfolios" GridPane.columnSpan="2">
                <font>
                   <Font name="System Bold" size="12.0" />
-               </font></RadioButton>
+               </font>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding></RadioButton>
             <RadioButton fx:id="customRB" mnemonicParsing="false" text="Custom Asset Allocation" GridPane.columnSpan="2" GridPane.rowIndex="3">
                <font>
                   <Font name="System Bold" size="12.0" />
-               </font></RadioButton>
-            <ComboBox fx:id="predefinedCombo" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+               </font>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding></RadioButton>
+            <ComboBox fx:id="predefinedCombo" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </padding>
+               <GridPane.margin>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </GridPane.margin></ComboBox>
             <Icon fx:id="predefinedHelpIcon" content="HELP_OUTLINE" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-            <Hyperlink fx:id="predefinedUrlHref" text="Details" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Label fx:id="customLabel" text="(customize below)" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Hyperlink fx:id="predefinedUrlHref" text="Details" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding></Hyperlink>
+            <Label fx:id="customLabel" text="(customize below - double click to change %'s)" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding></Label>
             <Icon fx:id="customHelpIcon" content="HELP_OUTLINE" GridPane.columnIndex="2" GridPane.rowIndex="3" />
-            <Button fx:id="customResetButton" mnemonicParsing="false" text="Reset" GridPane.columnIndex="2" GridPane.rowIndex="4" />
          </children>
          <padding>
-            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
          </padding>
       </GridPane>
    </top>

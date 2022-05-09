@@ -13,7 +13,8 @@ import com.msfinance.pbalancer.util.Validation;
 
 public class Asset implements IPersistable
 {
-    public enum PricingType { MANUAL_PER_UNIT, MANUAL_PER_WHOLE, AUTO_PER_UNIT }
+    public enum PricingType { MANUAL_PER_UNIT, MANUAL_PER_WHOLE, AUTO_PER_UNIT, FIXED_PER_UNIT }
+    public static final String CASH = "$CASH";
 
     private final String accountId;
     private final String id;
@@ -23,6 +24,7 @@ public class Asset implements IPersistable
     private int listPosition;
     private String assetClass;
     private PricingType pricingType;
+    private AssetProxy proxy;
     private BigDecimal units;
     private BigDecimal manualValue;
     private Date manualValueTmstp;
@@ -56,6 +58,7 @@ public class Asset implements IPersistable
         listPosition = 0;
         assetClass = null;
         pricingType = null;
+        proxy = null;
         units = null;
         manualValue = null;
         manualValueTmstp = null;
@@ -111,6 +114,12 @@ public class Asset implements IPersistable
     public PricingType getPricingType()
     {
         return pricingType;
+    }
+
+    @JsonProperty
+    public AssetProxy getProxy()
+    {
+        return proxy;
     }
 
     @JsonProperty
@@ -189,6 +198,12 @@ public class Asset implements IPersistable
     public void setPricingType(final PricingType pricingType)
     {
         this.pricingType = pricingType;
+    }
+
+    @JsonProperty
+    public void setProxy(final AssetProxy proxy)
+    {
+        this.proxy = proxy;
     }
 
     @JsonProperty
@@ -274,6 +289,7 @@ public class Asset implements IPersistable
     {
         if((lastAutoValue != null) && (units != null))
         {
+            // this case covers proxied assets also
             return totalValue(units, lastAutoValue);
         }
         if(pricingType == PricingType.MANUAL_PER_WHOLE)
@@ -281,6 +297,10 @@ public class Asset implements IPersistable
             return manualValue;
         }
         if((pricingType == PricingType.MANUAL_PER_UNIT) && (manualValue != null) && (units != null))
+        {
+            return totalValue(units, manualValue);
+        }
+        if((pricingType == PricingType.FIXED_PER_UNIT) && (manualValue != null) && (units != null))
         {
             return totalValue(units, manualValue);
         }

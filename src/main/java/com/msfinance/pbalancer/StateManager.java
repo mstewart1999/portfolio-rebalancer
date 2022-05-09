@@ -3,14 +3,12 @@ package com.msfinance.pbalancer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,22 +165,12 @@ public class StateManager
         Set<Profile> pendingSaveProfile = new HashSet<>();
         for(Asset asset : assets)
         {
-            PriceResult newPrice = priceUpdates.get(asset.getTicker());
-            if(newPrice != null)
+            if(applyPrice(asset, priceUpdates))
             {
-                if(!Validation.isSame(asset.getLastAutoValue(), newPrice.price()) || !Validation.isSame(asset.getLastAutoValueTmstp(), newPrice.when()))
-                {
-                    asset.setLastAutoValue(newPrice.price());
-                    asset.setLastAutoValueTmstp(newPrice.when());
-                    asset.setManualValue(null);
-                    asset.setManualValueTmstp(null);
-                    asset.setPricingType(PricingType.AUTO_PER_UNIT);
-                    asset.markDirty();
-                    pendingSaveAsset.add(asset);
-                    pendingSaveAccount.add(asset.getAccount());
-                    pendingSavePortfolio.add(asset.getAccount().getPortfolio());
-                    pendingSaveProfile.add(asset.getAccount().getPortfolio().getProfile());
-                }
+                pendingSaveAsset.add(asset);
+                pendingSaveAccount.add(asset.getAccount());
+                pendingSavePortfolio.add(asset.getAccount().getPortfolio());
+                pendingSaveProfile.add(asset.getAccount().getPortfolio().getProfile());
             }
         }
 
@@ -205,20 +193,68 @@ public class StateManager
 
     public static boolean refreshPrice(final Asset asset)
     {
-        Collection<String> tickers = Collections.singleton(asset.getTicker());
-        Map<String,PriceResult> priceUpdates = PricingFactory.get().getMostRecentEOD(tickers);
-        PriceResult newPrice = priceUpdates.get(asset.getTicker());
-        if(newPrice != null)
+        Collection<String> tickers = new HashSet<>();
+        if(hasRegularTicker(asset))
         {
-            if(!Validation.isSame(asset.getLastAutoValue(), newPrice.price()) || !Validation.isSame(asset.getLastAutoValueTmstp(), newPrice.when()))
+            tickers.add(getRegularTicker(asset));
+        }
+        else if(hasProxyTicker(asset))
+        {
+            tickers.add(getProxyTicker(asset));
+        }
+        else
+        {
+            return false;
+        }
+
+        Map<String,PriceResult> priceUpdates = PricingFactory.get().getMostRecentEOD(tickers);
+
+        return applyPrice(asset, priceUpdates);
+    }
+
+    private static boolean applyPrice(final Asset asset, final Map<String, PriceResult> priceUpdates)
+    {
+        if(hasRegularTicker(asset))
+        {
+            PriceResult newPrice = priceUpdates.get(getRegularTicker(asset));
+            if(newPrice != null)
             {
-                asset.setLastAutoValue(newPrice.price());
-                asset.setLastAutoValueTmstp(newPrice.when());
-                asset.setManualValue(null);
-                asset.setManualValueTmstp(null);
-                asset.setPricingType(PricingType.AUTO_PER_UNIT);
-                asset.markDirty();
-                return true;
+                if(!Validation.isSame(
+                        asset.getLastAutoValue(), newPrice.price())
+                        || !Validation.isSame(asset.getLastAutoValueTmstp(), newPrice.when()))
+                {
+                    asset.setLastAutoValue(newPrice.price());
+                    asset.setLastAutoValueTmstp(newPrice.when());
+                    asset.setManualValue(null);
+                    asset.setManualValueTmstp(null);
+                    asset.setPricingType(PricingType.AUTO_PER_UNIT);
+                    asset.markDirty();
+                    return true;
+                }
+            }
+        }
+        else if(hasProxyTicker(asset))
+        {
+            PriceResult newPrice = priceUpdates.get(getProxyTicker(asset));
+            if(newPrice != null)
+            {
+                if(!Validation.isSame(
+                        asset.getProxy().getLastProxyValue(), newPrice.price())
+                        || !Validation.isSame(asset.getProxy().getLastProxyValueTmstp(), newPrice.when()))
+                {
+                    asset.getProxy().setLastProxyValue(newPrice.price());
+                    asset.getProxy().setLastProxyValueTmstp(newPrice.when());
+
+                    BigDecimal calculatedValue = asset.getProxy().calculate();
+
+                    asset.setLastAutoValue(calculatedValue);
+                    asset.setLastAutoValueTmstp(newPrice.when());
+                    asset.setManualValue(null);
+                    asset.setManualValueTmstp(null);
+                    asset.setPricingType(PricingType.AUTO_PER_UNIT);
+                    asset.markDirty();
+                    return true;
+                }
             }
         }
         return false;
@@ -227,10 +263,46 @@ public class StateManager
 
     private static Set<String> uniqueTickers(final Collection<Asset> assets)
     {
-        return assets.stream()
-                .map(a -> a.getTicker())
-                .filter(t -> !Validation.isBlank(t))
-                .collect(Collectors.toSet());
+        Set<String> tickers = new HashSet<>();
+
+        for(Asset a : assets)
+        {
+            if(hasRegularTicker(a))
+            {
+                tickers.add(getRegularTicker(a));
+            }
+            else if(hasProxyTicker(a))
+            {
+                tickers.add(getProxyTicker(a));
+            }
+        }
+        return tickers;
+    }
+
+    private static String getRegularTicker(final Asset a)
+    {
+        return a.getTicker();
+    }
+    private static String getProxyTicker(final Asset a)
+    {
+        if(a.getProxy() == null)
+        {
+            return null;
+        }
+        return a.getProxy().getProxyTicker();
+    }
+
+    private static boolean hasRegularTicker(final Asset a)
+    {
+        return !Validation.isBlank(a.getTicker());
+    }
+    private static boolean hasProxyTicker(final Asset a)
+    {
+        if(a.getProxy() == null)
+        {
+            return false;
+        }
+        return !Validation.isBlank(a.getProxy().getProxyTicker());
     }
 
     private static Collection<Asset> listAssets(final Profile profile)

@@ -45,6 +45,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -64,7 +65,7 @@
             </TableView>
          </children>
          <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+            <Insets bottom="8.0" left="8.0" top="8.0" />
          </padding>
       </AnchorPane>
    </center>
@@ -113,7 +114,7 @@
             </VBox>
          </children>
          <padding>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+            <Insets bottom="8.0" right="8.0" top="8.0" />
          </padding>
       </AnchorPane>
    </right>
@@ -191,4 +192,25 @@
          </children>
       </GridPane>
    </top>
+   <bottom>
+      <AnchorPane BorderPane.alignment="CENTER">
+         <children>
+            <HBox fillHeight="false" spacing="8.0" styleClass="pb-statusbox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Label fx:id="statusLabel" text="&lt;status&gt;">
+                     <padding>
+                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+                     </padding>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="4.0" left="8.0" right="8.0" top="-4.0" />
+         </padding>
+      </AnchorPane>
+   </bottom>
 </View>

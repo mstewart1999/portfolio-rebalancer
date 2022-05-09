@@ -21,6 +21,7 @@ import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -110,7 +111,10 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
         AssetAllocation aa = asset.getAccount().getPortfolio().getTargetAA();
         Validation.assertNull(asset.getTicker());
         Validation.assertNonNull(asset.getManualName());
-        Validation.assertTrue((asset.getPricingType() == PricingType.MANUAL_PER_UNIT) || (asset.getPricingType() == PricingType.MANUAL_PER_WHOLE));
+        Validation.assertTrue(
+                (asset.getPricingType() == PricingType.MANUAL_PER_UNIT)
+                || (asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
+                || (asset.getPricingType() == PricingType.FIXED_PER_UNIT));
 
         manualNameLabel.setText(asset.getManualName());
 
@@ -129,7 +133,10 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
 
         if(asset.getPricingType() == PricingType.MANUAL_PER_UNIT)
         {
-            unitsText.setText(NumberFormatHelper.formatWith3Decimals(asset.getUnits()));
+            allAssetClassesTS.setDisable(false);
+            assetClassCombo.setDisable(false);
+
+            unitsText.setText(NumberFormatHelper.formatWith2Decimals(asset.getUnits()));
             valuePerUnitText.setText( NumberFormatHelper.formatWith4Decimals(asset.getManualValue()) );
             valuePerWholeContentLabel.setText( NumberFormatHelper.formatWith2Decimals(asset.getBestTotalValue()) );
 
@@ -140,11 +147,14 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerWholeLabelLabel.setVisible(true);
             valuePerWholeContentLabel.setVisible(true);
 
-            unitsText.requestFocus();
+            Platform.runLater(() -> unitsText.requestFocus());
         }
         else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
         {
-            unitsText.setText(NumberFormatHelper.formatWith3Decimals(BigDecimal.ONE)); // just override this
+            allAssetClassesTS.setDisable(false);
+            assetClassCombo.setDisable(false);
+
+            unitsText.setText(NumberFormatHelper.formatWith3Decimals(asset.getUnits())); // should be "1"
             valuePerUnitText.setText( NumberFormatHelper.formatWith2Decimals(asset.getManualValue()) );
             valuePerWholeContentLabel.setText( NumberFormatHelper.formatWith2Decimals(asset.getBestTotalValue()) );
 
@@ -155,7 +165,25 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerWholeLabelLabel.setVisible(false);
             valuePerWholeContentLabel.setVisible(false);
 
-            valuePerUnitText.requestFocus();
+            Platform.runLater(() -> valuePerUnitText.requestFocus());
+        }
+        else if(asset.getPricingType() == PricingType.FIXED_PER_UNIT)
+        {
+            allAssetClassesTS.setDisable(true);
+            assetClassCombo.setDisable(true);
+
+            unitsText.setText(NumberFormatHelper.formatWith3Decimals(asset.getUnits()));
+            valuePerUnitText.setText( NumberFormatHelper.formatWith2Decimals(asset.getManualValue()) );
+            valuePerWholeContentLabel.setText( NumberFormatHelper.formatWith2Decimals(asset.getBestTotalValue()) );
+
+            unitsText.setEditable(true);
+            valuePerUnitText.setEditable(false);
+
+            valuePerUnitLabel.setText("Value per Share ($)");
+            valuePerWholeLabelLabel.setVisible(true);
+            valuePerWholeContentLabel.setVisible(true);
+
+            Platform.runLater(() -> unitsText.requestFocus());
         }
     }
 
@@ -224,6 +252,12 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
         }
         else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
         {
+            asset.setManualValue(NumberFormatHelper.parseNumber2(valuePerUnitText.getText()));
+            asset.setManualValueTmstp(new Date());
+        }
+        else if(asset.getPricingType() == PricingType.FIXED_PER_UNIT)
+        {
+            // was not editable
             asset.setManualValue(NumberFormatHelper.parseNumber2(valuePerUnitText.getText()));
             asset.setManualValueTmstp(new Date());
         }

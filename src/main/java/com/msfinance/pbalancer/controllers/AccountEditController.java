@@ -82,6 +82,9 @@ public class AccountEditController extends BaseController<Account,Account>
     @FXML
     private Button refreshButton;
 
+    @FXML
+    private Label statusLabel;
+
 
     public AccountEditController()
     {
@@ -102,6 +105,7 @@ public class AccountEditController extends BaseController<Account,Account>
         Validation.assertNonNull(downButton);
         Validation.assertNonNull(deleteButton);
         Validation.assertNonNull(refreshButton);
+        Validation.assertNonNull(statusLabel);
 
         institutionCombo.getItems().addAll(Institution.ALL);
         institutionCombo.setEditable(false); // only allow selections from list
@@ -175,11 +179,12 @@ public class AccountEditController extends BaseController<Account,Account>
         nameText.setText( acct.getName() );
         institutionCombo.getSelectionModel().select( acct.getInstitution() );
         typeCombo.getSelectionModel().select( acct.getType() );
-        populateTotalValue();
 
         t.getSelectionModel().clearSelection();
         t.setItems( FXCollections.observableList( acct.getAssets() ) );
         t.refresh();
+
+        populateTotalValue();
     }
 
     private void populateTotalValue()
@@ -193,6 +198,8 @@ public class AccountEditController extends BaseController<Account,Account>
         {
             totalValueLabel.setText("$ 0");
         }
+
+        statusLabel.setText(String.format("Total Assets: %,d", t.getItems().size()));
     }
 
     @Override

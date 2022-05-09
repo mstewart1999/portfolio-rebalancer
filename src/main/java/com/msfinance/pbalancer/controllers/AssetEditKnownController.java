@@ -20,6 +20,7 @@ import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -31,7 +32,7 @@ import javafx.scene.control.TextField;
 public class AssetEditKnownController extends BaseController<Asset,Asset>
 {
     private static final Logger LOG = LoggerFactory.getLogger(AssetEditKnownController.class);
-    public static final String APP_BAR_TITLE = "Edit Known Asset";
+    public static final String APP_BAR_TITLE = "Edit Public Asset";
 
     @FXML
     private ToggleSwitch allAssetClassesTS;
@@ -102,12 +103,20 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
     protected void populateData(final Asset asset)
     {
         AssetAllocation aa = asset.getAccount().getPortfolio().getTargetAA();
-        Validation.assertNonNull(asset.getTicker());
-        Validation.assertNull(asset.getManualName());
+        Validation.assertTrue((asset.getTicker() != null) || (asset.getProxy() != null));
         Validation.assertTrue(asset.getPricingType() == PricingType.AUTO_PER_UNIT);
 
-        tickerLabel.setText(asset.getTicker());
-        autoNameLabel.setText(asset.getAutoName());
+        if(asset.getProxy() == null)
+        {
+            tickerLabel.setText(asset.getTicker());
+            autoNameLabel.setText(asset.getAutoName());
+        }
+        else
+        {
+            // TODO: better UI for this
+            tickerLabel.setText(String.format("<Proxy of %s>", asset.getProxy().getProxyTicker()));
+            autoNameLabel.setText(asset.getManualName());
+        }
 
         assetClassCombo.setValue(asset.getAssetClass());
         if(aa != null)
@@ -127,7 +136,7 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
         autoValuePerUnitLabel.setText( NumberFormatHelper.formatWith3Decimals(asset.getLastAutoValue()) );
         autoValuePerWholeLabel.setText( NumberFormatHelper.formatWith2Decimals(asset.getBestTotalValue()) );
 
-        unitsText.requestFocus();
+        Platform.runLater(() -> unitsText.requestFocus());
     }
 
     protected void populateAssetClasses()
