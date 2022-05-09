@@ -141,6 +141,10 @@ public class NumberFormatHelper
 
         try
         {
+            if(val.startsWith("$"))
+            {
+                val = val.substring(1);
+            }
             if(val.contains(","))
             {
                 // BigDecimal does not deal with commas
