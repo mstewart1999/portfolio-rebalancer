@@ -33,9 +33,11 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 
 public class AssetAddController extends BaseController<Asset,Asset>
 {
@@ -160,6 +162,17 @@ public class AssetAddController extends BaseController<Asset,Asset>
 
         cancelBtn.setOnAction(e -> onCancel());
         nextBtn.setOnAction(e -> onNext());
+    }
+
+    @Override
+    protected void doSizing()
+    {
+        super.doSizing();
+        // critical to get proper scrollbar behavior
+        getRoot().setMinSize(100, 100);
+        getRoot().setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        ((ScrollPane)getRoot().getCenter()).setPrefSize(20, 20);
+        ((Region)((ScrollPane)getRoot().getCenter()).getContent()).setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
     }
 
 

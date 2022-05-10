@@ -197,7 +197,10 @@ public class AccountEditController extends BaseController<Account,Account>
     protected void setFocus()
     {
         super.setFocus();
-        nameText.requestFocus();
+        if(nameText.getText().isEmpty())
+        {
+            nameText.requestFocus();
+        }
     }
 
     private void populateTotalValue()

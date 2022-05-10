@@ -190,7 +190,10 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
     protected void setFocus()
     {
         super.setFocus();
-        //xyzText.requestFocus();
+        if(nameText.getText().isEmpty())
+        {
+            nameText.requestFocus();
+        }
     }
 
     @Override

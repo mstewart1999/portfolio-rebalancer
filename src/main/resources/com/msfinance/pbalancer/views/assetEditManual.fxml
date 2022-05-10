@@ -51,9 +51,9 @@
 
 <View maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.AssetEditManualController">
    <center>
-      <ScrollPane fitToWidth="true" BorderPane.alignment="CENTER">
+      <ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
          <content>
-            <VBox spacing="8.0">
+            <VBox maxWidth="600.0" spacing="8.0">
                <children>
                   <GridPane style="-fx-border-color: black;">
                     <columnConstraints>

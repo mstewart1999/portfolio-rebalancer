@@ -26,7 +26,9 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Region;
 
 public class AssetEditKnownController extends BaseController<Asset,Asset>
 {
@@ -95,6 +97,17 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
 
         cancelBtn.setOnAction(e -> onCancel());
         saveBtn.setOnAction(e -> onSave());
+    }
+
+    @Override
+    protected void doSizing()
+    {
+        super.doSizing();
+        // critical to get proper scrollbar behavior
+        getRoot().setMinSize(100, 100);
+        getRoot().setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
+        ((ScrollPane)getRoot().getCenter()).setPrefSize(20, 20);
+        ((Region)((ScrollPane)getRoot().getCenter()).getContent()).setPrefSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
     }
 
 
