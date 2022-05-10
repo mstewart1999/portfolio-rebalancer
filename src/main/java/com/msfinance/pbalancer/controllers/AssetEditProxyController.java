@@ -1,6 +1,5 @@
 package com.msfinance.pbalancer.controllers;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +18,7 @@ import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.AssetProxy;
 import com.msfinance.pbalancer.model.aa.AssetTicker;
 import com.msfinance.pbalancer.model.aa.AssetTickerCache;
+import com.msfinance.pbalancer.util.DateHelper;
 import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
@@ -130,11 +130,23 @@ public class AssetEditProxyController extends BaseController<Asset,Asset>
     protected void populateData(final Asset asset)
     {
         // just assume all of these to are blank for an "add"
-        tickerText.setText("");
-        autoNameLabel.setText("");
-        privatePriceText.setText("");
-        proxyPriceText.setText("");
-        pricingDateText.setText("");
+        AssetProxy proxy = asset.getProxy();
+        if(proxy == null)
+        {
+            tickerText.setText("");
+            autoNameLabel.setText("");
+            privatePriceText.setText("");
+            proxyPriceText.setText("");
+            pricingDateText.setText("");
+        }
+        else
+        {
+            tickerText.setText(proxy.getProxyTicker());
+            autoNameLabel.setText(proxy.getProxyAutoName());
+            privatePriceText.setText(NumberFormatHelper.formatWith2Decimals(proxy.getPrivateAssetPriceComp()));
+            proxyPriceText.setText(NumberFormatHelper.formatWith2Decimals(proxy.getProxyAssetPriceComp()));
+            pricingDateText.setText(DateHelper.formatUSLocalDate(proxy.getPricingCompDate()));
+        }
     }
 
     @Override
@@ -182,11 +194,11 @@ public class AssetEditProxyController extends BaseController<Asset,Asset>
         proxy.setProxyAssetPriceComp(NumberFormatHelper.parseNumber2(proxyPriceText.getText()));
         try
         {
-            proxy.setPricingCompDate(LocalDate.parse(pricingDateText.getText()));
+            proxy.setPricingCompDate(DateHelper.parseUSLocalDate(pricingDateText.getText()));
         }
-        catch (DateTimeParseException e)
+        catch (DateTimeParseException|IndexOutOfBoundsException e)
         {
-            getApp().showMessage("Valid pricing date required (yyyy-MM-dd)");
+            getApp().showMessage("Valid pricing date required (MM/DD/YYYY)");
             return false;
         }
 

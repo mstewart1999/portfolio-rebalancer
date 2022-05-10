@@ -335,56 +335,43 @@ public class AccountEditController extends BaseController<Account,Account>
         Asset item = t.getSelectionModel().getSelectedItem();
         if(item == null) return;
 
-        if(item.getPricingType() == PricingType.AUTO_PER_UNIT)
-        {
-            getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_KNOWN_VIEW, item,
-                    a -> {
-                        StateManager.recalculateAccountValue(a.getAccount());
-                        StateManager.recalculatePortfolioValue(a.getAccount().getPortfolio());
-                        StateManager.recalculateProfileValue(a.getAccount().getPortfolio().getProfile());
+        String editScreen;
 
-                        t.refresh();
-                        populateTotalValue();
-                        try
-                        {
-                            PersistManager.persistAll(a.getAccount().getPortfolio().getProfile());
-                            getApp().showMessage("Updated Asset");
-                        }
-                        catch (IOException e)
-                        {
-                            LOG.error("Error updating asset: " + a.getId(), e);
-                            getApp().showMessage("Error updating asset");
-                        }
-                    },
-                    () -> {
-                        // no-op
-                    });
+        if(item.getProxy() != null)
+        {
+            editScreen = App.ASSET_EDIT_PROXY_VIEW;
+        }
+        else if(item.getPricingType() == PricingType.AUTO_PER_UNIT)
+        {
+            editScreen = App.ASSET_EDIT_KNOWN_VIEW;
         }
         else
         {
-            getApp().<Asset,Asset>mySwitchView(App.ASSET_EDIT_MANUAL_VIEW, item,
-                    a -> {
-                        StateManager.recalculateAccountValue(a.getAccount());
-                        StateManager.recalculatePortfolioValue(a.getAccount().getPortfolio());
-                        StateManager.recalculateProfileValue(a.getAccount().getPortfolio().getProfile());
-
-                        t.refresh();
-                        populateTotalValue();
-                        try
-                        {
-                            PersistManager.persistAll(a.getAccount().getPortfolio().getProfile());
-                            getApp().showMessage("Updated Asset");
-                        }
-                        catch (IOException e)
-                        {
-                            LOG.error("Error updating asset: " + a.getId(), e);
-                            getApp().showMessage("Error updating asset");
-                        }
-                    },
-                    () -> {
-                        // no-op
-                    });
+            editScreen = App.ASSET_EDIT_MANUAL_VIEW;
         }
+
+        getApp().<Asset,Asset>mySwitchView(editScreen, item,
+                a -> {
+                    StateManager.recalculateAccountValue(a.getAccount());
+                    StateManager.recalculatePortfolioValue(a.getAccount().getPortfolio());
+                    StateManager.recalculateProfileValue(a.getAccount().getPortfolio().getProfile());
+
+                    t.refresh();
+                    populateTotalValue();
+                    try
+                    {
+                        PersistManager.persistAll(a.getAccount().getPortfolio().getProfile());
+                        getApp().showMessage("Updated Asset");
+                    }
+                    catch (IOException e)
+                    {
+                        LOG.error("Error updating asset: " + a.getId(), e);
+                        getApp().showMessage("Error updating asset");
+                    }
+                },
+                () -> {
+                    // no-op
+                });
     }
 
     private void onUp()

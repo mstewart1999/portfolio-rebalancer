@@ -51,7 +51,7 @@
          <content>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="600.0" spacing="8.0">
                <children>
-                  <VBox maxWidth="1.7976931348623157E308" spacing="4.0" style="-fx-border-color: black;">
+                  <VBox maxWidth="600.0" spacing="4.0" style="-fx-border-color: black;">
                      <VBox.margin>
                         <Insets />
                      </VBox.margin>
@@ -150,7 +150,7 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <Label text="Pricing date" GridPane.rowIndex="5">
+                              <Label text="Pricing date (MM/DD/YYYY)" GridPane.rowIndex="5">
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </padding>
@@ -158,7 +158,7 @@
                                     <Font name="System Bold" size="12.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="pricingDateText" promptText="yyyy-MM-dd" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                              <TextField fx:id="pricingDateText" promptText="MM/DD/YYYY" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </padding>
