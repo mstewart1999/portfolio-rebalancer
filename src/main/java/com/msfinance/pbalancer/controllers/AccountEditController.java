@@ -1,6 +1,8 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -62,6 +64,9 @@ public class AccountEditController extends BaseController<Account,Account>
     private Label totalValueLabel;
 
     @FXML
+    private Label valueAsOfLabel;
+
+    @FXML
     private TableView<Asset> t;
 
     @FXML
@@ -98,6 +103,7 @@ public class AccountEditController extends BaseController<Account,Account>
         Validation.assertNonNull(institutionCombo);
         Validation.assertNonNull(typeCombo);
         Validation.assertNonNull(totalValueLabel);
+        Validation.assertNonNull(valueAsOfLabel);
         Validation.assertNonNull(t);
         Validation.assertNonNull(addButton);
         Validation.assertNonNull(editButton);
@@ -187,6 +193,13 @@ public class AccountEditController extends BaseController<Account,Account>
         populateTotalValue();
     }
 
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        nameText.requestFocus();
+    }
+
     private void populateTotalValue()
     {
         Account acct = getIn();
@@ -197,6 +210,18 @@ public class AccountEditController extends BaseController<Account,Account>
         else
         {
             totalValueLabel.setText("$ 0");
+        }
+        if(acct.getLastValueTmstp() != null)
+        {
+            valueAsOfLabel.setText(
+                    String.format(
+                        "(as of %s)",
+                        DateTimeFormatter.ISO_LOCAL_DATE.format(
+                                acct.getLastValueTmstp().toInstant().atZone(ZoneId.systemDefault()))));
+        }
+        else
+        {
+            valueAsOfLabel.setText("");
         }
 
         statusLabel.setText(String.format("Total Assets: %,d", t.getItems().size()));

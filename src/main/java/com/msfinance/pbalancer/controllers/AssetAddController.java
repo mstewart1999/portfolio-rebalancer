@@ -64,6 +64,10 @@ public class AssetAddController extends BaseController<Asset,Asset>
     @FXML
     private Pane propertyPanel2;
 
+    @FXML
+    private Pane cashPanel2;
+
+
 
     @FXML
     private TextField tickerText;
@@ -81,6 +85,10 @@ public class AssetAddController extends BaseController<Asset,Asset>
 
     @FXML
     private TextField propertyNameText;
+
+
+    @FXML
+    private TextField cashNameText;
 
 
     @FXML
@@ -108,11 +116,13 @@ public class AssetAddController extends BaseController<Asset,Asset>
         Validation.assertNonNull(publicPanel2);
         Validation.assertNonNull(privatePanel2);
         Validation.assertNonNull(propertyPanel2);
+        Validation.assertNonNull(cashPanel2);
         Validation.assertNonNull(tickerText);
         Validation.assertNonNull(autoNameLabel);
         Validation.assertNonNull(privateNameText);
         Validation.assertNonNull(proxyCB);
         Validation.assertNonNull(propertyNameText);
+        Validation.assertNonNull(cashNameText);
         Validation.assertNonNull(buttonBar);
         Validation.assertNonNull(cancelBtn);
         Validation.assertNonNull(nextBtn);
@@ -162,12 +172,18 @@ public class AssetAddController extends BaseController<Asset,Asset>
         privateNameText.setText("");
         proxyCB.setSelected(false);
         propertyNameText.setText("");
+        cashNameText.setText(Asset.CASH);
 
         // default to ticker entry, it should be the majority
         publicRB.setSelected(true);
-        Platform.runLater(() -> tickerText.requestFocus());
     }
 
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        tickerText.requestFocus();
+    }
 
     @Override
     protected void updateAppBar(final AppBar appBar)
@@ -286,7 +302,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
 
             if(Validation.isBlank(asset.getManualName()))
             {
-                getApp().showMessage("Private asset name required");
+                getApp().showMessage("Misc asset name required");
                 return false;
             }
 
@@ -318,7 +334,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
         {
             asset.setTicker(null);
             asset.setAutoName(null);
-            asset.setManualName(Asset.CASH);
+            asset.setManualName(cashNameText.getText().trim());
             asset.setPricingType(PricingType.FIXED_PER_UNIT);
             asset.setUnits(null);
             asset.setManualValue(BigDecimal.ONE);
@@ -327,6 +343,13 @@ public class AssetAddController extends BaseController<Asset,Asset>
             asset.setLastAutoValueTmstp(null);
             asset.setAssetClass(AssetClass.CASH);
             asset.markDirty();
+
+            if(Validation.isBlank(asset.getManualName()))
+            {
+                getApp().showMessage("Cash name required");
+                return false;
+            }
+
             return true;
         }
 
@@ -338,12 +361,14 @@ public class AssetAddController extends BaseController<Asset,Asset>
         publicPanel2.managedProperty().bind(publicPanel2.visibleProperty());
         privatePanel2.managedProperty().bind(privatePanel2.visibleProperty());
         propertyPanel2.managedProperty().bind(propertyPanel2.visibleProperty());
+        cashPanel2.managedProperty().bind(cashPanel2.visibleProperty());
 
         if(publicRB.isSelected())
         {
             publicPanel2.setVisible(true);
             privatePanel2.setVisible(false);
             propertyPanel2.setVisible(false);
+            cashPanel2.setVisible(false);
 
             Platform.runLater(() -> tickerText.requestFocus());
         }
@@ -352,6 +377,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
             publicPanel2.setVisible(false);
             privatePanel2.setVisible(true);
             propertyPanel2.setVisible(false);
+            cashPanel2.setVisible(false);
 
             Platform.runLater(() -> privateNameText.requestFocus());
         }
@@ -360,6 +386,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
             publicPanel2.setVisible(false);
             privatePanel2.setVisible(false);
             propertyPanel2.setVisible(true);
+            cashPanel2.setVisible(false);
 
             Platform.runLater(() -> propertyNameText.requestFocus());
         }
@@ -368,11 +395,15 @@ public class AssetAddController extends BaseController<Asset,Asset>
             publicPanel2.setVisible(false);
             privatePanel2.setVisible(false);
             propertyPanel2.setVisible(false);
+            cashPanel2.setVisible(true);
+
+            Platform.runLater(() -> cashNameText.requestFocus());
         }
 
         publicPanel2.getParent().requestLayout();
         privatePanel2.getParent().requestLayout();
         propertyPanel2.getParent().requestLayout();
+        cashPanel2.getParent().requestLayout();
     }
 
     private void onTickerChanged()

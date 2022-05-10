@@ -1,6 +1,8 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +59,9 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private Label totalValueLabel;
 
     @FXML
+    private Label valueAsOfLabel;
+
+    @FXML
     private TableView<Portfolio> t;
 
     @FXML
@@ -91,6 +96,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     {
         Validation.assertNonNull(nameLabel);
         Validation.assertNonNull(totalValueLabel);
+        Validation.assertNonNull(valueAsOfLabel);
         Validation.assertNonNull(t);
         Validation.assertNonNull(addButton);
         Validation.assertNonNull(editButton);
@@ -180,6 +186,14 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         populateTotalValue();
     }
 
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        //xyzText.requestFocus();
+        FXUtil.autoFitTableNow(t);
+    }
+
     private void populateTotalValue()
     {
         Profile p = getIn();
@@ -189,7 +203,19 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         }
         else
         {
-            totalValueLabel.setText("0");
+            totalValueLabel.setText("$ 0");
+        }
+        if(p.getLastValueTmstp() != null)
+        {
+            valueAsOfLabel.setText(
+                    String.format(
+                        "(as of %s)",
+                        DateTimeFormatter.ISO_LOCAL_DATE.format(
+                                p.getLastValueTmstp().toInstant().atZone(ZoneId.systemDefault()))));
+        }
+        else
+        {
+            valueAsOfLabel.setText("");
         }
 
         statusLabel.setText(String.format("Total Portfolios: %,d", t.getItems().size()));

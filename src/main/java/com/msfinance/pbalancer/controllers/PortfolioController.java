@@ -73,10 +73,10 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
     private Button targetAAButton;
 
     @FXML
-    private Label valueAsOfLabel;
+    private Label totalValueLabel;
 
     @FXML
-    private Label valueLabel;
+    private Label valueAsOfLabel;
 
     @FXML
     private Button withdrawalButton;
@@ -103,8 +103,8 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         Validation.assertNonNull(nameText);
         Validation.assertNonNull(rebalanceButton);
         Validation.assertNonNull(targetAAButton);
+        Validation.assertNonNull(totalValueLabel);
         Validation.assertNonNull(valueAsOfLabel);
-        Validation.assertNonNull(valueLabel);
         Validation.assertNonNull(withdrawalButton);
 
         nameLabel.setLabelFor(nameText);
@@ -166,11 +166,11 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
         if(p.getLastValue() != null)
         {
-            valueLabel.setText("$ " + NumberFormatHelper.prettyFormatCurrency(p.getLastValue()));
+            totalValueLabel.setText("$ " + NumberFormatHelper.prettyFormatCurrency(p.getLastValue()));
         }
         else
         {
-            valueLabel.setText("$ 0");
+            totalValueLabel.setText("$ 0");
         }
         if(p.getLastValueTmstp() != null)
         {
@@ -184,6 +184,13 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         {
             valueAsOfLabel.setText("");
         }
+    }
+
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        //xyzText.requestFocus();
     }
 
     @Override

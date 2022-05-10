@@ -25,7 +25,6 @@ import com.msfinance.pbalancer.util.Validation;
 
 import impl.org.controlsfx.skin.AutoCompletePopup;
 import impl.org.controlsfx.skin.AutoCompletePopupSkin;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.fxml.FXML;
@@ -123,8 +122,13 @@ public class AssetEditProxyController extends BaseController<Asset,Asset>
         privatePriceText.setText("");
         proxyPriceText.setText("");
         pricingDateText.setText("");
+    }
 
-        Platform.runLater(() -> tickerText.requestFocus());
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        tickerText.requestFocus();
     }
 
 

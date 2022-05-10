@@ -44,13 +44,14 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<View maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="335.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.AccountEditController">
+<View maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="568.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.msfinance.pbalancer.controllers.AccountEditController">
    <center>
       <AnchorPane>
          <children>
@@ -121,7 +122,7 @@
    <top>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="10.0" />
+          <ColumnConstraints fillWidth="false" hgrow="NEVER" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="500.0" minWidth="10.0" />
         </columnConstraints>
         <rowConstraints>
@@ -136,59 +137,89 @@
                   <Font name="System Bold" size="18.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
-            </Label>
-            <Label fx:id="totalValueLabel" text="\$ &lt;val&gt;" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <font>
-                  <Font size="18.0" />
-               </font>
-               <GridPane.margin>
+               <padding>
                   <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
-               </GridPane.margin>
+               </padding>
             </Label>
             <Label layoutX="20.0" layoutY="41.0" text="Account Name">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </Label>
             <Label layoutX="20.0" layoutY="11.0" text="Institution" GridPane.rowIndex="1">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </Label>
             <Label layoutX="10.0" layoutY="41.0" text="Type" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </Label>
-            <ComboBox fx:id="institutionCombo" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <ComboBox fx:id="institutionCombo" maxWidth="350.0" minWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </padding>
             </ComboBox>
-            <ComboBox fx:id="typeCombo" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <ComboBox fx:id="typeCombo" maxWidth="350.0" minWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </padding>
             </ComboBox>
-            <TextField fx:id="nameText" promptText="account name" GridPane.columnIndex="1">
+            <TextField fx:id="nameText" maxWidth="350.0" minWidth="250.0" promptText="account name" GridPane.columnIndex="1">
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </TextField>
+            <FlowPane hgap="24.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <children>
+                  <Label fx:id="totalValueLabel" text="\$ &lt;val&gt;">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="valueAsOfLabel" text="(as of 2022-04-03)">
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </FlowPane>
          </children>
       </GridPane>
    </top>

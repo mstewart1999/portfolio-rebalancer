@@ -56,9 +56,12 @@ public class MockPricing implements IPricing
         when = new Date(LocalDate.parse("2022-05-05").atTime(16, 0).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli());
         mockData.put("ACWX", new PriceResult("ACWX", new BigDecimal("47.66"), when)); // for proxy
         mockData.put("VFINX", new PriceResult("VFINX", new BigDecimal("383.11"), when)); // for proxy
-        mockData.put("VTTVX", new PriceResult("VTTVX", new BigDecimal("18.13"), when));
-        mockData.put("PLRIX", new PriceResult("PLRIX", new BigDecimal("8.19"), when));
-        mockData.put("FIPDX", new PriceResult("FIPDX", new BigDecimal("10.55"), when));
+        mockData.put("VTTVX", new PriceResult("VTTVX", new BigDecimal("17.99"), when));
+        mockData.put("PLRIX", new PriceResult("PLRIX", new BigDecimal("8.06"), when));
+        mockData.put("FIPDX", new PriceResult("FIPDX", new BigDecimal("10.45"), when));
+
+        mockData.put("VTMFX", new PriceResult("VTMFX", new BigDecimal("37.78"), when)); // for proxy
+        mockData.put("BND", new PriceResult("BND", new BigDecimal("75.57"), when)); // for proxy
     }
 
     @Override

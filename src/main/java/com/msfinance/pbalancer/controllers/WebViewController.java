@@ -46,6 +46,13 @@ public class WebViewController extends BaseController<String,Void>
     }
 
     @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        //xyzText.requestFocus();
+    }
+
+    @Override
     protected void updateAppBar(final AppBar appBar)
     {
         appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));

@@ -1,7 +1,9 @@
 package com.msfinance.pbalancer.util;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.Node;
@@ -30,6 +32,7 @@ public class FXUtil
     {
         t.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
+        /*
         t.sceneProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(final Observable observable) {
@@ -41,6 +44,7 @@ public class FXUtil
                 //System.out.println("sceneProperty changed");
                 autoFitTableNow(t);
             });
+        */
         t.itemsProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(final Observable observable) {
@@ -59,6 +63,7 @@ public class FXUtil
     {
         t.setColumnResizePolicy(TreeTableView.UNCONSTRAINED_RESIZE_POLICY);
 
+        /*
         t.sceneProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(final Observable observable) {
@@ -70,6 +75,7 @@ public class FXUtil
                 //System.out.println("sceneProperty changed");
                 autoFitTableNow(t);
             });
+        */
         t.rootProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(final Observable observable) {
@@ -84,30 +90,38 @@ public class FXUtil
     }
 
 
-    private static <T> void autoFitTableNow(final TableView<T> t)
+    public static <T> void autoFitTableNow(final TableView<T> t)
     {
         //System.out.println("autoFitTableNow(t)");
         Node n = t;
-        autoFitTableNow(n);
+        autoFitTableNow(n, t.getColumns().size());
     }
 
-    private static <T> void autoFitTableNow(final TreeTableView<T> tt)
+    public static <T> void autoFitTableNow(final TreeTableView<T> tt)
     {
         //System.out.println("autoFitTableNow(tt)");
         Node n = tt;
-        autoFitTableNow(n);
+        autoFitTableNow(n, tt.getColumns().size());
     }
 
-    private static void autoFitTableNow(final Node n)
+    private static void autoFitTableNow(final Node n, final int expectedCols)
     {
-        for (Node columnHeader : n.lookupAll(".column-header"))
+        Set<Node> columnHeaders = n.lookupAll(".column-header");
+        if((columnHeaders.size() == 0) && (expectedCols > 0))
+        {
+            //System.out.println("...later");
+            Platform.runLater(() -> autoFitTableNow(n, expectedCols));
+            return;
+        }
+        //System.out.println("Found cols=" + columnHeaders.size() + "; expected=" + expectedCols); // typically 1 more than expected
+        for (Node columnHeader : columnHeaders)
         {
             if(columnHeader instanceof TableColumnHeader tch)
             {
                 if(tch.getTableColumn() != null)
                 {
                     try {
-                        // violate module integrity :(
+                        // violate module integrity with reflection :(
                         columnToFitMethod.invoke(tch, -1);
                         //System.out.println("  resized");
                     } catch (Exception e) {

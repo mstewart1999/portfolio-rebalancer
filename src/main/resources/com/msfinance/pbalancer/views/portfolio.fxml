@@ -58,7 +58,7 @@
                   <GridPane hgap="10.0" layoutY="3.0999999046325684" vgap="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="76.6666259765625" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="779.333344777425" minWidth="10.0" prefWidth="206.3333740234375" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="779.333344777425" minWidth="10.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
@@ -77,13 +77,13 @@
                               <Icon fx:id="alertsErrorIcon" content="ERROR" layoutX="32.0" layoutY="10.0" />
                            </children>
                         </HBox>
-                        <Button fx:id="accountsButton" mnemonicParsing="false" text="Accounts/Assets" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
-                        <Button fx:id="targetAAButton" mnemonicParsing="false" text="Target Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="2" />
-                        <Button fx:id="actualAAButton" mnemonicParsing="false" text="Current Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="3" />
-                        <Button fx:id="alertsButton" mnemonicParsing="false" text="Alerts" GridPane.columnIndex="1" GridPane.halignment="LEFT" />
-                        <Button fx:id="investButton" mnemonicParsing="false" text="Suggest: Invest $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="4" />
-                        <Button fx:id="withdrawalButton" mnemonicParsing="false" text="Suggest: Withdraw $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="5" />
-                        <Button fx:id="rebalanceButton" layoutX="95.0" layoutY="211.0" mnemonicParsing="false" text="Suggest: Rebalance" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="6" />
+                        <Button fx:id="accountsButton" maxWidth="500.0" mnemonicParsing="false" text="Accounts/Assets" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                        <Button fx:id="targetAAButton" maxWidth="500.0" mnemonicParsing="false" text="Target Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+                        <Button fx:id="actualAAButton" maxWidth="500.0" mnemonicParsing="false" text="Current Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                        <Button fx:id="alertsButton" maxWidth="500.0" mnemonicParsing="false" text="Alerts" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="SOMETIMES" />
+                        <Button fx:id="investButton" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Invest $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
+                        <Button fx:id="withdrawalButton" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Withdraw $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
+                        <Button fx:id="rebalanceButton" layoutX="95.0" layoutY="211.0" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Rebalance" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
                      </children>
                   </GridPane>
                </children>
@@ -97,8 +97,8 @@
    <top>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints fillWidth="false" hgrow="NEVER" minWidth="10.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints fillWidth="false" hgrow="NEVER" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="500.0" minWidth="10.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
@@ -106,54 +106,75 @@
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="nameLabel" maxWidth="1024.0" text="Name">
+            <Label fx:id="nameLabel" text="Name">
                <font>
                   <Font name="System Bold" size="25.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </Label>
-            <Label fx:id="goalLabel" maxWidth="1024.0" text="Goal" GridPane.rowIndex="1">
+            <Label fx:id="goalLabel" text="Goal" GridPane.rowIndex="1">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </Label>
             <TextField fx:id="nameText" maxWidth="350.0" minWidth="250.0" promptText="name" GridPane.columnIndex="1">
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </TextField>
             <ComboBox fx:id="goalCombo" maxWidth="350.0" minWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </padding>
             </ComboBox>
             <Label text="Total Value" GridPane.rowIndex="2">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
             </Label>
             <FlowPane hgap="24.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <children>
-                  <Label fx:id="valueLabel" text="\$2.56 M">
+                  <Label fx:id="totalValueLabel" text="\$2.56 M">
                      <font>
                         <Font size="18.0" />
                      </font>
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding>
                   </Label>
-                  <Label fx:id="valueAsOfLabel" text="(as of 2022-04-03)" />
+                  <Label fx:id="valueAsOfLabel" text="(as of 2022-04-03)">
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding></Label>
                </children>
                <GridPane.margin>
-                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                  <Insets />
                </GridPane.margin>
             </FlowPane>
          </children>

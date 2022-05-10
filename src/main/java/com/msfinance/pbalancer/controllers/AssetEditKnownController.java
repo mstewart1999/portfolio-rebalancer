@@ -20,7 +20,6 @@ import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -135,8 +134,6 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
 
         autoValuePerUnitLabel.setText( NumberFormatHelper.formatWith3Decimals(asset.getLastAutoValue()) );
         autoValuePerWholeLabel.setText( NumberFormatHelper.formatWith2Decimals(asset.getBestTotalValue()) );
-
-        Platform.runLater(() -> unitsText.requestFocus());
     }
 
     protected void populateAssetClasses()
@@ -166,6 +163,13 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
 
         assetClassCombo.getItems().setAll(assetClasses);
         assetClassCombo.setValue(lastChoice);
+    }
+
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        unitsText.requestFocus();
     }
 
     @Override

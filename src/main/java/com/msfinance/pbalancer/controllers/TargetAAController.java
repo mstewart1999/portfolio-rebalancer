@@ -40,6 +40,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
@@ -81,6 +82,9 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private Hyperlink predefinedUrlHref;
 
     @FXML
+    private TabPane tabs;
+
+    @FXML
     private TreeTableView<AANode> tt;
 
     @FXML
@@ -120,6 +124,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         Validation.assertNonNull(predefinedCombo);
         Validation.assertNonNull(predefinedHelpIcon);
         Validation.assertNonNull(predefinedUrlHref);
+        Validation.assertNonNull(tabs);
         Validation.assertNonNull(t);
         Validation.assertNonNull(tt);
         Validation.assertNonNull(customizePane);
@@ -278,6 +283,16 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         t.getSelectionModel().clearSelection();
         t.setItems( FXCollections.observableList( rootNode.allLeaves() ) );
         t.refresh();
+    }
+
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+        //xyzText.requestFocus();
+        tabs.getSelectionModel().selectFirst();
+        FXUtil.autoFitTableNow(tt);
+        FXUtil.autoFitTableNow(t);
     }
 
 

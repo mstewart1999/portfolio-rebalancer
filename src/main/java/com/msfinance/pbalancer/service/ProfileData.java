@@ -5,6 +5,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
@@ -13,6 +16,8 @@ import com.msfinance.pbalancer.model.Profile;
 
 public class ProfileData
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ProfileData.class);
+
     private final Profile profile;
     private final Map<String,Portfolio> portfolios = new HashMap<>();
     private final Map<String,Account> accounts = new HashMap<>();
@@ -39,20 +44,41 @@ public class ProfileData
         for(Asset a : assets.values())
         {
             Account parent = accounts.get(a.getAccountId());
-            parent.getAssets().add(a);
-            a.setAccount(parent);
+            if(parent == null)
+            {
+                LOG.warn("Orphaned asset: {}", a.getId());
+            }
+            else
+            {
+                parent.getAssets().add(a);
+                a.setAccount(parent);
+            }
         }
         for(Account a : accounts.values())
         {
             Portfolio parent = portfolios.get(a.getPortfolioId());
-            parent.getAccounts().add(a);
-            a.setPortfolio(parent);
+            if(parent == null)
+            {
+                LOG.warn("Orphaned account: {}", a.getId());
+            }
+            else
+            {
+                parent.getAccounts().add(a);
+                a.setPortfolio(parent);
+            }
         }
         for(Portfolio p : portfolios.values())
         {
             Profile parent = profile;
-            parent.getPortfolios().add(p);
-            p.setProfile(parent);
+            if(parent == null)
+            {
+                LOG.warn("Orphaned portfolio: {}", p.getId());
+            }
+            else
+            {
+                parent.getPortfolios().add(p);
+                p.setProfile(parent);
+            }
         }
 
         sortRecursive(profile);

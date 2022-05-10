@@ -21,7 +21,6 @@ import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -146,8 +145,6 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerUnitLabel.setText("Value per Share ($)");
             valuePerWholeLabelLabel.setVisible(true);
             valuePerWholeContentLabel.setVisible(true);
-
-            Platform.runLater(() -> unitsText.requestFocus());
         }
         else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
         {
@@ -164,8 +161,6 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerUnitLabel.setText("Value ($)");
             valuePerWholeLabelLabel.setVisible(false);
             valuePerWholeContentLabel.setVisible(false);
-
-            Platform.runLater(() -> valuePerUnitText.requestFocus());
         }
         else if(asset.getPricingType() == PricingType.FIXED_PER_UNIT)
         {
@@ -182,8 +177,6 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
             valuePerUnitLabel.setText("Value per Share ($)");
             valuePerWholeLabelLabel.setVisible(true);
             valuePerWholeContentLabel.setVisible(true);
-
-            Platform.runLater(() -> unitsText.requestFocus());
         }
     }
 
@@ -214,6 +207,26 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
 
         assetClassCombo.getItems().setAll(assetClasses);
         assetClassCombo.setValue(lastChoice);
+    }
+
+    @Override
+    protected void setFocus()
+    {
+        super.setFocus();
+
+        Asset asset = getIn();
+        if(asset.getPricingType() == PricingType.MANUAL_PER_UNIT)
+        {
+            unitsText.requestFocus();
+        }
+        else if(asset.getPricingType() == PricingType.MANUAL_PER_WHOLE)
+        {
+            valuePerUnitText.requestFocus();
+        }
+        else if(asset.getPricingType() == PricingType.FIXED_PER_UNIT)
+        {
+            unitsText.requestFocus();
+        }
     }
 
 

@@ -87,6 +87,7 @@ public abstract class BaseController<IN,OUT>
         doSizing();
         updateAppBar(root.getAppManager().getAppBar());
         populateData(in);
+        root.setOnShown(e -> setFocus());
     }
 
     protected void doSizing()
@@ -96,6 +97,11 @@ public abstract class BaseController<IN,OUT>
     }
 
     protected abstract void populateData(IN in);
+    protected void setFocus()
+    {
+        // we don't want this to trigger on a "back" scenario
+        root.setOnShown(null);
+    }
     protected abstract void updateAppBar(AppBar appBar);
 
 
