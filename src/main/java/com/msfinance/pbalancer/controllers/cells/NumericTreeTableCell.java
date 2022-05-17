@@ -35,11 +35,13 @@ public class NumericTreeTableCell<T> extends TreeTableCell<T,Number>
     protected void updateItem(final Number value, final boolean empty)
     {
         super.updateItem(value, empty);
+
+        // reset colors
+        this.getStyleClass().removeAll(possibleStyleClasses);
+
         if(empty || (value == null))
         {
             setText("");
-            // reset colors
-            this.getStyleClass().removeAll(possibleStyleClasses);
         }
         else
         {
@@ -125,6 +127,5 @@ public class NumericTreeTableCell<T> extends TreeTableCell<T,Number>
                     );
         }
     }
-
 
 }

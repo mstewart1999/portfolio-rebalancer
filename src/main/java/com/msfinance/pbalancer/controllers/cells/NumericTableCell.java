@@ -35,11 +35,13 @@ public class NumericTableCell<T> extends TableCell<T,Number>
     protected void updateItem(final Number value, final boolean empty)
     {
         super.updateItem(value, empty);
+
+        // reset colors
+        this.getStyleClass().removeAll(possibleStyleClasses);
+
         if(empty || (value == null))
         {
             setText("");
-            // reset colors
-            this.getStyleClass().removeAll(possibleStyleClasses);
         }
         else
         {
@@ -57,7 +59,6 @@ public class NumericTableCell<T> extends TableCell<T,Number>
                 if(negativeStyleClass != null)
                 {
                     this.getStyleClass().add(negativeStyleClass);
-                    System.out.println("negative: " + value);
                 }
             }
             else

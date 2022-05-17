@@ -63,6 +63,7 @@
                                     <TreeTableColumn id="ttTotalValue" editable="false" prefWidth="200.0" sortable="false" text="\$" />
                                     <TreeTableColumn id="ttTargetPercent" editable="false" prefWidth="110.0" sortable="false" text="Target % of Portfolio" />
                                     <TreeTableColumn id="ttActualPercent" editable="false" prefWidth="110.0" sortable="false" text="Actual % of Portfolio" />
+                                    <TreeTableColumn id="ttDifferencePercent" editable="false" prefWidth="110.0" sortable="false" text="Difference %" />
                                     <TreeTableColumn id="ttBuyMin" editable="false" prefWidth="110.0" sortable="false" text="Buy Min" />
                                     <TreeTableColumn id="ttBuyMax" editable="false" prefWidth="110.0" sortable="false" text="Buy Max" />
                                     <TreeTableColumn id="ttSellMin" editable="false" prefWidth="110.0" sortable="false" text="Sell Min" />
@@ -87,6 +88,7 @@
                                     <TableColumn id="tTotalValue" editable="false" prefWidth="150.0" text="\$" />
                                     <TableColumn id="tTargetPercent" editable="false" prefWidth="150.0" text="Target % of Portfolio" />
                                     <TableColumn id="tActualPercent" editable="false" prefWidth="150.0" text="Actual % of Portfolio" />
+                                    <TableColumn id="tDifferencePercent" editable="false" prefWidth="150.0" text="Difference %" />
                                     <TableColumn id="tBuyMin" editable="false" prefWidth="150.0" text="Buy Min" />
                                     <TableColumn id="tBuyMax" editable="false" prefWidth="150.0" text="Buy Max" />
                                     <TableColumn id="tSellMin" editable="false" prefWidth="150.0" text="Sell Min" />

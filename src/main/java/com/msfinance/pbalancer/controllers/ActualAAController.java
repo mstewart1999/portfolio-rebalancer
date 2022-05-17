@@ -59,10 +59,11 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         tt.getColumns().get(1).setCellValueFactory(new TreeItemPropertyValueFactory<>("totalValue"));
         tt.getColumns().get(2).setCellValueFactory(new TreeItemPropertyValueFactory<>("targetPercentOfPortfolio"));
         tt.getColumns().get(3).setCellValueFactory(new TreeItemPropertyValueFactory<>("actualPercentOfPortfolio"));
-        tt.getColumns().get(4).setCellValueFactory(new TreeItemPropertyValueFactory<>("buyLow"));
-        tt.getColumns().get(5).setCellValueFactory(new TreeItemPropertyValueFactory<>("buyHigh"));
-        tt.getColumns().get(6).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellLow"));
-        tt.getColumns().get(7).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellHigh"));
+        tt.getColumns().get(4).setCellValueFactory(new TreeItemPropertyValueFactory<>("differencePercent"));
+        tt.getColumns().get(5).setCellValueFactory(new TreeItemPropertyValueFactory<>("buyLow"));
+        tt.getColumns().get(6).setCellValueFactory(new TreeItemPropertyValueFactory<>("buyHigh"));
+        tt.getColumns().get(7).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellLow"));
+        tt.getColumns().get(8).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellHigh"));
 
         TreeTableColumn<ActualAANode,Number> ttColN;
         ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(1);
@@ -73,14 +74,16 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         ttColP.setCellFactory(new PercentTreeTableCell.Factory());
         ttColP = (TreeTableColumn<ActualAANode,Double>) tt.getColumns().get(3);
         ttColP.setCellFactory(new PercentTreeTableCell.Factory());
+        ttColP = (TreeTableColumn<ActualAANode,Double>) tt.getColumns().get(4);
+        ttColP.setCellFactory(new PercentTreeTableCell.ColoredFactory());
 
-        ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(4);
-        ttColN.setCellFactory(new NumericTreeTableCell.ColoredCurrencyFactory());
         ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(5);
         ttColN.setCellFactory(new NumericTreeTableCell.ColoredCurrencyFactory());
         ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(6);
         ttColN.setCellFactory(new NumericTreeTableCell.ColoredCurrencyFactory());
         ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(7);
+        ttColN.setCellFactory(new NumericTreeTableCell.ColoredCurrencyFactory());
+        ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(8);
         ttColN.setCellFactory(new NumericTreeTableCell.ColoredCurrencyFactory());
 
 
@@ -89,10 +92,11 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("totalValue"));
         t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("targetPercentOfPortfolio"));
         t.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("actualPercentOfPortfolio"));
-        t.getColumns().get(5).setCellValueFactory(new PropertyValueFactory<>("buyLow"));
-        t.getColumns().get(6).setCellValueFactory(new PropertyValueFactory<>("buyHigh"));
-        t.getColumns().get(7).setCellValueFactory(new PropertyValueFactory<>("sellLow"));
-        t.getColumns().get(8).setCellValueFactory(new PropertyValueFactory<>("sellHigh"));
+        t.getColumns().get(5).setCellValueFactory(new PropertyValueFactory<>("differencePercent"));
+        t.getColumns().get(6).setCellValueFactory(new PropertyValueFactory<>("buyLow"));
+        t.getColumns().get(7).setCellValueFactory(new PropertyValueFactory<>("buyHigh"));
+        t.getColumns().get(8).setCellValueFactory(new PropertyValueFactory<>("sellLow"));
+        t.getColumns().get(9).setCellValueFactory(new PropertyValueFactory<>("sellHigh"));
 
         TableColumn<ActualAANode,Number> tcolN;
         tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(2);
@@ -103,14 +107,16 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         tcolP.setCellFactory(new PercentTableCell.Factory<ActualAANode>());
         tcolP = (TableColumn<ActualAANode, Double>) t.getColumns().get(4);
         tcolP.setCellFactory(new PercentTableCell.Factory<ActualAANode>());
+        tcolP = (TableColumn<ActualAANode, Double>) t.getColumns().get(5);
+        tcolP.setCellFactory(new PercentTableCell.ColoredFactory<ActualAANode>());
 
-        tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(5);
-        tcolN.setCellFactory(new NumericTableCell.ColoredCurrencyFactory<ActualAANode>());
         tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(6);
         tcolN.setCellFactory(new NumericTableCell.ColoredCurrencyFactory<ActualAANode>());
         tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(7);
         tcolN.setCellFactory(new NumericTableCell.ColoredCurrencyFactory<ActualAANode>());
         tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(8);
+        tcolN.setCellFactory(new NumericTableCell.ColoredCurrencyFactory<ActualAANode>());
+        tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(9);
         tcolN.setCellFactory(new NumericTableCell.ColoredCurrencyFactory<ActualAANode>());
 
         t.setOnSort(e -> t.refresh()); // this gets styling to reflect properly after a sort

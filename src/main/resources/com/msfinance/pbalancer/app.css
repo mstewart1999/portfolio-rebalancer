@@ -110,12 +110,12 @@
 
 .pb-positive-number {
   -fx-background-color: linear-gradient(to bottom, derive(green, +50%), derive(green, +80%));
-  -fx-text-fill: derive(green, -50%);
+  -fx-text-fill: derive(green, -75%);
   -fx-opacity: 0.8;
 }
 .pb-negative-number {
   -fx-background-color: linear-gradient(to bottom, derive(red, +50%), derive(red, +80%));
-  -fx-text-fill: derive(red, -50%);
+  -fx-text-fill: derive(red, -75%);
   -fx-opacity: 0.8;
 }
 .pb-zero-number {
