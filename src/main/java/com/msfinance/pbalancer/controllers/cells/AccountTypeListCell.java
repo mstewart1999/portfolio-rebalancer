@@ -9,16 +9,16 @@ import javafx.util.Callback;
 public class AccountTypeListCell extends ListCell<AccountType>
 {
     @Override
-    protected void updateItem(final AccountType p, final boolean empty)
+    protected void updateItem(final AccountType e, final boolean empty)
     {
-        super.updateItem(p, empty);
-        if(p != null)
+        super.updateItem(e, empty);
+        if(empty || (e == null))
         {
-            setText(p.getText());
+            setText("");
         }
         else
         {
-            setText("");
+            setText(e.getText());
         }
     }
 

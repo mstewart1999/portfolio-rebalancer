@@ -1,0 +1,25 @@
+.view {
+
+}
+
+.tree-table-view .column-header#ttTotalValue .label,
+.tree-table-view .column-header#ttTargetPercent .label,
+.tree-table-view .column-header#ttActualPercent .label,
+.tree-table-view .column-header#ttBuyMin .label,
+.tree-table-view .column-header#ttBuyMax .label,
+.tree-table-view .column-header#ttSellMin .label,
+.tree-table-view .column-header#ttSellMax .label
+{
+  -fx-alignment: center-right;
+}
+
+.table-view .column-header#tTotalValue .label,
+.table-view .column-header#tTargetPercent .label,
+.table-view .column-header#tActualPercent .label,
+.table-view .column-header#tBuyMin .label,
+.table-view .column-header#tBuyMax .label,
+.table-view .column-header#tSellMin .label,
+.table-view .column-header#tSellMax .label
+{
+  -fx-alignment: center-right;
+}

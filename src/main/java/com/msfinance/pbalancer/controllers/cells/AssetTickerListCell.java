@@ -21,10 +21,13 @@ public final class AssetTickerListCell extends ListCell<String>
     public void updateItem(final String item, final boolean empty)
     {
         super.updateItem(item, empty);
-        if (empty) {
-                setText(null);
-        } else {
-                setText(item + " -- " + tickerSuggestions.get(item).getName());
+        if (empty || (item == null))
+        {
+            setText(null);
+        }
+        else
+        {
+            setText(item + " -- " + tickerSuggestions.get(item).getName());
         }
     }
 

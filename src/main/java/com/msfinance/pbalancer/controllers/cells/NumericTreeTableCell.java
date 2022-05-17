@@ -5,11 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 
-public class NumericTableCell<T> extends TableCell<T,Number>
+public class NumericTreeTableCell<T> extends TreeTableCell<T,Number>
 {
     private final DecimalFormat format;
     private final String positiveStyleClass;
@@ -17,7 +17,7 @@ public class NumericTableCell<T> extends TableCell<T,Number>
     private final String zeroStyleClass;
     private final List<String> possibleStyleClasses;
 
-    public NumericTableCell(
+    public NumericTreeTableCell(
             final DecimalFormat format,
             final String positiveStyleClass,
             final String negativeStyleClass,
@@ -57,7 +57,6 @@ public class NumericTableCell<T> extends TableCell<T,Number>
                 if(negativeStyleClass != null)
                 {
                     this.getStyleClass().add(negativeStyleClass);
-                    System.out.println("negative: " + value);
                 }
             }
             else
@@ -70,7 +69,7 @@ public class NumericTableCell<T> extends TableCell<T,Number>
         }
     }
 
-    private static class Factory<T> implements Callback<TableColumn<T,Number>, TableCell<T,Number>>
+    private static class Factory<T> implements Callback<TreeTableColumn<T,Number>, TreeTableCell<T,Number>>
     {
         private final DecimalFormat format;
         private final String positiveStyleClass;
@@ -96,9 +95,9 @@ public class NumericTableCell<T> extends TableCell<T,Number>
         }
 
         @Override
-        public TableCell<T,Number> call(final TableColumn<T,Number> col)
+        public TreeTableCell<T,Number> call(final TreeTableColumn<T,Number> col)
         {
-            return new NumericTableCell<T>(
+            return new NumericTreeTableCell<T>(
                     format,
                     positiveStyleClass,
                     negativeStyleClass,
@@ -124,15 +123,8 @@ public class NumericTableCell<T> extends TableCell<T,Number>
                     "pb-negative-number",
                     "pb-zero-number"
                     );
-
         }
     }
 
-    public static class UnitsFactory<T> extends Factory<T>
-    {
-        public UnitsFactory()
-        {
-            super("#,##0.000");
-        }
-    }
+
 }

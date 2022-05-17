@@ -118,14 +118,14 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         // TODO
         //accountsButton.setDisable(true);
         //targetAAButton.setDisable(true);
-        actualAAButton.setDisable(true);
+        //actualAAButton.setDisable(true);
         alertsButton.setDisable(true);
         investButton.setDisable(true);
         withdrawalButton.setDisable(true);
         rebalanceButton.setDisable(true);
         accountsButton.setOnAction(e -> visitAccountList());
         targetAAButton.setOnAction(e -> visitTargetAAList());
-        actualAAButton.setOnAction(e -> {});
+        actualAAButton.setOnAction(e -> visitActualAAList());
         alertsButton.setOnAction(e -> {});
         investButton.setOnAction(e -> {});
         withdrawalButton.setOnAction(e -> {});
@@ -273,6 +273,17 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                         LOG.error("Error updating portfolio: " + getIn().getId(), e);
                         getApp().showMessage("Error updating portfolio");
                     }
+                },
+                () -> {
+                    // no-op
+                });
+    }
+
+    private void visitActualAAList()
+    {
+        getApp().<Portfolio,Portfolio>mySwitchView(App.ACTUAL_AA_VIEW, getIn(),
+                p -> {
+                    // no-op
                 },
                 () -> {
                     // no-op

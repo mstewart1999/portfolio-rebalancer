@@ -33,6 +33,7 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
@@ -181,6 +182,9 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
                 onAASelectionChanged();
             }
         });
+
+        t.setOnSort(e -> t.refresh()); // this gets styling to reflect properly after a sort
+
         FXUtil.autoFitTable(tt);
         FXUtil.autoFitTable(t);
 
@@ -280,8 +284,12 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     private void populateFlatView()
     {
         AANode rootNode = tt.getRoot().getValue(); // get this from tree table for convenience
+        SortedList<AANode> sortedList = new SortedList<>(FXCollections.observableArrayList(rootNode.allLeaves()));
+
         t.getSelectionModel().clearSelection();
-        t.setItems( FXCollections.observableList( rootNode.allLeaves() ) );
+        t.setItems( sortedList );
+        sortedList.comparatorProperty().bind(t.comparatorProperty());
+
         t.refresh();
     }
 

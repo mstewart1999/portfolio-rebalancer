@@ -1,15 +1,15 @@
 package com.msfinance.pbalancer.controllers.cells;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
 import javafx.util.Callback;
 
-public class PercentTableCell<T> extends TableCell<T,Double>
+public class PercentTreeTableCell<T> extends TreeTableCell<T,Double>
 {
     private final String format;
 
-    public PercentTableCell(final String format)
+    public PercentTreeTableCell(final String format)
     {
         this.format = format;
     }
@@ -29,7 +29,7 @@ public class PercentTableCell<T> extends TableCell<T,Double>
         }
     }
 
-    public static class Factory<T> implements Callback<TableColumn<T,Double>, TableCell<T,Double>>
+    public static class Factory<T> implements Callback<TreeTableColumn<T,Double>, TreeTableCell<T,Double>>
     {
         private String format;
 
@@ -44,9 +44,9 @@ public class PercentTableCell<T> extends TableCell<T,Double>
         }
 
         @Override
-        public TableCell<T,Double> call(final TableColumn<T,Double> col)
+        public TreeTableCell<T,Double> call(final TreeTableColumn<T,Double> col)
         {
-            return new PercentTableCell<T>(format);
+            return new PercentTreeTableCell<T>(format);
         }
     }
 }

@@ -277,7 +277,7 @@ public class AANode
             }
             if(AssetClass.lookup(name) == null)
             {
-                alerts.add(new PortfolioAlert(AA, WARN, "leaf node's name is not a known AssetClass"));
+                alerts.add(new PortfolioAlert(AA, INFO, "Custom AssetClass"));
             }
             if( AssetClass.UNDEFINED.equals(name) )
             {

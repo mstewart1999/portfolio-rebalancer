@@ -7,41 +7,52 @@
   -pb-gray-200: #EEEEEE;
   -pb-gray-300: #DDDDDD;
   -pb-gray-400: #CCCCCC;
+  
+  /*
+  -fx-accent: #0096C9;
+  -fx-focus-color: #039ED3;
+  -fx-faint-focus-color: #039ED322;
+  */
 }
 
 
-/*
-.tree-table-row-cell {
-  -fx-background-color: white;
-}
-*/
+.table-row-cell .table-cell,
 .tree-table-row-cell .tree-table-cell {
   -fx-border-width: 0.5px;
   -fx-border-color: gray gray gray gray;
+  -fx-min-height: 30;
 }
+.table-row-cell:empty,
 .tree-table-row-cell:empty {
   -fx-background-color: transparent;
 }
+.table-row-cell:empty .table-cell,
 .tree-table-row-cell:empty .tree-table-cell {
   -fx-border-width: 0px;
 }
 
 
-/*
-.table-row-cell {
-  -fx-background-color: white;
+/* glisten.css failed to define these 3 for tree tables, only regular tables */
+.table-row-cell,
+.tree-table-row-cell {
+    -fx-background: white;
+    -fx-background-color: "#eaeaea", -fx-background;
+    -fx-background-insets: 0, 0 0 1 0;
 }
-*/
-.table-row-cell .table-cell {
-  -fx-border-width: 0.5px;
-  -fx-border-color: gray gray gray gray;
+
+.table-row-cell:hover,
+.tree-table-row-cell:hover {
+    -fx-background: #EEEEEE;
+    -fx-background-color: "#eaeaea", -fx-background;
 }
-.table-row-cell:empty {
-  -fx-background-color: transparent;
+
+.table-row-cell:selected,
+.tree-table-row-cell:selected {
+    -fx-background: derive(gold, +70%); /* make the selection color more obvious than glisten.css #F5F5F5;*/
+    -fx-background-color: "#eaeaea", -fx-background;
 }
-.table-row-cell:empty .table-cell {
-  -fx-border-width: 0px;
-}
+
+
 
 .table-view .column-header .label {
   -fx-text-fill: black;
@@ -95,6 +106,23 @@
   -fx-font-weight: bold;
   -fx-alignment: center-left;
 }
+
+
+.pb-positive-number {
+  -fx-background-color: linear-gradient(to bottom, derive(green, +50%), derive(green, +80%));
+  -fx-text-fill: derive(green, -50%);
+  -fx-opacity: 0.8;
+}
+.pb-negative-number {
+  -fx-background-color: linear-gradient(to bottom, derive(red, +50%), derive(red, +80%));
+  -fx-text-fill: derive(red, -50%);
+  -fx-opacity: 0.8;
+}
+.pb-zero-number {
+  -fx-background-color: transparent;
+  -fx-text-fill: black;
+  -fx-opacity: 0.8;
+  }
 
 
 /* container of buttons */

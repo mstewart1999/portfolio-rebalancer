@@ -10,18 +10,16 @@ public class PortfolioGoalTableCell<T> extends TableCell<T,PortfolioGoal>
 {
 
     @Override
-    protected void updateItem(final PortfolioGoal value, final boolean empty)
+    protected void updateItem(final PortfolioGoal e, final boolean empty)
     {
-        if (value == getItem() && empty == isEmpty()) return;
-
-        super.updateItem(value, empty);
-        if(value == null)
+        super.updateItem(e, empty);
+        if(empty || (e == null))
         {
             setText("");
         }
         else
         {
-            setText(value.getText());
+            setText(e.getText());
         }
     }
 

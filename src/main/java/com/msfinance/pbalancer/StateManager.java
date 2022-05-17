@@ -305,7 +305,7 @@ public class StateManager
         return !Validation.isBlank(a.getProxy().getProxyTicker());
     }
 
-    private static Collection<Asset> listAssets(final Profile profile)
+    public static Collection<Asset> listAssets(final Profile profile)
     {
         Collection<Asset> found = new ArrayList<>();
 
@@ -319,7 +319,7 @@ public class StateManager
         return found;
     }
 
-    private static Collection<Asset> listAssets(final Portfolio portfolio)
+    public static Collection<Asset> listAssets(final Portfolio portfolio)
     {
         Collection<Asset> found = new ArrayList<>();
 
@@ -330,7 +330,7 @@ public class StateManager
         return found;
     }
 
-    private static Collection<Asset> listAssets(final Account account)
+    public static Collection<Asset> listAssets(final Account account)
     {
         return account.getAssets();
     }

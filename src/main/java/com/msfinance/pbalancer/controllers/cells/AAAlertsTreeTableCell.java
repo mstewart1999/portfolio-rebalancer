@@ -22,10 +22,8 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
     @Override
     protected void updateItem(final List<PortfolioAlert> alerts, final boolean empty)
     {
-        if (alerts == getItem() && empty == isEmpty()) return;
-
         super.updateItem(alerts, empty);
-        if((alerts == null) || alerts.isEmpty())
+        if(empty || (alerts == null) || alerts.isEmpty())
         {
             setText("");
             setGraphic(null);
