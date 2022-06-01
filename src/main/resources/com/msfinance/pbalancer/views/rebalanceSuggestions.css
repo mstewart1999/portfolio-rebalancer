@@ -2,9 +2,3 @@
 
 }
 
-.table-view .column-header#unitsCol .label {
-  -fx-alignment: center-right;
-}
-.table-view .column-header#valueCol .label {
-  -fx-alignment: center-right;
-}
