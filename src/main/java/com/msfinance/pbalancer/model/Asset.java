@@ -307,6 +307,26 @@ public class Asset implements IPersistable
         return null;
     }
 
+    @JsonIgnore
+    public BigDecimal getBestUnitValue()
+    {
+        if(lastAutoValue != null)
+        {
+            // AUTO_PER_UNIT
+            // proxied assets
+            return lastAutoValue;
+        }
+        if(manualValue != null)
+        {
+            // MANUAL_PER_UNIT
+            // FIXED_PER_UNIT
+            // even MANUAL_PER_WHOLE (which doesn't fit well anywhere in this function)
+            return manualValue;
+        }
+        // WTF?
+        return BigDecimal.ZERO;
+    }
+
     public static BigDecimal totalValue(final BigDecimal units, final BigDecimal perUnitValue)
     {
         if((perUnitValue != null) && (units != null))

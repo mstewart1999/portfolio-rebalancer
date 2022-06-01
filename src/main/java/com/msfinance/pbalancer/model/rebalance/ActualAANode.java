@@ -74,7 +74,7 @@ public class ActualAANode
         return computeTotalValue().divide(portfolioValue, 4, RoundingMode.HALF_UP).doubleValue();
     }
 
-    public double getDifferencePercent()
+    public double getAbsoluteDifferencePercent()
     {
         // negative (sell) if actual is bigger than target
         return getTargetPercentOfPortfolio() - getActualPercentOfPortfolio();
@@ -97,6 +97,17 @@ public class ActualAANode
     {
         return method.computeBuyHigh(getTargetPercentOfPortfolio(), portfolioValue, computeTotalValue());
     }
+
+    public double getBuyToActual()
+    {
+        double absDiffPercent = getAbsoluteDifferencePercent();
+        if(absDiffPercent > 0.0)
+        {
+            return computeTotalValue().doubleValue()*absDiffPercent;
+        }
+        return 0.0;
+    }
+
 
     private BigDecimal computeTotalValue()
     {

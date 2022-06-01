@@ -60,6 +60,7 @@ public class App extends Application
     public static final String ASSET_EDIT_MANUAL_VIEW = "ASSET_EDIT_MANUAL_VIEW";
     public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
     public static final String ACTUAL_AA_VIEW = "ACTUAL_AA_VIEW";
+    public static final String REBALANCE_SUGGESTIONS = "REBALANCE_SUGGESTIONS";
     public static final String WEB_VIEW = "WEB_VIEW";
 
 
@@ -84,6 +85,7 @@ public class App extends Application
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(TARGET_AA_VIEW, "targetAA.fxml");
+        createView(REBALANCE_SUGGESTIONS, "rebalanceSuggestions.fxml");
         createView(ACTUAL_AA_VIEW, "actualAA.fxml");
         //createView(WEB_VIEW, "webView.fxml");
 
@@ -103,6 +105,7 @@ public class App extends Application
         appManager.addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> viewByKey.get(ASSET_EDIT_MANUAL_VIEW));
         appManager.addViewFactory(TARGET_AA_VIEW, () -> viewByKey.get(TARGET_AA_VIEW));
         appManager.addViewFactory(ACTUAL_AA_VIEW, () -> viewByKey.get(ACTUAL_AA_VIEW));
+        appManager.addViewFactory(REBALANCE_SUGGESTIONS, () -> viewByKey.get(REBALANCE_SUGGESTIONS));
         appManager.addViewFactory(WEB_VIEW, () -> createView(WEB_VIEW, "webView.fxml"));
 
         buildDrawer();

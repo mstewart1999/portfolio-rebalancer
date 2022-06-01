@@ -104,4 +104,10 @@ public class AssetClass
         return longDescription;
     }
 
+
+    public static boolean isEquity(final String code)
+    {
+        return code.startsWith("EQ-");
+    }
+
 }

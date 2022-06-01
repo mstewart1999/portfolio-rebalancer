@@ -59,7 +59,7 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         tt.getColumns().get(1).setCellValueFactory(new TreeItemPropertyValueFactory<>("totalValue"));
         tt.getColumns().get(2).setCellValueFactory(new TreeItemPropertyValueFactory<>("targetPercentOfPortfolio"));
         tt.getColumns().get(3).setCellValueFactory(new TreeItemPropertyValueFactory<>("actualPercentOfPortfolio"));
-        tt.getColumns().get(4).setCellValueFactory(new TreeItemPropertyValueFactory<>("differencePercent"));
+        tt.getColumns().get(4).setCellValueFactory(new TreeItemPropertyValueFactory<>("absoluteDifferencePercent"));
         tt.getColumns().get(5).setCellValueFactory(new TreeItemPropertyValueFactory<>("buyLow"));
         tt.getColumns().get(6).setCellValueFactory(new TreeItemPropertyValueFactory<>("buyHigh"));
         tt.getColumns().get(7).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellLow"));
@@ -92,7 +92,7 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("totalValue"));
         t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("targetPercentOfPortfolio"));
         t.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("actualPercentOfPortfolio"));
-        t.getColumns().get(5).setCellValueFactory(new PropertyValueFactory<>("differencePercent"));
+        t.getColumns().get(5).setCellValueFactory(new PropertyValueFactory<>("absoluteDifferencePercent"));
         t.getColumns().get(6).setCellValueFactory(new PropertyValueFactory<>("buyLow"));
         t.getColumns().get(7).setCellValueFactory(new PropertyValueFactory<>("buyHigh"));
         t.getColumns().get(8).setCellValueFactory(new PropertyValueFactory<>("sellLow"));
@@ -130,11 +130,6 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
     protected void populateData(final Portfolio p)
     {
         ActualAANode rootAaan = RebalanceManager.toActualAssetAllocation(p);
-        System.out.printf("[[-%n");
-        RebalanceManager.dumpToConsole(rootAaan);
-        System.out.printf("-]]%n");
-
-        LOG.info("here");
 
         populateNestedView(rootAaan);
         populateFlatView();

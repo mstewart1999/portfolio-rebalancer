@@ -122,14 +122,14 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         alertsButton.setDisable(true);
         investButton.setDisable(true);
         withdrawalButton.setDisable(true);
-        rebalanceButton.setDisable(true);
+        //rebalanceButton.setDisable(true);
         accountsButton.setOnAction(e -> visitAccountList());
         targetAAButton.setOnAction(e -> visitTargetAAList());
         actualAAButton.setOnAction(e -> visitActualAAList());
         alertsButton.setOnAction(e -> {});
         investButton.setOnAction(e -> {});
         withdrawalButton.setOnAction(e -> {});
-        rebalanceButton.setOnAction(e -> {});
+        rebalanceButton.setOnAction(e -> visitRebalance());
         accountsButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         targetAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         actualAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
@@ -289,4 +289,16 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                     // no-op
                 });
     }
+
+    private void visitRebalance()
+    {
+        getApp().<Portfolio,Portfolio>mySwitchView(App.REBALANCE_SUGGESTIONS, getIn(),
+                p -> {
+                    // no-op
+                },
+                () -> {
+                    // no-op
+                });
+    }
+
 }
