@@ -48,7 +48,7 @@
    <center>
       <AnchorPane>
          <padding>
-            <Insets bottom="8.0" left="8.0" top="8.0" />
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
          </padding>
          <children>
             <TextArea fx:id="instructionsTextArea" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
@@ -63,7 +63,6 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label layoutX="20.0" layoutY="41.0" text="Portfolio">

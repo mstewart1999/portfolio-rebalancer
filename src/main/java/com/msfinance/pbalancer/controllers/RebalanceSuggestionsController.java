@@ -70,7 +70,8 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Por
         nameLabel.setText(p.getName());
         instructionsTextArea.setText( suggestionText );
 
-        statusLabel.setText(String.format("Total suggested transactions: %,d", suggestions.size()));
+        long suggCount = suggestions.stream().filter(s -> !s.isBlank()).count();
+        statusLabel.setText(String.format("Total suggested transactions: %,d", suggCount));
     }
 
     @Override

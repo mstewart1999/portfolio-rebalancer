@@ -108,8 +108,8 @@ public class RebalanceManager
         List<ActualAANode> sells = new ArrayList<>();
         List<ActualAANode> buys = new ArrayList<>();
 
-        List<Account> freeCashAccounts = new ArrayList<>();
         Map<Account,Double> freedCashByAccountId = new HashMap<>();
+        Map<Account,Double> neededCashByAccountId = new HashMap<>();
 
 
         for(ActualAANode n : all)
@@ -163,8 +163,7 @@ public class RebalanceManager
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
                         String what = nameOf(a);
                         String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Sell %,.2f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
-                        freeCashAccounts.add(a.getAccount());
+                        suggestions.add(String.format("[%s] Sell %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
                         addFreeCash(freedCashByAccountId, a.getAccount(), howMuchDollars);
                     }
                 }
@@ -188,8 +187,7 @@ public class RebalanceManager
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
                         String what = nameOf(a);
                         String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Sell %,.2f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
-                        freeCashAccounts.add(a.getAccount());
+                        suggestions.add(String.format("[%s] Sell %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
                         addFreeCash(freedCashByAccountId, a.getAccount(), howMuchDollars);
                     }
                 }
@@ -225,12 +223,12 @@ public class RebalanceManager
                         {
                             suggestions.add(String.format("[%s] Sell %,.2f dollars of %s in account '%s' (represents entire asset))", assetClass, howMuchDollars, what, where));
                         }
-                        freeCashAccounts.add(a.getAccount());
                         addFreeCash(freedCashByAccountId, a.getAccount(), howMuchDollars);
                     }
                 }
             }
         }
+        suggestions.add("");
 
         for(ActualAANode n : buys)
         {
@@ -268,9 +266,8 @@ public class RebalanceManager
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
                         String what = nameOf(a);
                         String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Sell %,.2f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
-                        freeCashAccounts.add(a.getAccount());
-                        addFreeCash(freedCashByAccountId, a.getAccount(), howMuchDollars);
+                        suggestions.add(String.format("[%s] Buy %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
+                        subtractFreeCash(neededCashByAccountId, a.getAccount(), howMuchDollars);
                     }
                 }
                 // then non tax advantaged accounts
@@ -293,9 +290,8 @@ public class RebalanceManager
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
                         String what = nameOf(a);
                         String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Sell %,.2f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
-                        freeCashAccounts.add(a.getAccount());
-                        addFreeCash(freedCashByAccountId, a.getAccount(), howMuchDollars);
+                        suggestions.add(String.format("[%s] Buy %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
+                        subtractFreeCash(neededCashByAccountId, a.getAccount(), howMuchDollars);
                     }
                 }
             }
@@ -324,22 +320,24 @@ public class RebalanceManager
                         String where = a.getAccount().getName();
                         if(wasAll)
                         {
-                            suggestions.add(String.format("[%s] Sell %,.2f dollars of %s in account '%s' (this asset is a single unit, so may not be partially sellable)", assetClass, howMuchDollars, what, where));
+                            suggestions.add(String.format("[%s] Buy %,.2f dollars of %s in account '%s' (this asset is a single unit, so may not be partially sellable)", assetClass, howMuchDollars, what, where));
                         }
                         else
                         {
-                            suggestions.add(String.format("[%s] Sell %,.2f dollars of %s in account '%s' (represents entire asset))", assetClass, howMuchDollars, what, where));
+                            suggestions.add(String.format("[%s] Buy %,.2f dollars of %s in account '%s' (represents entire asset))", assetClass, howMuchDollars, what, where));
                         }
-                        freeCashAccounts.add(a.getAccount());
-                        addFreeCash(freedCashByAccountId, a.getAccount(), howMuchDollars);
+                        subtractFreeCash(neededCashByAccountId, a.getAccount(), howMuchDollars);
                     }
                 }
             }
         }
+        suggestions.add("");
 
         {
+            suggestions.addAll(toWithdrawalSuggestions(p, rootAaan, neededCashByAccountId));
             suggestions.add("");
             suggestions.addAll(toInvestSuggestions(p, rootAaan, freedCashByAccountId));
+            suggestions.add("");
         }
 
         return suggestions;
@@ -421,11 +419,29 @@ public class RebalanceManager
         }
         else
         {
-            freedCashByAccountId.put(account, howMuchDollars);
+            freedCashByAccountId.put(account, -howMuchDollars);
         }
     }
 
 
+
+    /**
+     * Determine which (if any) sell transactions to perform across your accounts,
+     * given a set of cash in various accounts
+     * @param p the portfolio in question
+     * @param rootAaan Consolidated view of target vs actual asset allocation
+     * @param newCashByAcctId how much cash is available in each account that should be withdrawn
+     * @return a list of suggested buy transactions
+     */
+    public static List<String> toWithdrawalSuggestions(final Portfolio p, final ActualAANode rootAaan, final Map<Account,Double> newCashByAcctId)
+    {
+        List<String> suggestions = new ArrayList<>();
+
+        // TODO: implement
+        suggestions.add("dummy withdrawal section: " + newCashByAcctId);
+
+        return suggestions;
+    }
 
     /**
      * Determine which (if any) buy transactions to perform across your accounts,
@@ -492,7 +508,7 @@ public class RebalanceManager
                     buyUnits = buyCash / a.getBestUnitValue().doubleValue();
                     String what = nameOf(a);
                     String where = a.getAccount().getName();
-                    suggestions.add(String.format("[%s] Buy %,.2f shares of %s in account '%s'", assetClass, buyUnits, what, where));
+                    suggestions.add(String.format("[%s] Buy %,.3f shares of %s in account '%s'", assetClass, buyUnits, what, where));
                     subtractFreeCash(newCashByAcctId, a.getAccount(), buyCash);
                 }
             }
