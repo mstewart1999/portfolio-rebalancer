@@ -60,7 +60,11 @@ public class App extends Application
     public static final String ASSET_EDIT_MANUAL_VIEW = "ASSET_EDIT_MANUAL_VIEW";
     public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
     public static final String ACTUAL_AA_VIEW = "ACTUAL_AA_VIEW";
-    public static final String REBALANCE_SUGGESTIONS = "REBALANCE_SUGGESTIONS";
+    public static final String INVEST_SUGGESTIONS_PROMPT_VIEW = "INVEST_SUGGESTIONS_PROMPT_VIEW";
+    public static final String INVEST_SUGGESTIONS_RESULTS_VIEW = "INVEST_SUGGESTIONS_RESULTS_VIEW";
+    public static final String WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW = "WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW";
+    public static final String WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW = "WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW";
+    public static final String REBALANCE_SUGGESTIONS_VIEW = "REBALANCE_SUGGESTIONS_VIEW";
     public static final String WEB_VIEW = "WEB_VIEW";
 
 
@@ -85,7 +89,11 @@ public class App extends Application
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(TARGET_AA_VIEW, "targetAA.fxml");
-        createView(REBALANCE_SUGGESTIONS, "rebalanceSuggestions.fxml");
+        createView(INVEST_SUGGESTIONS_PROMPT_VIEW, "investSuggestionsPrompt.fxml");
+        //createView(INVEST_SUGGESTIONS_RESULTS_VIEW, "investSuggestionsResults.fxml"); // TODO
+        createView(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, "withdrawalSuggestionsPrompt.fxml");
+        //createView(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW, "withdrawalSuggestionsResults.fxml"); // TODO
+        createView(REBALANCE_SUGGESTIONS_VIEW, "rebalanceSuggestions.fxml");
         createView(ACTUAL_AA_VIEW, "actualAA.fxml");
         //createView(WEB_VIEW, "webView.fxml");
 
@@ -105,7 +113,11 @@ public class App extends Application
         appManager.addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> viewByKey.get(ASSET_EDIT_MANUAL_VIEW));
         appManager.addViewFactory(TARGET_AA_VIEW, () -> viewByKey.get(TARGET_AA_VIEW));
         appManager.addViewFactory(ACTUAL_AA_VIEW, () -> viewByKey.get(ACTUAL_AA_VIEW));
-        appManager.addViewFactory(REBALANCE_SUGGESTIONS, () -> viewByKey.get(REBALANCE_SUGGESTIONS));
+        appManager.addViewFactory(INVEST_SUGGESTIONS_PROMPT_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_PROMPT_VIEW));
+        //appManager.addViewFactory(INVEST_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_RESULTS_VIEW)); // TODO
+        appManager.addViewFactory(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, () -> viewByKey.get(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW));
+        //appManager.addViewFactory(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW)); // TODO
+        appManager.addViewFactory(REBALANCE_SUGGESTIONS_VIEW, () -> viewByKey.get(REBALANCE_SUGGESTIONS_VIEW));
         appManager.addViewFactory(WEB_VIEW, () -> createView(WEB_VIEW, "webView.fxml"));
 
         buildDrawer();

@@ -120,15 +120,15 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         //targetAAButton.setDisable(true);
         //actualAAButton.setDisable(true);
         alertsButton.setDisable(true);
-        investButton.setDisable(true);
-        withdrawalButton.setDisable(true);
+        //investButton.setDisable(true);
+        //withdrawalButton.setDisable(true);
         //rebalanceButton.setDisable(true);
         accountsButton.setOnAction(e -> visitAccountList());
         targetAAButton.setOnAction(e -> visitTargetAAList());
         actualAAButton.setOnAction(e -> visitActualAAList());
         alertsButton.setOnAction(e -> {});
-        investButton.setOnAction(e -> {});
-        withdrawalButton.setOnAction(e -> {});
+        investButton.setOnAction(e -> visitInvest());
+        withdrawalButton.setOnAction(e -> visitWithdrawal());
         rebalanceButton.setOnAction(e -> visitRebalance());
         accountsButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         targetAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
@@ -290,9 +290,31 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                 });
     }
 
+    private void visitInvest()
+    {
+        getApp().<Portfolio,Void>mySwitchView(App.INVEST_SUGGESTIONS_PROMPT_VIEW, getIn(),
+                p -> {
+                    // no-op
+                },
+                () -> {
+                    // no-op
+                });
+    }
+
+    private void visitWithdrawal()
+    {
+        getApp().<Portfolio,Void>mySwitchView(App.WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, getIn(),
+                p -> {
+                    // no-op
+                },
+                () -> {
+                    // no-op
+                });
+    }
+
     private void visitRebalance()
     {
-        getApp().<Portfolio,Portfolio>mySwitchView(App.REBALANCE_SUGGESTIONS, getIn(),
+        getApp().<Portfolio,Void>mySwitchView(App.REBALANCE_SUGGESTIONS_VIEW, getIn(),
                 p -> {
                     // no-op
                 },

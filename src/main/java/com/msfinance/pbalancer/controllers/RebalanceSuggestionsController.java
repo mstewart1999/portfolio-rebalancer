@@ -18,7 +18,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 
-public class RebalanceSuggestionsController extends BaseController<Portfolio,Portfolio>
+public class RebalanceSuggestionsController extends BaseController<Portfolio,Void>
 {
     private static final Logger LOG = LoggerFactory.getLogger(RebalanceSuggestionsController.class);
     public static final String APP_BAR_TITLE = "Rebalancing Suggestions";
@@ -84,12 +84,7 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Por
 
     private void goBack()
     {
-        returnSuccess(getIn());
-    }
-
-    private String toSuggestions(final ActualAANode rootAaan)
-    {
-        return "";
+        returnSuccess(null);
     }
 
 }
