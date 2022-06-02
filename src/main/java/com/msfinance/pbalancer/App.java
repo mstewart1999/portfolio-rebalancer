@@ -90,9 +90,9 @@ public class App extends Application
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(TARGET_AA_VIEW, "targetAA.fxml");
         createView(INVEST_SUGGESTIONS_PROMPT_VIEW, "investSuggestionsPrompt.fxml");
-        //createView(INVEST_SUGGESTIONS_RESULTS_VIEW, "investSuggestionsResults.fxml"); // TODO
+        createView(INVEST_SUGGESTIONS_RESULTS_VIEW, "investSuggestionsResults.fxml");
         createView(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, "withdrawalSuggestionsPrompt.fxml");
-        //createView(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW, "withdrawalSuggestionsResults.fxml"); // TODO
+        createView(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW, "withdrawalSuggestionsResults.fxml");
         createView(REBALANCE_SUGGESTIONS_VIEW, "rebalanceSuggestions.fxml");
         createView(ACTUAL_AA_VIEW, "actualAA.fxml");
         //createView(WEB_VIEW, "webView.fxml");
@@ -114,9 +114,9 @@ public class App extends Application
         appManager.addViewFactory(TARGET_AA_VIEW, () -> viewByKey.get(TARGET_AA_VIEW));
         appManager.addViewFactory(ACTUAL_AA_VIEW, () -> viewByKey.get(ACTUAL_AA_VIEW));
         appManager.addViewFactory(INVEST_SUGGESTIONS_PROMPT_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_PROMPT_VIEW));
-        //appManager.addViewFactory(INVEST_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_RESULTS_VIEW)); // TODO
+        appManager.addViewFactory(INVEST_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_RESULTS_VIEW));
         appManager.addViewFactory(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, () -> viewByKey.get(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW));
-        //appManager.addViewFactory(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW)); // TODO
+        appManager.addViewFactory(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(WITHDRAWAL_SUGGESTIONS_RESULTS_VIEW));
         appManager.addViewFactory(REBALANCE_SUGGESTIONS_VIEW, () -> viewByKey.get(REBALANCE_SUGGESTIONS_VIEW));
         appManager.addViewFactory(WEB_VIEW, () -> createView(WEB_VIEW, "webView.fxml"));
 

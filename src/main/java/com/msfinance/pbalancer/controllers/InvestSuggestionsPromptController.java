@@ -12,6 +12,7 @@ import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Portfolio;
+import com.msfinance.pbalancer.model.rebalance.PortfolioCashSuggestionsRequest;
 import com.msfinance.pbalancer.model.rebalance.TempCash;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
@@ -140,7 +141,8 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
     {
         if(checkData())
         {
-            getApp().<TempCash,Void>mySwitchView(App.INVEST_SUGGESTIONS_RESULTS_VIEW, getData(),
+            PortfolioCashSuggestionsRequest request = new PortfolioCashSuggestionsRequest(getIn(), getData());
+            getApp().<PortfolioCashSuggestionsRequest,Void>mySwitchView(App.INVEST_SUGGESTIONS_RESULTS_VIEW, request,
                     a -> returnSuccess(a),
                     () -> returnFailure());
         }
