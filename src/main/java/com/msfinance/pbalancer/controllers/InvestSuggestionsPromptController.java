@@ -46,6 +46,7 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
     private Button cancelBtn;
 
 
+    private List<Account> accounts;
     private final List<TextField> cashTextFields;
     private final List<Label> errorLabels;
 
@@ -53,6 +54,7 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
     public InvestSuggestionsPromptController()
     {
         super(null);
+        accounts = null;
         cashTextFields = new ArrayList<>();
         errorLabels = new ArrayList<>();
     }
@@ -99,7 +101,8 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
         errorLabels.clear();
 
         int row = 0;
-        for(Account a : p.getAccounts())
+        accounts = p.getAccounts();
+        for(Account a : accounts)
         {
             Label acctNameLabel = new Label(a.getName());
             TextField cashText = new TextField();

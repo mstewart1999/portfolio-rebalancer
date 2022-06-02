@@ -46,6 +46,7 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
     private Button cancelBtn;
 
 
+    private List<Account> accounts;
     private final List<TextField> cashTextFields;
     private final List<Label> errorLabels;
 
@@ -53,6 +54,7 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
     public WithdrawalSuggestionsPromptController()
     {
         super(null);
+        accounts = null;
         cashTextFields = new ArrayList<>();
         errorLabels = new ArrayList<>();
     }
@@ -100,20 +102,24 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
         errorLabels.clear();
 
         int row = 0;
-        for(Account a : p.getAccounts())
+        accounts = p.getAccounts();
+        for(Account a : accounts)
         {
             Label acctNameLabel = new Label(a.getName());
+            Label maxValLabel = new Label("( $" + NumberFormatHelper.formatWith2Decimals(a.getLastValue()) + " )");
             TextField cashText = new TextField();
             Label errorLabel = new Label();
             acctNameLabel.setPadding(new Insets(8));
+            maxValLabel.setPadding(new Insets(8));
             cashText.setPadding(new Insets(8));
             errorLabel.setPadding(new Insets(8));
             cashTextFields.add(cashText);
             errorLabels.add(errorLabel);
 
             whichAccountsPane.add(acctNameLabel, 0, row);
-            whichAccountsPane.add(cashText, 1, row);
-            whichAccountsPane.add(errorLabel, 2, row);
+            whichAccountsPane.add(maxValLabel, 1, row);
+            whichAccountsPane.add(cashText, 2, row);
+            whichAccountsPane.add(errorLabel, 3, row);
 
             whichAccountsPane.getRowConstraints().add(new RowConstraints(0, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
             row++;
@@ -156,6 +162,7 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
         int row = 0;
         for(TextField tf : cashTextFields)
         {
+            Account account = accounts.get(row);
             errorLabels.get(row).setText("");
             String valStr = tf.getText().trim();
             if(!valStr.isBlank())
@@ -166,7 +173,15 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
                     if(valNbr.doubleValue() >= 0.01)
                     {
                         // zeros are not invalid, but only positive values really matter
-                        valid++;
+                        if(valNbr.doubleValue() <= account.getLastValue().doubleValue())
+                        {
+                            valid++;
+                        }
+                        else
+                        {
+                            errorLabels.get(row).setText("Account value exceeded");
+                            invalid++;
+                        }
                     }
                 }
                 else
@@ -184,7 +199,7 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
 
     private TempCash getData()
     {
-        List<Account> accounts = getIn().getAccounts();
+
         TempCash out = new TempCash();
         int row = 0;
         for(TextField tf : cashTextFields)
