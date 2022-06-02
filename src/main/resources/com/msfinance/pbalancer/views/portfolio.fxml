@@ -53,15 +53,16 @@
    <center>
       <ScrollPane pannable="true" prefViewportHeight="200.0" prefViewportWidth="200.0" BorderPane.alignment="CENTER">
          <content>
-            <AnchorPane>
+            <AnchorPane maxWidth="1024.0">
                <children>
-                  <GridPane hgap="10.0" layoutY="3.0999999046325684" vgap="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <GridPane hgap="12.0" layoutY="3.0999999046325684" maxWidth="1024.0" vgap="12.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>
                       <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="76.6666259765625" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="779.333344777425" minWidth="10.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="30.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="60.0" prefWidth="250.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER" />
+                      <RowConstraints minHeight="10.0" vgrow="NEVER" />
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                       <RowConstraints minHeight="10.0" vgrow="NEVER" />
                         <RowConstraints minHeight="10.0" vgrow="NEVER" />
@@ -70,7 +71,7 @@
                         <RowConstraints minHeight="10.0" vgrow="NEVER" />
                     </rowConstraints>
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="30.0" prefWidth="200.0">
                            <children>
                               <Icon fx:id="alertsInfoIcon" content="INFO" />
                               <Icon fx:id="alertsWarnIcon" content="WARNING" />
@@ -80,10 +81,40 @@
                         <Button fx:id="accountsButton" maxWidth="500.0" mnemonicParsing="false" text="Accounts/Assets" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
                         <Button fx:id="targetAAButton" maxWidth="500.0" mnemonicParsing="false" text="Target Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
                         <Button fx:id="actualAAButton" maxWidth="500.0" mnemonicParsing="false" text="Current Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
-                        <Button fx:id="alertsButton" maxWidth="500.0" mnemonicParsing="false" text="Alerts" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="SOMETIMES" />
+                        <Button fx:id="alertsButton" maxWidth="500.0" mnemonicParsing="false" text="Alerts" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" />
                         <Button fx:id="investButton" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Invest $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
                         <Button fx:id="withdrawalButton" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Withdraw $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="5" />
                         <Button fx:id="rebalanceButton" layoutX="95.0" layoutY="211.0" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Rebalance" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" />
+                        <Label text="View and edit your investments." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Define your ideal asset allocation." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Compare your current invesment mix vs your target." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </Label>
+                        <Label text="When you have new money to invest..." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </Label>
+                        <Label text="When you want money out of your portfolio..." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </Label>
+                        <Label text="Check whether you currently need rebalancing." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </Label>
                      </children>
                   </GridPane>
                </children>

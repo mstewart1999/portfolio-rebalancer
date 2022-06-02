@@ -13,6 +13,7 @@ import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.controllers.cells.PortfolioGoalListCell;
+import com.msfinance.pbalancer.model.InvalidDataException;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
@@ -259,14 +260,16 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private void visitTargetAAList()
     {
-        getApp().<AssetAllocation,AssetAllocation>mySwitchView(App.TARGET_AA_VIEW, getIn().getTargetAA(),
-                aa -> {
-                    getIn().setTargetAA(aa);
+        AssetAllocation aaIn = getIn().getTargetAA();
+        getApp().<AssetAllocation,AssetAllocation>mySwitchView(App.TARGET_AA_VIEW, aaIn,
+                aaOut -> {
+                    getIn().setTargetAA(aaOut);
                     getIn().markDirty();
 
                     try
                     {
                         PersistManager.persistAll(getIn().getProfile());
+                        getApp().showMessage("Saved asset allocation");
                     }
                     catch (IOException e)
                     {
@@ -281,6 +284,10 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private void visitActualAAList()
     {
+        if(!confirmTargetAA(getIn()))
+        {
+            return;
+        }
         getApp().<Portfolio,Portfolio>mySwitchView(App.ACTUAL_AA_VIEW, getIn(),
                 p -> {
                     // no-op
@@ -292,6 +299,14 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private void visitInvest()
     {
+        if(!confirmTargetAA(getIn()))
+        {
+            return;
+        }
+        if(!confirmAccounts(getIn()))
+        {
+            return;
+        }
         getApp().<Portfolio,Void>mySwitchView(App.INVEST_SUGGESTIONS_PROMPT_VIEW, getIn(),
                 p -> {
                     // no-op
@@ -303,6 +318,14 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private void visitWithdrawal()
     {
+        if(!confirmTargetAA(getIn()))
+        {
+            return;
+        }
+        if(!confirmAccounts(getIn()))
+        {
+            return;
+        }
         getApp().<Portfolio,Void>mySwitchView(App.WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, getIn(),
                 p -> {
                     // no-op
@@ -314,6 +337,14 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private void visitRebalance()
     {
+        if(!confirmTargetAA(getIn()))
+        {
+            return;
+        }
+        if(!confirmAccounts(getIn()))
+        {
+            return;
+        }
         getApp().<Portfolio,Void>mySwitchView(App.REBALANCE_SUGGESTIONS_VIEW, getIn(),
                 p -> {
                     // no-op
@@ -323,4 +354,39 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                 });
     }
 
+
+    private boolean confirmTargetAA(final Portfolio p)
+    {
+        AssetAllocation aa = p.getTargetAA();
+        if(aa == null)
+        {
+            getApp().showMessage("Define target asset allocation first");
+            return false;
+        }
+        try
+        {
+            aa.getRoot().validate();
+        }
+        catch (InvalidDataException e)
+        {
+            getApp().showMessage("Fix target asset allocation first");
+            return false;
+        }
+        if((aa.countErrors() > 0) || (aa.countWarns() > 0))
+        {
+            getApp().showMessage("Fix target asset allocation alerts first");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean confirmAccounts(final Portfolio p)
+    {
+        if(p.getAccounts().size() == 0)
+        {
+            getApp().showMessage("Define accounts first");
+            return false;
+        }
+        return true;
+    }
 }
