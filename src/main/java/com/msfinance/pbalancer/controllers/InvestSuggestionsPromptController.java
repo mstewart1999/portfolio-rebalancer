@@ -125,7 +125,7 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
     @Override
     protected void updateAppBar(final AppBar appBar)
     {
-        appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
+        //appBar.setNavIcon(MaterialDesignIcon.ARROW_BACK.button(e -> goBack()));
         appBar.getActionItems().clear();
         appBar.setTitleText(APP_BAR_TITLE);
     }
@@ -181,7 +181,17 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
             }
             row++;
         }
-        return (valid > 0) && (invalid == 0);
+        if(invalid > 0)
+        {
+            // error messages are inline
+            return false;
+        }
+        if(valid == 0)
+        {
+            getApp().showMessage("Enter dollar values in the desired accounts");
+            return false;
+        }
+        return true;
     }
 
     private TempCash getData()
@@ -191,6 +201,7 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
         int row = 0;
         for(TextField tf : cashTextFields)
         {
+            Account account = accounts.get(row);
             String valStr = tf.getText().trim();
             if(!valStr.isBlank())
             {
@@ -200,7 +211,7 @@ public class InvestSuggestionsPromptController extends BaseController<Portfolio,
                     if(valNbr.doubleValue() >= 0.01)
                     {
                         // zeros are not invalid, but only positive values really matter
-                        out.add(accounts.get(row), valNbr.doubleValue());
+                        out.add(account, valNbr.doubleValue());
                     }
                 }
                 else
