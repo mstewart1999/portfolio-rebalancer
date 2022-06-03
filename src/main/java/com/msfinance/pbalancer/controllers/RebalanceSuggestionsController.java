@@ -1,5 +1,7 @@
 package com.msfinance.pbalancer.controllers;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -7,9 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.rebalance.ActualAANode;
 import com.msfinance.pbalancer.model.rebalance.RebalanceManager;
+import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
@@ -64,13 +68,13 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Voi
     protected void populateData(final Portfolio p)
     {
         ActualAANode rootAaan = RebalanceManager.toActualAssetAllocation(p);
-        List<String> suggestions = RebalanceManager.toRebalanceSuggestions(p, rootAaan);
-        String suggestionText = String.join("\n", suggestions);
+        List<TransactionSpecific> suggestions = RebalanceManager.toRebalanceSuggestions(p, rootAaan);
+        String suggestionText = toString(suggestions);
 
         nameLabel.setText(p.getName());
         instructionsTextArea.setText( suggestionText );
 
-        long suggCount = suggestions.stream().filter(s -> !s.isBlank()).count();
+        long suggCount = suggestions.size();
         statusLabel.setText(String.format("Total suggested transactions: %,d", suggCount));
     }
 
@@ -87,4 +91,46 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Voi
         returnSuccess(null);
     }
 
+    private String toString(final List<TransactionSpecific> suggestions)
+    {
+        if(suggestions.size() == 0)
+        {
+            return "No rebalancing suggested at this time";
+        }
+
+        Collections.sort(suggestions, new TransactionComparatorByAccount());
+
+        // TODO: add some plain text formatting, separators between accounts
+        Account prevAccount = null;
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<suggestions.size(); i++)
+        {
+            TransactionSpecific curr = suggestions.get(i);
+            TransactionSpecific next = ((i+1) == suggestions.size()) ? null : suggestions.get(i+1);
+            sb.append(curr.toString());
+            sb.append("\n");
+
+            if((next != null) && (curr.where() != next.where()))
+            {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+
+    private static class TransactionComparatorByAccount implements Comparator<TransactionSpecific>
+    {
+        @Override
+        public int compare(final TransactionSpecific o1, final TransactionSpecific o2)
+        {
+            if(o1.where() != o2.where())
+            {
+                // primary sort by account - using user's preferred order, not alphabetic
+                return Integer.compare(o1.where().getListPosition(), o2.where().getListPosition());
+            }
+            // secondary sort by dollar amount (sells first, then buys)
+            return Double.compare(o1.howMuchDollars(), o2.howMuchDollars());
+        }
+    }
 }

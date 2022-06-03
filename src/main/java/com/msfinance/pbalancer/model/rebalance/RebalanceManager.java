@@ -102,7 +102,7 @@ public class RebalanceManager
      * @param rootAaan Consolidated view of target vs actual asset allocation
      * @return a list of suggested rebalancing transactions
      */
-    public static List<String> toRebalanceSuggestions(final Portfolio p, final ActualAANode rootAaan)
+    public static List<TransactionSpecific> toRebalanceSuggestions(final Portfolio p, final ActualAANode rootAaan)
     {
         List<ActualAANode> all = rootAaan.allLeaves();
         List<ActualAANode> sells = new ArrayList<>();
@@ -125,10 +125,10 @@ public class RebalanceManager
         }
         if((sells.size() == 0) && (buys.size() == 0))
         {
-            return Collections.singletonList("No rebalancing suggested at this time");
+            return Collections.emptyList();
         }
 
-        List<String> suggestions = new ArrayList<>();
+        List<TransactionSpecific> suggestions = new ArrayList<>();
         for(ActualAANode n : sells)
         {
             String assetClass = n.getName();
@@ -146,7 +146,7 @@ public class RebalanceManager
                 // prioritize tax advantaged accounts for selling, to avoid capital gains
                 for(Asset a : taxAdvantaged)
                 {
-                    if(surplus > MIN_INVESTIBLE)
+                    if(surplus >= MIN_INVESTIBLE)
                     {
                         double howMuchDollars;
                         double howMuchUnits;
@@ -161,16 +161,14 @@ public class RebalanceManager
                             surplus = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        String what = nameOf(a);
-                        String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Sell %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
+                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), -howMuchUnits, -howMuchDollars, a.getAccount(), null));
                         freedCashByAccountId.add(a.getAccount(), howMuchDollars);
                     }
                 }
                 // then non tax advantaged accounts
                 for(Asset a : nonTaxAdvantaged)
                 {
-                    if(surplus > MIN_INVESTIBLE)
+                    if(surplus >= MIN_INVESTIBLE)
                     {
                         double howMuchDollars;
                         double howMuchUnits;
@@ -185,9 +183,7 @@ public class RebalanceManager
                             surplus = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        String what = nameOf(a);
-                        String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Sell %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
+                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), -howMuchUnits, -howMuchDollars, a.getAccount(), null));
                         freedCashByAccountId.add(a.getAccount(), howMuchDollars);
                     }
                 }
@@ -197,7 +193,7 @@ public class RebalanceManager
                 // finally just report it to them
                 for(Asset a : nonDivisible)
                 {
-                    if(surplus > MIN_INVESTIBLE)
+                    if(surplus >= MIN_INVESTIBLE)
                     {
                         double howMuchDollars;
                         boolean wasAll;
@@ -213,22 +209,19 @@ public class RebalanceManager
                             surplus = 0.0;
                             wasAll = false;
                         }
-                        String what = nameOf(a);
-                        String where = a.getAccount().getName();
                         if(wasAll)
                         {
-                            suggestions.add(String.format("[%s] Sell %,.2f dollars of %s in account '%s' (this asset is a single unit, so may not be partially sellable)", assetClass, howMuchDollars, what, where));
+                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, -howMuchDollars, a.getAccount(), "this asset is a single unit, so may not be partially sellable"));
                         }
                         else
                         {
-                            suggestions.add(String.format("[%s] Sell %,.2f dollars of %s in account '%s' (represents entire asset))", assetClass, howMuchDollars, what, where));
+                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, -howMuchDollars, a.getAccount(), "represents entire asset"));
                         }
                         freedCashByAccountId.add(a.getAccount(), howMuchDollars);
                     }
                 }
             }
         }
-        suggestions.add("");
 
         for(ActualAANode n : buys)
         {
@@ -239,17 +232,15 @@ public class RebalanceManager
             // target buying to midpoint of range (positive number here)
             double deficit = n.getBuyHigh().add(n.getBuyLow()).divide(BigDecimal.valueOf(2.0)).doubleValue();
 
-            // TODO: technically we can only buy in accts that have cash! or else we need to sell more stuff first
             if(divisible.size() > 0)
             {
                 List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(divisible, true);
                 List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(divisible, false);
 
-                // TODO: this prioritization doesn't make sense for buying
                 // prioritize tax advantaged accounts for buying, to avoid capital gains
                 for(Asset a : taxAdvantaged)
                 {
-                    if(deficit > MIN_INVESTIBLE)
+                    if(deficit >= MIN_INVESTIBLE)
                     {
                         double howMuchDollars;
                         double howMuchUnits;
@@ -264,16 +255,14 @@ public class RebalanceManager
                             deficit = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        String what = nameOf(a);
-                        String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Buy %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
+                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), howMuchUnits, howMuchDollars, a.getAccount(), null));
                         neededCashByAccountId.subtract(a.getAccount(), howMuchDollars);
                     }
                 }
                 // then non tax advantaged accounts
                 for(Asset a : nonTaxAdvantaged)
                 {
-                    if(deficit > MIN_INVESTIBLE)
+                    if(deficit >= MIN_INVESTIBLE)
                     {
                         double howMuchDollars;
                         double howMuchUnits;
@@ -288,9 +277,7 @@ public class RebalanceManager
                             deficit = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        String what = nameOf(a);
-                        String where = a.getAccount().getName();
-                        suggestions.add(String.format("[%s] Buy %,.3f shares of %s in account '%s'", assetClass, howMuchUnits, what, where));
+                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), howMuchUnits, howMuchDollars, a.getAccount(), null));
                         neededCashByAccountId.subtract(a.getAccount(), howMuchDollars);
                     }
                 }
@@ -300,7 +287,7 @@ public class RebalanceManager
                 // finally just report it to them
                 for(Asset a : nonDivisible)
                 {
-                    if(deficit > MIN_INVESTIBLE)
+                    if(deficit >= MIN_INVESTIBLE)
                     {
                         double howMuchDollars;
                         boolean wasAll;
@@ -316,22 +303,20 @@ public class RebalanceManager
                             deficit = 0.0;
                             wasAll = false;
                         }
-                        String what = nameOf(a);
-                        String where = a.getAccount().getName();
                         if(wasAll)
                         {
-                            suggestions.add(String.format("[%s] Buy %,.2f dollars of %s in account '%s' (this asset is a single unit, so may not be partially sellable)", assetClass, howMuchDollars, what, where));
+                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, howMuchDollars, a.getAccount(), "this asset is a single unit, so may not be partially buyable"));
                         }
                         else
                         {
-                            suggestions.add(String.format("[%s] Buy %,.2f dollars of %s in account '%s' (represents entire asset))", assetClass, howMuchDollars, what, where));
+                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, howMuchDollars, a.getAccount(), "represents entire asset"));
                         }
+
                         neededCashByAccountId.subtract(a.getAccount(), howMuchDollars);
                     }
                 }
             }
         }
-        suggestions.add("");
 
         {
             // offset negative/positive and resplit
@@ -339,10 +324,9 @@ public class RebalanceManager
             freedCashByAccountId = merged.positiveOnly();
             neededCashByAccountId = merged.negativeOnly();
 
+            // deal with cash changes caused by buy/sell above
             suggestions.addAll(toInvestSuggestions(p, rootAaan, freedCashByAccountId));
-            suggestions.add("");
             suggestions.addAll(toWithdrawalSuggestions(p, rootAaan, neededCashByAccountId));
-            suggestions.add("");
         }
 
         return suggestions;
@@ -400,7 +384,7 @@ public class RebalanceManager
         {
             return a.getTicker();
         }
-        return "'" + a.getBestName() + "'";
+        return a.getBestName();
     }
 
 
@@ -408,70 +392,213 @@ public class RebalanceManager
 
     /**
      * Determine which (if any) sell transactions to perform across your accounts,
-     * given a set of cash in various accounts
+     * given a set of desired withdrawals in various accounts.
      * @param p the portfolio in question
      * @param rootAaan Consolidated view of target vs actual asset allocation
-     * @param neededCashByAccountId how much cash is available in each account that should be withdrawn
+     * @param neededCashByAccountId how much cash should be withdrawn from each account
      * @return a list of suggested buy transactions
      */
-    public static List<String> toWithdrawalSuggestions(final Portfolio p, final ActualAANode rootAaan, final TempCash neededCashByAccountId)
+    public static List<TransactionSpecific> toWithdrawalSuggestions(final Portfolio p, final ActualAANode rootAaan, final TempCash neededCashByAccountId)
     {
-        List<String> suggestions = new ArrayList<>();
+        List<TransactionSpecific> suggestions = new ArrayList<>();
 
-        // TODO: implement
-        suggestions.add("dummy withdrawal section: " + neededCashByAccountId);
+        double cashNeeded = neededCashByAccountId.total();
+        List<TransactionGeneral> trans = new ArrayList<>();
+        double cashRemainder = toGeneralWithdrawalSuggestions(p, rootAaan, cashNeeded, trans);
 
-        return suggestions;
-    }
-
-    /**
-     * Determine which (if any) buy transactions to perform across your accounts,
-     * given a set of cash in various accounts
-     * @param p the portfolio in question
-     * @param rootAaan Consolidated view of target vs actual asset allocation
-     * @param newCashByAcctId how much cash is available in each account that should be invested
-     * @return a list of suggested buy transactions
-     */
-    public static List<String> toInvestSuggestions(final Portfolio p, final ActualAANode rootAaan, final TempCash newCashByAcctId)
-    {
-        List<String> suggestions = new ArrayList<>();
-
-        double cashAvailable = newCashByAcctId.total();
-        List<BuyDesired> buys = new ArrayList<>();
-        double cashRemainder = toGeneralInvestSuggestions(p, rootAaan, cashAvailable, buys);
-
-        for(BuyDesired buy : buys)
+        for(TransactionGeneral tran : trans)
         {
-            String assetClass = buy.assetClass;
+            String assetClass = tran.assetClass;
             // allocate
-            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(buy.possibleAssets, true);
-            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(buy.possibleAssets, false);
+            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, true);
+            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, false);
 
             List<Asset> ordered = new ArrayList<>();
             String favoredAcctType;
-            if(AssetClass.isEquity(assetClass))
+            if(!AssetClass.isEquity(assetClass))
             {
-                // favor equities in taxable acct
+                // favor selling non-equities in taxable acct
                 ordered.addAll(nonTaxAdvantaged);
                 ordered.addAll(taxAdvantaged);
                 favoredAcctType = "taxable";
             }
             else
             {
-                // favor non-equities in tax advantaged acct
+                // favor selling equities in tax advantaged acct
                 ordered.addAll(taxAdvantaged);
                 ordered.addAll(nonTaxAdvantaged);
                 favoredAcctType = "tax advantaged";
             }
 
-            double desiredInvestCash = buy.howMuchDollars;
+            double desiredWithdrawalCash = tran.howMuchDollars;
 
             List<Asset> divisible = filterByDivisible(ordered, true);
             List<Asset> nonDivisible = filterByDivisible(ordered, false);
 
             for(Asset a : divisible)
             {
-                if(newCashByAcctId.hasCash(a.getAccount()) && (desiredInvestCash > MIN_INVESTIBLE))
+                if(neededCashByAccountId.hasCash(a.getAccount()) && (desiredWithdrawalCash <= -MIN_INVESTIBLE))
+                {
+                    double neededCash = neededCashByAccountId.getCash(a.getAccount());
+                    double sellCash;
+                    double sellUnits;
+                    if(Math.abs(desiredWithdrawalCash) > Math.abs(neededCash))
+                    {
+                        sellCash = neededCash;
+                        desiredWithdrawalCash -= sellCash;
+                    }
+                    else
+                    {
+                        sellCash = desiredWithdrawalCash;
+                        desiredWithdrawalCash = 0.0;
+                    }
+                    sellUnits = sellCash / a.getBestUnitValue().doubleValue();
+                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), sellUnits, sellCash, a.getAccount(), null));
+                    neededCashByAccountId.subtract(a.getAccount(), sellCash);
+                }
+            }
+            for(Asset a : nonDivisible)
+            {
+                if(neededCashByAccountId.hasCash(a.getAccount()) && (desiredWithdrawalCash <= -MIN_INVESTIBLE))
+                {
+                    double neededCash = neededCashByAccountId.getCash(a.getAccount());
+                    double sellCash;
+                    if(Math.abs(desiredWithdrawalCash) > Math.abs(neededCash))
+                    {
+                        sellCash = neededCash;
+                        desiredWithdrawalCash -= sellCash;
+                    }
+                    else
+                    {
+                        sellCash = desiredWithdrawalCash;
+                        desiredWithdrawalCash = 0.0;
+                    }
+                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, sellCash, a.getAccount(), "this asset is a single unit, so may not be partially sellable"));
+                    neededCashByAccountId.subtract(a.getAccount(), sellCash);
+                }
+            }
+            /* Unlike buying, you cannot just sell an asset you don't have.  We will NOT be suggesting short sales.
+            if(desiredWithdrawalCash <= -MIN_INVESTIBLE)
+            {
+                List<Account> taxAdvantagedAccts = filterByTaxAdvantagedAccounts(neededCashByAccountId.getAccounts(), true);
+                List<Account> nonTaxAdvantagedAccts = filterByTaxAdvantagedAccounts(neededCashByAccountId.getAccounts(), false);
+
+                List<Account> ordered2 = new ArrayList<>();
+                if(!AssetClass.isEquity(tran.assetClass))
+                {
+                    // favor selling non-equities in taxable acct
+                    ordered2.addAll(nonTaxAdvantagedAccts);
+                    ordered2.addAll(taxAdvantagedAccts);
+                }
+                else
+                {
+                    // favor selling equities in tax advantaged acct
+                    ordered2.addAll(taxAdvantagedAccts);
+                    ordered2.addAll(nonTaxAdvantagedAccts);
+                }
+
+                for(Account acct : ordered2)
+                {
+                    double neededCash = neededCashByAccountId.getCash(acct);
+                    if((neededCash <= -MIN_INVESTIBLE) && (desiredWithdrawalCash <= -MIN_INVESTIBLE))
+                    {
+                        double sellCash;
+                        if(Math.abs(desiredWithdrawalCash) > Math.abs(neededCash))
+                        {
+                            sellCash = neededCash;
+                            desiredWithdrawalCash -= sellCash;
+                        }
+                        else
+                        {
+                            sellCash = desiredWithdrawalCash;
+                            desiredWithdrawalCash = 0.0;
+                        }
+                        String what = "this asset class";
+                        suggestions.add(new TransactionSpecific(assetClass, what, null, sellCash, acct, null));
+                        neededCashByAccountId.subtract(acct, sellCash);
+                    }
+                }
+            }
+            */
+        }
+
+        cashRemainder = neededCashByAccountId.total(); // ignore old value
+        if(cashRemainder <= -MIN_INVESTIBLE)
+        {
+            for(Account acct : neededCashByAccountId.getAccounts())
+            {
+                double howMuchDollars = neededCashByAccountId.getCash(acct);
+                if(howMuchDollars <= -MIN_INVESTIBLE)
+                {
+                    // TODO: specify: subtract in a balanced fashion
+                    String assetClass = "Misc";
+                    String what = "assets matching your asset allocation";
+                    suggestions.add(new TransactionSpecific(assetClass, what, null, howMuchDollars, acct, null));
+                    neededCashByAccountId.subtract(acct, howMuchDollars);
+                }
+                if(howMuchDollars > 0.0)
+                {
+                    LOG.warn("math error in RebalanceManager.toWithdrawalSuggestions(): too much withdrawn from an account: " + howMuchDollars);
+                }
+            }
+        }
+        cashRemainder = neededCashByAccountId.total(); // ignore old value
+        if(!Validation.almostEqual(cashRemainder, 0.0, MIN_INVESTIBLE))
+        {
+            LOG.warn("math error in RebalanceManager.toWithdrawalSuggestions(): discrepancy: cashRemainder=" + cashRemainder);
+        }
+
+        return suggestions;
+    }
+
+    /**
+     * Determine which (if any) buy transactions to perform across your accounts,
+     * given a set of cash in various accounts.
+     * @param p the portfolio in question
+     * @param rootAaan Consolidated view of target vs actual asset allocation
+     * @param newCashByAcctId how much cash is available in each account that should be invested
+     * @return a list of suggested buy transactions
+     */
+    public static List<TransactionSpecific> toInvestSuggestions(final Portfolio p, final ActualAANode rootAaan, final TempCash newCashByAcctId)
+    {
+        List<TransactionSpecific> suggestions = new ArrayList<>();
+
+        double cashAvailable = newCashByAcctId.total();
+        List<TransactionGeneral> trans = new ArrayList<>();
+        double cashRemainder = toGeneralInvestSuggestions(p, rootAaan, cashAvailable, trans);
+
+        for(TransactionGeneral tran : trans)
+        {
+            String assetClass = tran.assetClass;
+            // allocate
+            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, true);
+            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, false);
+
+            List<Asset> ordered = new ArrayList<>();
+            String favoredAcctType;
+            if(AssetClass.isEquity(assetClass))
+            {
+                // favor buying equities in taxable acct
+                ordered.addAll(nonTaxAdvantaged);
+                ordered.addAll(taxAdvantaged);
+                favoredAcctType = "taxable";
+            }
+            else
+            {
+                // favor buying non-equities in tax advantaged acct
+                ordered.addAll(taxAdvantaged);
+                ordered.addAll(nonTaxAdvantaged);
+                favoredAcctType = "tax advantaged";
+            }
+
+            double desiredInvestCash = tran.howMuchDollars;
+
+            List<Asset> divisible = filterByDivisible(ordered, true);
+            List<Asset> nonDivisible = filterByDivisible(ordered, false);
+
+            for(Asset a : divisible)
+            {
+                if(newCashByAcctId.hasCash(a.getAccount()) && (desiredInvestCash >= MIN_INVESTIBLE))
                 {
                     double availableCash = newCashByAcctId.getCash(a.getAccount());
                     double buyCash;
@@ -487,15 +614,13 @@ public class RebalanceManager
                         desiredInvestCash = 0.0;
                     }
                     buyUnits = buyCash / a.getBestUnitValue().doubleValue();
-                    String what = nameOf(a);
-                    String where = a.getAccount().getName();
-                    suggestions.add(String.format("[%s] Buy %,.3f shares of %s in account '%s'", assetClass, buyUnits, what, where));
+                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), buyUnits, buyCash, a.getAccount(), null));
                     newCashByAcctId.subtract(a.getAccount(), buyCash);
                 }
             }
             for(Asset a : nonDivisible)
             {
-                if(newCashByAcctId.hasCash(a.getAccount()) && (desiredInvestCash > MIN_INVESTIBLE))
+                if(newCashByAcctId.hasCash(a.getAccount()) && (desiredInvestCash >= MIN_INVESTIBLE))
                 {
                     double availableCash = newCashByAcctId.getCash(a.getAccount());
                     double buyCash;
@@ -509,9 +634,7 @@ public class RebalanceManager
                         buyCash = desiredInvestCash;
                         desiredInvestCash = 0.0;
                     }
-                    String what = nameOf(a);
-                    String where = a.getAccount().getName();
-                    suggestions.add(String.format("[%s] Buy %,.2f dollars of %s in account '%s' (this asset is a single unit, so may not be partially buyable)", assetClass, buyCash, what, where));
+                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, buyCash, a.getAccount(), "this asset is a single unit, so may not be partially buyable"));
                     newCashByAcctId.subtract(a.getAccount(), buyCash);
                 }
             }
@@ -521,15 +644,15 @@ public class RebalanceManager
                 List<Account> nonTaxAdvantagedAccts = filterByTaxAdvantagedAccounts(newCashByAcctId.getAccounts(), false);
 
                 List<Account> ordered2 = new ArrayList<>();
-                if(AssetClass.isEquity(buy.assetClass))
+                if(AssetClass.isEquity(tran.assetClass))
                 {
-                    // favor equities in taxable acct
+                    // favor buying equities in taxable acct
                     ordered2.addAll(nonTaxAdvantagedAccts);
                     ordered2.addAll(taxAdvantagedAccts);
                 }
                 else
                 {
-                    // favor non-equities in tax advantaged acct
+                    // favor buying non-equities in tax advantaged acct
                     ordered2.addAll(taxAdvantagedAccts);
                     ordered2.addAll(nonTaxAdvantagedAccts);
                 }
@@ -537,7 +660,7 @@ public class RebalanceManager
                 for(Account acct : ordered2)
                 {
                     double availableCash = newCashByAcctId.getCash(acct);
-                    if((availableCash > MIN_INVESTIBLE) && (desiredInvestCash > MIN_INVESTIBLE))
+                    if((availableCash >= MIN_INVESTIBLE) && (desiredInvestCash >= MIN_INVESTIBLE))
                     {
                         double buyCash;
                         if(desiredInvestCash > availableCash)
@@ -551,39 +674,38 @@ public class RebalanceManager
                             desiredInvestCash = 0.0;
                         }
                         String what = "this asset class";
-                        String where = acct.getName();
-                        suggestions.add(String.format("[%s] Buy %,.2f dollars of %s in account '%s'", assetClass, buyCash, what, where));
+                        suggestions.add(new TransactionSpecific(assetClass, what, null, buyCash, acct, null));
                         newCashByAcctId.subtract(acct, buyCash);
                     }
                 }
             }
         }
 
-        if(cashRemainder > MIN_INVESTIBLE)
+        cashRemainder = newCashByAcctId.total(); // ignore old value
+        if(cashRemainder >= MIN_INVESTIBLE)
         {
-            suggestions.add("");
-            double cashInvested = 0.0;
             for(Account acct : newCashByAcctId.getAccounts())
             {
                 double howMuchDollars = newCashByAcctId.getCash(acct);
-                String where = acct.getName();
-                if(howMuchDollars > MIN_INVESTIBLE)
+                if(howMuchDollars >= MIN_INVESTIBLE)
                 {
                     // TODO: specify: add in a balanced fashion
-                    suggestions.add(String.format("[Misc] Buy %,.2f dollars in percentages matching your asset allocation in account '%s'", howMuchDollars, where));
-                    cashInvested += howMuchDollars;
+                    String assetClass = "Misc";
+                    String what = "assets matching your asset allocation";
+                    suggestions.add(new TransactionSpecific(assetClass, what, null, howMuchDollars, acct, null));
+                    newCashByAcctId.subtract(acct, howMuchDollars);
                 }
                 if(howMuchDollars < 0.0)
                 {
                     LOG.warn("math error in RebalanceManager.toInvestSuggestions(): too much invested in an account: " + howMuchDollars);
                 }
             }
-            if(!Validation.almostEqual(cashRemainder, cashInvested, 1.00))
-            {
-                LOG.warn("math error in RebalanceManager.toInvestSuggestions(): discrepancy: " + cashAvailable + " vs " + cashInvested);
-            }
         }
-
+        cashRemainder = newCashByAcctId.total(); // ignore old value
+        if(!Validation.almostEqual(cashRemainder, 0.0, MIN_INVESTIBLE))
+        {
+            LOG.warn("math error in RebalanceManager.toInvestSuggestions(): discrepancy: cashRemainder=" + cashRemainder);
+        }
 
         return suggestions;
     }
@@ -596,11 +718,11 @@ public class RebalanceManager
      * @param buys an ugly "out" parameter for returning data
      * @return how much leftover cash there is after aligning all asset classes
      */
-    private static double toGeneralInvestSuggestions(final Portfolio p, final ActualAANode rootAaan, final double newCash, final List<BuyDesired> buys)
+    private static double toGeneralInvestSuggestions(final Portfolio p, final ActualAANode rootAaan, final double newCash, final List<TransactionGeneral> buys)
     {
         double workingCash = newCash;
         List<ActualAANode> buyChildren = rootAaan.getChildren().stream()
-                .filter(ac -> ac.getBuyToActual() > 0.0)
+                .filter(ac -> ac.getBuyToActual() > MIN_INVESTIBLE)
                 .sorted((a,b) -> Double.compare(a.getBuyToActual(), b.getBuyToActual()))
                 .toList();
 
@@ -608,19 +730,22 @@ public class RebalanceManager
         {
             if(aaan.isLeaf())
             {
-                double howMuchNeeded = aaan.getBuyToActual();
-                double howMuch;
-                if(howMuchNeeded > workingCash)
+                if(workingCash > MIN_INVESTIBLE)
                 {
-                    howMuch = workingCash;
-                    workingCash = 0.0;
+                    double howMuchNeeded = aaan.getBuyToActual();
+                    double howMuch;
+                    if(howMuchNeeded > workingCash)
+                    {
+                        howMuch = workingCash;
+                        workingCash = 0.0;
+                    }
+                    else
+                    {
+                        howMuch = howMuchNeeded;
+                        workingCash -= howMuch;
+                    }
+                    buys.add(new TransactionGeneral(aaan.getName(), aaan.getActual(), howMuch));
                 }
-                else
-                {
-                    howMuch = howMuchNeeded;
-                    workingCash -= howMuch;
-                }
-                buys.add(new BuyDesired(aaan.getName(), aaan.getActual(), howMuch));
             }
             else
             {
@@ -633,9 +758,56 @@ public class RebalanceManager
     }
 
     /**
+     * Generate an amount of cash from "sells" in granularity of asset class.
+     * @param p the portfolio
+     * @param rootAaan a hierarchy or sub-hierarchy of asset allocation
+     * @param cash how much cash is desired (negative)
+     * @param sells an ugly "out" parameter for returning data
+     * @return how much cash is still needed after aligning all asset classes
+     */
+    private static double toGeneralWithdrawalSuggestions(final Portfolio p, final ActualAANode rootAaan, final double cash, final List<TransactionGeneral> sells)
+    {
+        double workingCash = cash;
+        List<ActualAANode> sellChildren = rootAaan.getChildren().stream()
+                .filter(ac -> ac.getSellToActual() < -MIN_INVESTIBLE)
+                .sorted((a,b) -> Double.compare(-a.getSellToActual(), -b.getSellToActual()))
+                .toList();
+
+        for(ActualAANode aaan : sellChildren)
+        {
+            if(aaan.isLeaf())
+            {
+                if(workingCash < -MIN_INVESTIBLE)
+                {
+                    double howMuchNeeded = aaan.getSellToActual();
+                    double howMuch;
+                    if(Math.abs(howMuchNeeded) > Math.abs(workingCash))
+                    {
+                        howMuch = workingCash;
+                        workingCash = 0.0;
+                    }
+                    else
+                    {
+                        howMuch = howMuchNeeded;
+                        workingCash -= howMuch;
+                    }
+                    sells.add(new TransactionGeneral(aaan.getName(), aaan.getActual(), howMuch));
+                }
+            }
+            else
+            {
+                // recurse on this portion of tree.  collect sells and decrement the cash
+                workingCash = toGeneralWithdrawalSuggestions(p, aaan, workingCash, sells);
+            }
+        }
+
+        return workingCash;
+    }
+
+    /**
      * Temporary placeholder data for invest suggestion algorithm.
      */
-    final record BuyDesired(String assetClass, List<Asset> possibleAssets, double howMuchDollars)
+    final record TransactionGeneral(String assetClass, List<Asset> possibleAssets, double howMuchDollars)
     {
     }
 

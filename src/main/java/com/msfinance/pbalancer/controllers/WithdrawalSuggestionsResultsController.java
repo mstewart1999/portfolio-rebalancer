@@ -12,6 +12,7 @@ import com.msfinance.pbalancer.model.rebalance.ActualAANode;
 import com.msfinance.pbalancer.model.rebalance.PortfolioCashSuggestionsRequest;
 import com.msfinance.pbalancer.model.rebalance.RebalanceManager;
 import com.msfinance.pbalancer.model.rebalance.TempCash;
+import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
@@ -68,13 +69,13 @@ public class WithdrawalSuggestionsResultsController extends BaseController<Portf
         Portfolio p = pc.portfolio();
         TempCash tempCash = pc.cash();
         ActualAANode rootAaan = RebalanceManager.toActualAssetAllocation(p);
-        List<String> suggestions = RebalanceManager.toWithdrawalSuggestions(p, rootAaan, tempCash);
-        String suggestionText = String.join("\n", suggestions);
+        List<TransactionSpecific> suggestions = RebalanceManager.toWithdrawalSuggestions(p, rootAaan, tempCash);
+        String suggestionText = toString(suggestions);
 
         nameLabel.setText(p.getName());
         instructionsTextArea.setText( suggestionText );
 
-        long suggCount = suggestions.stream().filter(s -> !s.isBlank()).count();
+        long suggCount = suggestions.size();
         statusLabel.setText(String.format("Total suggested transactions: %,d", suggCount));
     }
 
@@ -91,4 +92,16 @@ public class WithdrawalSuggestionsResultsController extends BaseController<Portf
         returnSuccess(null);
     }
 
+    private String toString(final List<TransactionSpecific> suggestions)
+    {
+        // TODO: sort by (account, sell/buy)
+        // TODO: add some plain text formatting, separators between accounts
+        StringBuilder sb = new StringBuilder();
+        for(TransactionSpecific t : suggestions)
+        {
+            sb.append(t.toString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
 }
