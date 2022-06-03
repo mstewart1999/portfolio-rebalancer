@@ -91,10 +91,22 @@ public class ActualAANode
 
     public BigDecimal getBuyLow()
     {
+        /*
+        if(getSellLow().equals(BigDecimal.ZERO) && (getAbsoluteDifferencePercent() > 0))
+        { // TODO: remove test block
+            return BigDecimal.ONE;
+        }
+        */
         return method.computeBuyLow(getTargetPercentOfPortfolio(), portfolioValue, computeTotalValue());
     }
     public BigDecimal getBuyHigh()
     {
+        /*
+        if(getSellLow().equals(BigDecimal.ZERO) && (getAbsoluteDifferencePercent() > 0))
+        { // TODO: remove test block
+            return BigDecimal.TEN;
+        }
+        */
         return method.computeBuyHigh(getTargetPercentOfPortfolio(), portfolioValue, computeTotalValue());
     }
 
@@ -103,10 +115,21 @@ public class ActualAANode
         double absDiffPercent = getAbsoluteDifferencePercent();
         if(absDiffPercent > 0.0)
         {
-            return computeTotalValue().doubleValue()*absDiffPercent;
+            return portfolioValue.doubleValue()*absDiffPercent;
         }
         return 0.0;
     }
+
+    public double getSellToActual()
+    {
+        double absDiffPercent = getAbsoluteDifferencePercent();
+        if(absDiffPercent < 0.0)
+        {
+            return portfolioValue.doubleValue()*absDiffPercent;
+        }
+        return 0.0;
+    }
+
 
 
     private BigDecimal computeTotalValue()
