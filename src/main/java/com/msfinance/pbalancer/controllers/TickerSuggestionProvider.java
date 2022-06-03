@@ -1,5 +1,6 @@
 package com.msfinance.pbalancer.controllers;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 
@@ -11,8 +12,12 @@ import impl.org.controlsfx.autocompletion.SuggestionProvider;
 
 public class TickerSuggestionProvider extends SuggestionProvider<String>
 {
+    private boolean tickerOnlyMode;
+    private final Map<String,AssetTicker> tickerSuggestions;
+
     public TickerSuggestionProvider(final Map<String,AssetTicker> tickerSuggestions)
     {
+        this.tickerSuggestions = tickerSuggestions;
         addPossibleSuggestions(tickerSuggestions.keySet());
     }
 
@@ -25,10 +30,43 @@ public class TickerSuggestionProvider extends SuggestionProvider<String>
     @Override
     protected boolean isMatch(final String suggestion, final ISuggestionRequest request)
     {
-        // case insensitive prefix matching
-        String suggestionUpper = suggestion.toUpperCase();
-        String userTextUpper = request.getUserText().toUpperCase();
-        return suggestionUpper.startsWith(userTextUpper);
+        if(tickerOnlyMode)
+        {
+            // case insensitive prefix matching (symbol only)
+            String suggestionUpper = suggestion.toUpperCase();
+            String userTextUpper = request.getUserText().toUpperCase();
+            return suggestionUpper.startsWith(userTextUpper);
+        }
+        else
+        {
+            // case insensitive substring matching (security name not symbol)
+            // poor man's lucene
+            String suggestionUpper = tickerSuggestions.get(suggestion).getName().toUpperCase();
+            String[] userTextUpper = request.getUserText().toUpperCase().split("\\s");
+            int termCount = userTextUpper.length;
+            int matchCount = 0;
+            for(String term : userTextUpper)
+            {
+                if(suggestionUpper.contains(term))
+                {
+                    matchCount++;
+                }
+            }
+            return termCount == matchCount;
+        }
     }
 
+
+    @Override
+    public Collection<String> call(final ISuggestionRequest request)
+    {
+        tickerOnlyMode = true;
+        Collection<String> suggestions = super.call(request);
+        if(suggestions.size() == 0)
+        {
+            tickerOnlyMode = false;
+            suggestions = super.call(request);
+        }
+        return suggestions;
+    }
 }
