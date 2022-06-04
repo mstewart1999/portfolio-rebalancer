@@ -67,6 +67,11 @@ public class AssetClass
         return Collections.unmodifiableList(KNOWN_LIST);
     }
 
+    public static Map<String,AssetClass> all()
+    {
+        return Collections.unmodifiableMap(KNOWN);
+    }
+
     //----------------------------------------
     private final boolean builtIn;
     private final String code;
@@ -80,6 +85,10 @@ public class AssetClass
         this.shortDescription = shortDescription;
         this.longDescription = longDescription;
 
+        if(KNOWN.containsKey(code))
+        {
+            throw new IllegalStateException("Attempted to create asset class twice: " + code);
+        }
         KNOWN.put(code, this);
         KNOWN_LIST.add(this);
     }

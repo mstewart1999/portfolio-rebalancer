@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
+import com.msfinance.pbalancer.controllers.cells.AssetClassListCell;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
@@ -36,7 +37,7 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
     public static final String APP_BAR_TITLE = "Edit Public Asset";
 
     @FXML
-    private ToggleSwitch allAssetClassesTS;
+    private ToggleSwitch filterAssetClassesTS;
 
     @FXML
     private ComboBox<String> assetClassCombo;
@@ -74,7 +75,7 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
     @FXML
     void initialize()
     {
-        Validation.assertNonNull(allAssetClassesTS);
+        Validation.assertNonNull(filterAssetClassesTS);
         Validation.assertNonNull(assetClassCombo);
         Validation.assertNonNull(autoNameLabel);
         Validation.assertNonNull(autoValuePerUnitLabel);
@@ -85,8 +86,10 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
         Validation.assertNonNull(cancelBtn);
         Validation.assertNonNull(saveBtn);
 
-        allAssetClassesTS.selectedProperty().addListener(e -> populateAssetClasses());
+        filterAssetClassesTS.selectedProperty().addListener(e -> populateAssetClasses());
         assetClassCombo.setEditable(true); // allow entry of item not in list
+        assetClassCombo.setButtonCell(new AssetClassListCell(AssetClass.all()));
+        assetClassCombo.setCellFactory(new AssetClassListCell.Factory(AssetClass.all()));
 
         unitsText.textProperty().addListener((observable, oldValue, newValue) -> onUnitsChanged());
 
@@ -133,13 +136,13 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
         assetClassCombo.setValue(asset.getAssetClass());
         if(aa != null)
         {
-            allAssetClassesTS.setSelected(false); // default to targetAA choices
-            allAssetClassesTS.setDisable(false);
+            filterAssetClassesTS.setSelected(true); // default to targetAA choices
+            filterAssetClassesTS.setDisable(false);
         }
         else
         {
-            allAssetClassesTS.setSelected(true);
-            allAssetClassesTS.setDisable(true);
+            filterAssetClassesTS.setSelected(false);
+            filterAssetClassesTS.setDisable(true);
         }
         populateAssetClasses();
 
@@ -154,7 +157,7 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
         String lastChoice = assetClassCombo.getValue();
 
         List<String> assetClasses = new ArrayList<>();
-        if(allAssetClassesTS.isSelected())
+        if(!filterAssetClassesTS.isSelected())
         {
             assetClasses = AssetClass.list()
                     .stream()
@@ -172,6 +175,10 @@ public class AssetEditKnownController extends BaseController<Asset,Asset>
                     .collect(Collectors.toList());
             }
             assetClasses.add(AssetClass.UNDEFINED);
+            if(!assetClasses.contains(lastChoice))
+            {
+                assetClasses.add(0, lastChoice);
+            }
         }
 
         assetClassCombo.getItems().setAll(assetClasses);

@@ -266,6 +266,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
             asset.setUnits(null);
             asset.setManualValue(null);
             asset.setManualValueTmstp(null);
+            asset.setAssetClass(AssetClass.UNDEFINED);
             asset.markDirty();
 
             if(Validation.isBlank(asset.getTicker()))
@@ -305,7 +306,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
             asset.setManualValueTmstp(null);
             asset.setLastAutoValue(null);
             asset.setLastAutoValueTmstp(null);
-            asset.setAssetClass(null);
+            asset.setAssetClass(AssetClass.UNDEFINED);
             asset.markDirty();
 
             if(proxyCB.isSelected())
@@ -332,7 +333,7 @@ public class AssetAddController extends BaseController<Asset,Asset>
             asset.setManualValueTmstp(null);
             asset.setLastAutoValue(null);
             asset.setLastAutoValueTmstp(null);
-            asset.setAssetClass(null);
+            asset.setAssetClass(AssetClass.UNDEFINED);
             asset.markDirty();
 
             if(Validation.isBlank(asset.getManualName()))

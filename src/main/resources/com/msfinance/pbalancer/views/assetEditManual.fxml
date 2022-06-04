@@ -104,12 +104,12 @@
                         </Label>
                         <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
-                              <Label text="Show All">
+                              <Label text="Filter by target asset allocation">
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </padding>
                               </Label>
-                              <ToggleSwitch fx:id="allAssetClassesTS">
+                              <ToggleSwitch fx:id="filterAssetClassesTS">
                                  <padding>
                                     <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                  </padding>

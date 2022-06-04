@@ -6,8 +6,8 @@ EQ-US-MB|US Mid-Cap Blend Stocks|
 EQ-US-MV|US Mid-Cap Value Stocks|
 EQ-US-MG|US Mid-Cap Growth Stocks|
 EQ-US-SB|US Small-Cap Blend Stocks|
-EQ-US-SG|US Small-Cap Value Stocks|
-EQ-US-SV|US Small-Cap Growth Stocks|
+EQ-US-SV|US Small-Cap Value Stocks|
+EQ-US-SG|US Small-Cap Growth Stocks|
 
 EQ-ID-TSM|Intl Developed Mkts (ex-US) Stocks|
 EQ-ID-LB|Intl Developed Mkts (ex-US) Large-Cap Blend Stocks|
