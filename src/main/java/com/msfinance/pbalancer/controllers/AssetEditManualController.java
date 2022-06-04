@@ -218,7 +218,10 @@ public class AssetEditManualController extends BaseController<Asset,Asset>
                     .map(n -> n.getName())
                     .collect(Collectors.toList());
             }
-            assetClasses.add(AssetClass.UNDEFINED);
+            if(!assetClasses.contains(AssetClass.UNDEFINED))
+            {
+                assetClasses.add(AssetClass.UNDEFINED);
+            }
             if(!assetClasses.contains(lastChoice))
             {
                 assetClasses.add(0, lastChoice);

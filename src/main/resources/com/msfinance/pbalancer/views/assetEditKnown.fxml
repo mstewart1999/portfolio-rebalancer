@@ -106,7 +106,7 @@
                       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="Asset Class" GridPane.columnSpan="2">
+                        <Label text="Asset Class (equity, fixed income, other)" GridPane.columnSpan="2">
                            <GridPane.margin>
                               <Insets />
                            </GridPane.margin>

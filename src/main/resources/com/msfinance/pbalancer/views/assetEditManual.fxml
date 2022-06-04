@@ -94,7 +94,7 @@
                       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label text="Asset Class" GridPane.columnSpan="2">
+                        <Label text="Asset Class (equity, fixed income, other)" GridPane.columnSpan="2">
                            <font>
                               <Font name="System Bold" size="12.0" />
                            </font>
