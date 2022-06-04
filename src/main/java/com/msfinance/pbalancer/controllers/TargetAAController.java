@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gluonhq.charm.glisten.control.Alert;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.Icon;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.controllers.cells.AAAlertsTreeTableCell;
+import com.msfinance.pbalancer.controllers.cells.AssetClassListCell;
 import com.msfinance.pbalancer.controllers.cells.PercentTableCell;
 import com.msfinance.pbalancer.controllers.cells.PredefinedAAListCell;
 import com.msfinance.pbalancer.model.InvalidDataException;
@@ -35,7 +36,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Hyperlink;
@@ -206,6 +211,22 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
 
     private void onAATypeChange()
     {
+        if(predefinedRB.isSelected() && (working.getPredefined() == null))
+        {
+            Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to leave your customized asset allocation?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if(result.isPresent() && result.get() != ButtonType.OK)
+            {
+                // bail - return to custom
+                customRB.setSelected(true);
+                return;
+            }
+        }
+        if(customRB.isSelected())
+        {
+            working.setPredefined(null); // after this change, it is no longer a predefined AA
+        }
+
         // show these only after selection
         predefinedCombo.setVisible(predefinedRB.isSelected());
         predefinedHelpIcon.setVisible(predefinedRB.isSelected());
@@ -278,6 +299,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         tt.setRoot(convertToUI(aa.getRoot()));
         expandAll(tt.getRoot());
         tt.refresh();
+        FXUtil.autoFitTableNow(tt);
 
         onAASelectionChanged();
     }
@@ -291,6 +313,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         sortedList.comparatorProperty().bind(t.comparatorProperty());
 
         t.refresh();
+        FXUtil.autoFitTableNow(t);
     }
 
     @Override
@@ -346,7 +369,6 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
             }
             catch (InvalidDataException e)
             {
-                // TODO: stop "back" operation, figure out how to depict errors on UI
                 LOG.error("Invalid target asset allocation edits", e);
                 getApp().showMessage("Invalid target asset allocation edits");
                 return false;
@@ -388,8 +410,13 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
     {
         if(customRB.isSelected())
         {
-            tt.getRoot().getChildren().clear();
-            tt.getRoot().getValue().clearChildren();
+            Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to reset entire asset allocation?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if(result.isPresent() && result.get() == ButtonType.OK)
+            {
+                tt.getRoot().getChildren().clear();
+                tt.getRoot().getValue().clearChildren();
+            }
         }
     }
 
@@ -541,11 +568,24 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
 
         List<String> choices = AssetClass.list().stream()
                 .map(ac -> ac.getCode())
-                .collect(Collectors.toList());
-        ChoiceDialog<String> inputdialog = new ChoiceDialog<>("", choices);
+                .toList();
+
+        ChoiceDialog<String> inputdialog = new ChoiceDialog<>(AssetClass.UNDEFINED, choices);
         inputdialog.setContentText("Name: ");
-        inputdialog.setHeaderText("Choose the holding (asset class)");
+        inputdialog.setHeaderText("Choose the holding (asset class - equity, fixed income, other)");
         inputdialog.setTitle("Add Holding");
+        {
+            // ugly hack to customize the ComboBox
+            Parent grid = (Parent) (inputdialog.getDialogPane().getContent());
+            for(Node n : grid.getChildrenUnmodifiable())
+            {
+                if(n instanceof ComboBox cb)
+                {
+                    cb.setButtonCell(new AssetClassListCell(AssetClass.all()));
+                    cb.setCellFactory(new AssetClassListCell.Factory(AssetClass.all()));
+                }
+            }
+        }
         inputdialog.initOwner(getRoot().getScene().getWindow());
         inputdialog.initModality(Modality.WINDOW_MODAL);
         inputdialog.showAndWait();
