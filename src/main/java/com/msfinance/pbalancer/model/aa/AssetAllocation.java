@@ -37,7 +37,7 @@ public class AssetAllocation
         setPredefined(null);
         // make a dummy AA
         this.root = AANode.createRoot();
-        root.addChild(new AANode(root.getId(), UUID.randomUUID().toString(), "Unallocated", 1, DoubleExpression.createSafe100Percent(), AANodeType.AC));
+        root.addChild(new AANode(root.getId(), UUID.randomUUID().toString(), AssetClass.UNDEFINED, 1, DoubleExpression.createSafe100Percent(), AANodeType.AC));
     }
 
     @JsonProperty
