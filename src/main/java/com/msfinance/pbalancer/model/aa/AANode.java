@@ -389,6 +389,11 @@ public class AANode
         {
             return "";
         }
+        if(parent == null)
+        {
+            // this happens for "Unallocated" scenario a ActualAANode.getPath() caller
+            return "";
+        }
         return parent.getPath() + "/" + parent.getName();
     }
 
