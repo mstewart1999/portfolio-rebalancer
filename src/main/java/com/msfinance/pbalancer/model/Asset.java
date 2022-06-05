@@ -52,7 +52,7 @@ public class Asset implements IPersistable
     {
         this.accountId = Objects.requireNonNull(accountId);
         this.id = Objects.requireNonNull(id);
-        ticker = "";
+        ticker = null;
         manualName = null;
         autoName = null;
         listPosition = 0;
