@@ -106,7 +106,7 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
         for(Account a : accounts)
         {
             Label acctNameLabel = new Label(a.getName());
-            Label maxValLabel = new Label("( $" + NumberFormatHelper.formatWith2Decimals(a.getLastValue()) + " )");
+            Label maxValLabel = new Label("( $" + formatAmount(a.getLastValue()) + " )");
             TextField cashText = new TextField();
             Label errorLabel = new Label();
             acctNameLabel.setPadding(new Insets(8));
@@ -124,6 +124,15 @@ public class WithdrawalSuggestionsPromptController extends BaseController<Portfo
             whichAccountsPane.getRowConstraints().add(new RowConstraints(0, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
             row++;
         }
+    }
+
+    private String formatAmount(BigDecimal amt)
+    {
+        if(amt == null)
+        {
+            amt = BigDecimal.ZERO;
+        }
+        return NumberFormatHelper.formatWith2Decimals(amt);
     }
 
     @Override
