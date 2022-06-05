@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.msfinance.pbalancer.controllers.cells.AssetClassTableCell;
+import com.msfinance.pbalancer.controllers.cells.AssetClassTreeTableCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTreeTableCell;
 import com.msfinance.pbalancer.controllers.cells.PercentTableCell;
@@ -65,6 +67,10 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         tt.getColumns().get(7).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellLow"));
         tt.getColumns().get(8).setCellValueFactory(new TreeItemPropertyValueFactory<>("sellHigh"));
 
+        TreeTableColumn<ActualAANode,String> ttColS;
+        ttColS = (TreeTableColumn<ActualAANode,String>) tt.getColumns().get(0);
+        ttColS.setCellFactory(new AssetClassTreeTableCell.Factory<ActualAANode>());
+
         TreeTableColumn<ActualAANode,Number> ttColN;
         ttColN = (TreeTableColumn<ActualAANode,Number>) tt.getColumns().get(1);
         ttColN.setCellFactory(new NumericTreeTableCell.CurrencyFactory());
@@ -97,6 +103,10 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
         t.getColumns().get(7).setCellValueFactory(new PropertyValueFactory<>("buyHigh"));
         t.getColumns().get(8).setCellValueFactory(new PropertyValueFactory<>("sellLow"));
         t.getColumns().get(9).setCellValueFactory(new PropertyValueFactory<>("sellHigh"));
+
+        TableColumn<ActualAANode,String> tColS;
+        tColS = (TableColumn<ActualAANode,String>) t.getColumns().get(1);
+        tColS.setCellFactory(new AssetClassTableCell.Factory<ActualAANode>());
 
         TableColumn<ActualAANode,Number> tcolN;
         tcolN = (TableColumn<ActualAANode, Number>) t.getColumns().get(2);

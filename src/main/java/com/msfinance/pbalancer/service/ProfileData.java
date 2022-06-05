@@ -13,6 +13,7 @@ import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.aa.AssetClass;
 
 public class ProfileData
 {
@@ -53,6 +54,8 @@ public class ProfileData
                 parent.getAssets().add(a);
                 a.setAccount(parent);
             }
+            // deal with custom asset classes
+            AssetClass.add(a.getAssetClass());
         }
         for(Account a : accounts.values())
         {
@@ -78,6 +81,12 @@ public class ProfileData
             {
                 parent.getPortfolios().add(p);
                 p.setProfile(parent);
+            }
+            // deal with custom asset classes
+            if(p.getTargetAA() != null)
+            {
+                p.getTargetAA().getRoot().allLeaves().stream()
+                    .forEach(n -> AssetClass.add(n.getName()));
             }
         }
 

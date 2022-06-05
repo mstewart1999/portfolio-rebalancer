@@ -16,6 +16,7 @@ import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AccountTypeListCell;
+import com.msfinance.pbalancer.controllers.cells.AssetClassTableCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.AccountType;
@@ -123,11 +124,13 @@ public class AccountEditController extends BaseController<Account,Account>
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("ticker"));
         t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("bestName"));
         t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("assetClass"));
+        t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("units"));
+        t.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("bestTotalValue"));
+        TableColumn<Asset,String> tCol2 = (TableColumn<Asset,String>) t.getColumns().get(2);
+        tCol2.setCellFactory(new AssetClassTableCell.Factory<Asset>());
         TableColumn<Asset,Number> tCol3 = (TableColumn<Asset,Number>) t.getColumns().get(3);
-        tCol3.setCellValueFactory(new PropertyValueFactory<>("units"));
         tCol3.setCellFactory(new NumericTableCell.UnitsFactory<Asset>());
         TableColumn<Asset,Number> tCol4 = (TableColumn<Asset,Number>) t.getColumns().get(4);
-        tCol4.setCellValueFactory(new PropertyValueFactory<>("bestTotalValue"));
         tCol4.setCellFactory(new NumericTableCell.CurrencyFactory<Asset>());
 
         t.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {

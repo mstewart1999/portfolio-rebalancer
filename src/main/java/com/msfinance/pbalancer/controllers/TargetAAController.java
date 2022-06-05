@@ -15,6 +15,8 @@ import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.controllers.cells.AAAlertsTreeTableCell;
 import com.msfinance.pbalancer.controllers.cells.AssetClassListCell;
+import com.msfinance.pbalancer.controllers.cells.AssetClassTableCell;
+import com.msfinance.pbalancer.controllers.cells.AssetClassTreeTableCell;
 import com.msfinance.pbalancer.controllers.cells.PercentTableCell;
 import com.msfinance.pbalancer.controllers.cells.PredefinedAAListCell;
 import com.msfinance.pbalancer.model.InvalidDataException;
@@ -156,11 +158,13 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         customHelpIcon.setOnMouseClicked(e -> visitCustomHelp());
 
         tt.getColumns().get(0).setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
+        tt.getColumns().get(1).setCellValueFactory(new TreeItemPropertyValueFactory<>("percentOfParentIndentedAsString"));
+        tt.getColumns().get(2).setCellValueFactory(new TreeItemPropertyValueFactory<>("alerts"));
+        TreeTableColumn<AANode,String> ttCol0 = (TreeTableColumn<AANode,String>) tt.getColumns().get(0);
+        ttCol0.setCellFactory(new AssetClassTreeTableCell.Factory<AANode>());
         TreeTableColumn<AANode,String> ttCol1 = (TreeTableColumn<AANode,String>) tt.getColumns().get(1);
-        ttCol1.setCellValueFactory(new TreeItemPropertyValueFactory<>("percentOfParentIndentedAsString"));
         ttCol1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
         TreeTableColumn<AANode,List<PortfolioAlert>> ttCol2 = (TreeTableColumn<AANode,List<PortfolioAlert>>) tt.getColumns().get(2);
-        ttCol2.setCellValueFactory(new TreeItemPropertyValueFactory<>("alerts"));
         ttCol2.setCellFactory(new AAAlertsTreeTableCell.Factory());
         tt.setEditable(true);
         ttCol1.setEditable(true);
@@ -168,10 +172,12 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("path"));
         t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("name"));
-        TableColumn<AANode,Double> tcol2 = (TableColumn<AANode, Double>) t.getColumns().get(2);
-        tcol2.setCellValueFactory(new PropertyValueFactory<>("percentOfRoot"));
-        tcol2.setCellFactory(new PercentTableCell.Factory<AANode>());
+        t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("percentOfRoot"));
         t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("percentOfRootExprAsString"));
+        TableColumn<AANode,String> tcol1 = (TableColumn<AANode, String>) t.getColumns().get(1);
+        tcol1.setCellFactory(new AssetClassTableCell.Factory<AANode>());
+        TableColumn<AANode,Double> tcol2 = (TableColumn<AANode, Double>) t.getColumns().get(2);
+        tcol2.setCellFactory(new PercentTableCell.Factory<AANode>());
 
         tt.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
             @Override
@@ -592,6 +598,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         String name = inputdialog.getResult();
         if(!Validation.isBlank(name))
         {
+            AssetClass.add(name); // in case it is a new custom one
             String id = UUID.randomUUID().toString();
             AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.AC);
             aanChild.setParent(aan);
