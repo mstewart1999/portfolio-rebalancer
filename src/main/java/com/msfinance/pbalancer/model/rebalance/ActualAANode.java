@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.aa.AANode;
@@ -22,7 +23,7 @@ public class ActualAANode
     public ActualAANode(final AANode target, final BigDecimal portfolioValue, final IRebalancingMethod method)
     {
         this.target = target;
-        this.portfolioValue = portfolioValue;
+        this.portfolioValue = Objects.requireNonNullElse(portfolioValue, BigDecimal.ZERO);
         this.method = method;
     }
 
@@ -71,6 +72,10 @@ public class ActualAANode
 
     public double getActualPercentOfPortfolio()
     {
+        if(portfolioValue.equals(BigDecimal.ZERO))
+        {
+            return 0.0;
+        }
         return computeTotalValue().divide(portfolioValue, 4, RoundingMode.HALF_UP).doubleValue();
     }
 
@@ -91,22 +96,10 @@ public class ActualAANode
 
     public BigDecimal getBuyLow()
     {
-        /*
-        if(getSellLow().equals(BigDecimal.ZERO) && (getAbsoluteDifferencePercent() > 0))
-        { // TODO: remove test block
-            return BigDecimal.ONE;
-        }
-        */
         return method.computeBuyLow(getTargetPercentOfPortfolio(), portfolioValue, computeTotalValue());
     }
     public BigDecimal getBuyHigh()
     {
-        /*
-        if(getSellLow().equals(BigDecimal.ZERO) && (getAbsoluteDifferencePercent() > 0))
-        { // TODO: remove test block
-            return BigDecimal.TEN;
-        }
-        */
         return method.computeBuyHigh(getTargetPercentOfPortfolio(), portfolioValue, computeTotalValue());
     }
 
