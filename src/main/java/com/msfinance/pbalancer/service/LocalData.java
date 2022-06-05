@@ -41,6 +41,15 @@ public abstract class LocalData implements IData
                 createProfile(p);
                 return p;
             }
+            else if(Profile.SAMPLE.equals(profileId))
+            {
+                // auto create this special local profile
+                Profile p = new Profile(Profile.SAMPLE);
+                // TODO:
+                p.setName(Profile.SAMPLE);
+                createProfile(p);
+                return p;
+            }
             else
             {
                 throw new IOException("Portfolio not found " + path);

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Profile implements IPersistable
 {
     public static final String DEFAULT = "DEFAULT";
+    public static final String SAMPLE = "SAMPLE";
 
     private final String id;
     private String name;

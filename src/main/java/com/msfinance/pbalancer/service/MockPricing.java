@@ -17,8 +17,6 @@ public class MockPricing implements IPricing
     {
         Date when = new Date(LocalDate.parse("2022-05-04").atTime(16, 0).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli());
 
-        mockData.put("$CASH", new PriceResult("$CASH", new BigDecimal("1.00"), when)); // TBD
-
         mockData.put("VTAPX", new PriceResult("VTAPX", new BigDecimal("25.29"), when));
         mockData.put("VTABX", new PriceResult("VTABX", new BigDecimal("20.30"), when));
         mockData.put("VSBSX", new PriceResult("VSBSX", new BigDecimal("19.63"), when));
@@ -47,10 +45,12 @@ public class MockPricing implements IPricing
         mockData.put("VTI", new PriceResult("VTI", new BigDecimal("208.42"), when));
 
         // experimental proxy asset
+        /*
         mockData.put("P-VEA",            new PriceResult("P-VEA",            new BigDecimal("17.111"), when));
         mockData.put("P-VEA-2021-11-01", new PriceResult("P-VEA-2021-11-01", new BigDecimal("20.253"), when));
         mockData.put("VEA",              new PriceResult("VEA",              new BigDecimal("44.71"), when));
         mockData.put("VEA-2021-11-01",   new PriceResult("VEA-2021-11-01",  new BigDecimal("52.92"), when));
+        */
 
         // data for a test
         when = new Date(LocalDate.parse("2022-05-05").atTime(16, 0).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli());
@@ -62,6 +62,13 @@ public class MockPricing implements IPricing
 
         mockData.put("VTMFX", new PriceResult("VTMFX", new BigDecimal("37.78"), when)); // for proxy
         mockData.put("BND", new PriceResult("BND", new BigDecimal("75.57"), when)); // for proxy
+
+        // for SAMPLE portfolio
+        when = new Date(LocalDate.parse("2022-06-03").atTime(16, 0).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli());
+        mockData.put("FXAIX", new PriceResult("FXAIX", new BigDecimal("143.02"), when)); // S&P 500
+        mockData.put("FXNAX", new PriceResult("FXNAX", new BigDecimal("10.78"), when)); // bond index
+        mockData.put("IIRLX", new PriceResult("IIRLX", new BigDecimal("28.03"), when)); // Voya Russell Large Cap Index Portfolio - Class I (IIRLX)
+        mockData.put("IPIIX", new PriceResult("IPIIX", new BigDecimal("11.36"), when)); // Voya Intermediate Bond Portfolio - Class I (IPIIX)
     }
 
     @Override
