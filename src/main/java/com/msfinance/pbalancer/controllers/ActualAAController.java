@@ -133,6 +133,27 @@ public class ActualAAController extends BaseController<Portfolio,Portfolio>
 
         FXUtil.autoFitTable(tt);
         FXUtil.autoFitTable(t);
+
+        FXUtil.tableHeaderTooltip(tt, 0, "Name of the category or holding (asset class) - hover for description");
+        //FXUtil.tableHeaderTooltip(tt, 1, "");
+        FXUtil.tableHeaderTooltip(tt, 2, "Based on your target asset allocation");
+        FXUtil.tableHeaderTooltip(tt, 3, "Based on your actual assets and their asset class(es)");
+        FXUtil.tableHeaderTooltip(tt, 4, "Difference between target and actual");
+        FXUtil.tableHeaderTooltip(tt, 5, "Smallest Buy that will bring asset class back into desired range");
+        FXUtil.tableHeaderTooltip(tt, 6, "Largest Buy that will bring asset class back into desired range");
+        FXUtil.tableHeaderTooltip(tt, 7, "Smallest Sell that will bring asset class back into desired range");
+        FXUtil.tableHeaderTooltip(tt, 8, "Largest Sell that will bring asset class back into desired range");
+
+        FXUtil.tableHeaderTooltip(t, 0, "Full category path for this holding");
+        FXUtil.tableHeaderTooltip(t, 1, "Name of the holding (asset class) - hover for description");
+        //FXUtil.tableHeaderTooltip(t, 2, "");
+        FXUtil.tableHeaderTooltip(t, 3, "Based on your target asset allocation");
+        FXUtil.tableHeaderTooltip(t, 4, "Based on your actual assets and their asset class(es)");
+        FXUtil.tableHeaderTooltip(t, 5, "Difference between target and actual");
+        FXUtil.tableHeaderTooltip(t, 6, "Smallest Buy that will bring asset class back into desired range");
+        FXUtil.tableHeaderTooltip(t, 7, "Largest Buy that will bring asset class back into desired range");
+        FXUtil.tableHeaderTooltip(t, 8, "Smallest Sell that will bring asset class back into desired range");
+        FXUtil.tableHeaderTooltip(t, 9, "Largest Sell that will bring asset class back into desired range");
     }
 
 

@@ -7,7 +7,10 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.skin.TableColumnHeader;
 
@@ -133,6 +136,55 @@ public class FXUtil
                     //System.out.println("  No column");
                 }
             }
+        }
+    }
+
+
+    public static <T> void tableHeaderTooltip(final TableView<T> t, final int colNbr, final String text)
+    {
+        Node n = t;
+        tableHeaderTooltip(n, t.getColumns().get(colNbr), t.getColumns().size(), colNbr, text);
+    }
+
+    public static <T> void tableHeaderTooltip(final TreeTableView<T> tt, final int colNbr, final String text)
+    {
+        Node n = tt;
+        tableHeaderTooltip(n, tt.getColumns().get(colNbr), tt.getColumns().size(), colNbr, text);
+    }
+
+    public static void tableHeaderTooltip(final Node n, final TableColumnBase<?,?> desiredColumn, final int expectedCols, final int colNbr, final String text)
+    {
+        Set<Node> columnHeaders = n.lookupAll(".column-header");
+        boolean found = false;
+        for (Node columnHeader : columnHeaders)
+        {
+            if(columnHeader instanceof TableColumnHeader tch)
+            {
+                if(tch.getTableColumn() == desiredColumn)
+                {
+                    // Get column header's (untooltipped) label
+                    Label label = (Label) tch.lookup(".label");
+                    if(label != null)
+                    {
+                        // Give the label a tooltip
+                        label.setTooltip(new Tooltip(text));
+
+                        // Makes the tooltip display, no matter where the mouse is inside the column header.
+                        label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+                        found = true;
+                    }
+                }
+                else
+                {
+                    //System.out.println("  No column");
+                }
+            }
+        }
+        if(!found)
+        {
+            Platform.runLater(() -> tableHeaderTooltip(n, desiredColumn, expectedCols, colNbr, text));
+            return;
         }
     }
 }

@@ -28,7 +28,9 @@ FI-IT-TBM|Intermediate Term Total Bond Market|
 FI-ST-GOV|Short Term Treasury Bonds|
 FI-XUS-IT-GOV|Intermediate Term Foreign Bonds|
 
-OTHER-COM-CCF|Commodities futures fund|
+OTHER-COM-CCF|Collateralized commodities futures fund|
 OTHER-COM-GOLD|Gold|
 OTHER-COM-NR|Natural Resources|
-OTHER-REIT-US|US REITS|AKA Real Estate Investment Trusts|
+OTHER-REIT-US|US REITS|
+OTHER-REIT-I|Intl REITS|
+OTHER-RE-DIRECT|Directly owned real estate|

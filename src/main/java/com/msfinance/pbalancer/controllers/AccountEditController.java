@@ -153,6 +153,7 @@ public class AccountEditController extends BaseController<Account,Account>
             }
         });
         FXUtil.autoFitTable(t);
+        FXUtil.tableHeaderTooltip(t, 2, "Hover over each cell to see description");
 
 
         addButton.setGraphic(MaterialDesignIcon.ADD.graphic());

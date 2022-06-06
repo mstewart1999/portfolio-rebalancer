@@ -199,6 +199,16 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         FXUtil.autoFitTable(tt);
         FXUtil.autoFitTable(t);
 
+        FXUtil.tableHeaderTooltip(tt, 0, "Name of the category or holding (asset class) - hover for description");
+        FXUtil.tableHeaderTooltip(tt, 1, "Double click to edit");
+        FXUtil.tableHeaderTooltip(tt, 2, "Any issues discovered");
+
+        FXUtil.tableHeaderTooltip(t, 0, "Full category path for this holding");
+        FXUtil.tableHeaderTooltip(t, 1, "Name of the holding (asset class) - hover for description");
+        //FXUtil.tableHeaderTooltip(t, 2, "");
+        FXUtil.tableHeaderTooltip(t, 3, "How the % of portfolio was calculated");
+
+
         addGroupButton.setGraphic(MaterialDesignIcon.ADD.graphic());
         addAssetButton.setGraphic(MaterialDesignIcon.ADD.graphic());
         upButton.setGraphic(MaterialDesignIcon.ARROW_UPWARD.graphic());

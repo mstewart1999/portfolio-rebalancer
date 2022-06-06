@@ -88,7 +88,7 @@
                                     <TableColumn id="tTotalValue" editable="false" prefWidth="150.0" text="\$" />
                                     <TableColumn id="tTargetPercent" editable="false" prefWidth="150.0" text="Target % of Portfolio" />
                                     <TableColumn id="tActualPercent" editable="false" prefWidth="150.0" text="Actual % of Portfolio" />
-                                    <TableColumn id="tDifferencePercent" editable="false" prefWidth="150.0" text="Difference %" />
+                                    <TableColumn id="tDifferencePercent" editable="false" prefWidth="150.0" text="Absolute Difference" />
                                     <TableColumn id="tBuyMin" editable="false" prefWidth="150.0" text="Buy Min" />
                                     <TableColumn id="tBuyMax" editable="false" prefWidth="150.0" text="Buy Max" />
                                     <TableColumn id="tSellMin" editable="false" prefWidth="150.0" text="Sell Min" />

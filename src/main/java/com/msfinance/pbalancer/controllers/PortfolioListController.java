@@ -50,7 +50,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
 {
     private static final Logger LOG = LoggerFactory.getLogger(PortfolioListController.class);
 
-    public static final String APP_BAR_TITLE = "Portfolio List";
+    public static final String APP_BAR_TITLE = "Profile Home (Portfolio List)";
 
     @FXML
     private Label nameLabel;
