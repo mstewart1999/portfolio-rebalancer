@@ -329,6 +329,8 @@ public class RebalanceManager
             suggestions.addAll(toWithdrawalSuggestions(p, rootAaan, neededCashByAccountId));
         }
 
+        suggestions = TransactionSpecific.consolidate(suggestions);
+
         return suggestions;
     }
 
@@ -408,10 +410,10 @@ public class RebalanceManager
 
         for(TransactionGeneral tran : trans)
         {
-            String assetClass = tran.assetClass;
+            String assetClass = tran.assetClass();
             // allocate
-            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, true);
-            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, false);
+            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets(), true);
+            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets(), false);
 
             List<Asset> ordered = new ArrayList<>();
             String favoredAcctType;
@@ -430,7 +432,7 @@ public class RebalanceManager
                 favoredAcctType = "tax advantaged";
             }
 
-            double desiredWithdrawalCash = tran.howMuchDollars;
+            double desiredWithdrawalCash = tran.howMuchDollars();
 
             List<Asset> divisible = filterByDivisible(ordered, true);
             List<Asset> nonDivisible = filterByDivisible(ordered, false);
@@ -569,10 +571,10 @@ public class RebalanceManager
 
         for(TransactionGeneral tran : trans)
         {
-            String assetClass = tran.assetClass;
+            String assetClass = tran.assetClass();
             // allocate
-            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, true);
-            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets, false);
+            List<Asset> taxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets(), true);
+            List<Asset> nonTaxAdvantaged = filterByTaxAdvantagedAssets(tran.possibleAssets(), false);
 
             List<Asset> ordered = new ArrayList<>();
             String favoredAcctType;
@@ -591,7 +593,7 @@ public class RebalanceManager
                 favoredAcctType = "tax advantaged";
             }
 
-            double desiredInvestCash = tran.howMuchDollars;
+            double desiredInvestCash = tran.howMuchDollars();
 
             List<Asset> divisible = filterByDivisible(ordered, true);
             List<Asset> nonDivisible = filterByDivisible(ordered, false);
@@ -644,7 +646,7 @@ public class RebalanceManager
                 List<Account> nonTaxAdvantagedAccts = filterByTaxAdvantagedAccounts(newCashByAcctId.getAccounts(), false);
 
                 List<Account> ordered2 = new ArrayList<>();
-                if(AssetClass.isEquity(tran.assetClass))
+                if(AssetClass.isEquity(tran.assetClass()))
                 {
                     // favor buying equities in taxable acct
                     ordered2.addAll(nonTaxAdvantagedAccts);
@@ -804,11 +806,5 @@ public class RebalanceManager
         return workingCash;
     }
 
-    /**
-     * Temporary placeholder data for invest suggestion algorithm.
-     */
-    final record TransactionGeneral(String assetClass, List<Asset> possibleAssets, double howMuchDollars)
-    {
-    }
 
 }
