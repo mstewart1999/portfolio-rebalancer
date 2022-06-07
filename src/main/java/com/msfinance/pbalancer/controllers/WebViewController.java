@@ -3,7 +3,7 @@ package com.msfinance.pbalancer.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gluonhq.charm.glisten.animation.WobbleTransition;
+import com.gluonhq.charm.glisten.animation.BounceInDownTransition;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.util.Validation;
@@ -23,7 +23,7 @@ public class WebViewController extends BaseController<String,Void>
 
     public WebViewController()
     {
-        super(WobbleTransition::new);
+        super(BounceInDownTransition::new);
     }
 
     @FXML

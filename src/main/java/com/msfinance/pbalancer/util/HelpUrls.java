@@ -10,4 +10,7 @@ public class HelpUrls
     public static final String ASSET_EDIT_KNOWN_HELP_URL = HelpUrls.class.getResource("/help/assetEditKnown.html").toString();
     public static final String ASSET_EDIT_MANUAL_HELP_URL = HelpUrls.class.getResource("/help/assetEditManual.html").toString();
 
+    public static final String SUGGESTIONS_DISCLAIMER_URL = HelpUrls.class.getResource("/help/suggestionsDisclaimer.txt").toString();
+    public static final String SUGGESTIONS_TIPS_URL = HelpUrls.class.getResource("/help/suggestionsTips.txt").toString();
+
 }

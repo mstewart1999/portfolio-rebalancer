@@ -1,0 +1,1 @@
+TODO: trading MFs and ETFs tips (T+1 vs T+2) marketable limit orders, low volume ETFs.

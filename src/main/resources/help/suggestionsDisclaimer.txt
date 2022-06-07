@@ -1,0 +1,7 @@
+Use common sense when implementing any investment actions.
+Only perform these transactions if you understand and agree with them.
+pBalancer takes no responsibility for their suitability to your circumstances.
+pBalancer does not claim to optimize for tax-efficiency, and investments
+in taxable accounts may lead to tax liability for the owner of these assets.
+pBalancer is not a robo-advisor, you must implement portfolio changes on your own.
+Bottom line: invest at your own discretion.

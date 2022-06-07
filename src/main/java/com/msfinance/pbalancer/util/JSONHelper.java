@@ -1,8 +1,6 @@
 package com.msfinance.pbalancer.util;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -33,8 +31,4 @@ public class JSONHelper
         return mapper.readValue(val, c);
     }
 
-    public static String readAll(final InputStream in) throws IOException
-    {
-        return new String(in.readAllBytes(), StandardCharsets.UTF_8);
-    }
 }

@@ -1,5 +1,8 @@
 package com.msfinance.pbalancer.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -18,5 +21,10 @@ public class FileUtil
             return true;
         }
         return false;
+    }
+
+    public static String readAll(final InputStream in) throws IOException
+    {
+        return new String(in.readAllBytes(), StandardCharsets.UTF_8);
     }
 }
