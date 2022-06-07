@@ -7,15 +7,18 @@ import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.rebalance.ActualAANode;
 import com.msfinance.pbalancer.model.rebalance.PortfolioCashSuggestionsRequest;
 import com.msfinance.pbalancer.model.rebalance.RebalanceManager;
 import com.msfinance.pbalancer.model.rebalance.TempCash;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
+import com.msfinance.pbalancer.util.HelpUrls;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
@@ -28,6 +31,12 @@ public class InvestSuggestionsResultsController extends BaseController<Portfolio
 
     @FXML
     private Label nameLabel;
+
+    @FXML
+    private Button disclaimerBtn;
+
+    @FXML
+    private Button tipsBtn;
 
     @FXML
     private TextArea instructionsTextArea;
@@ -45,8 +54,16 @@ public class InvestSuggestionsResultsController extends BaseController<Portfolio
     void initialize()
     {
         Validation.assertNonNull(nameLabel);
+        Validation.assertNonNull(disclaimerBtn);
+        Validation.assertNonNull(tipsBtn);
         Validation.assertNonNull(instructionsTextArea);
         Validation.assertNonNull(statusLabel);
+
+        disclaimerBtn.setGraphic(MaterialDesignIcon.INFO_OUTLINE.graphic());
+        disclaimerBtn.setOnMouseClicked(e -> visitDisclaimer());
+
+        tipsBtn.setGraphic(MaterialDesignIcon.INFO_OUTLINE.graphic());
+        tipsBtn.setOnMouseClicked(e -> visitTips());
 
         instructionsTextArea.setEditable(false);
     }
@@ -103,5 +120,16 @@ public class InvestSuggestionsResultsController extends BaseController<Portfolio
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+
+    private void visitDisclaimer()
+    {
+        getApp().<String,Void>mySwitchView(App.WEB_VIEW, HelpUrls.SUGGESTIONS_DISCLAIMER_URL);
+    }
+
+    private void visitTips()
+    {
+        getApp().<String,Void>mySwitchView(App.WEB_VIEW, HelpUrls.SUGGESTIONS_TIPS_URL);
     }
 }
