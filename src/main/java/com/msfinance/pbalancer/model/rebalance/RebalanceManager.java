@@ -1,5 +1,8 @@
 package com.msfinance.pbalancer.model.rebalance;
 
+import static com.msfinance.pbalancer.model.rebalance.TransactionSpecific.Type.Buy;
+import static com.msfinance.pbalancer.model.rebalance.TransactionSpecific.Type.Sell;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +30,11 @@ public class RebalanceManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(RebalanceManager.class);
 
-    private static final double MIN_INVESTIBLE = 0.005;
+    private static final double MIN_INVESTIBLE = TransactionSpecific.MIN_INVESTIBLE;
+    private static final String ASSET_CLASS_MISC = "MISC";
+    private static final String ASSET_NAME_MISC = "assets matching your asset allocation";
+    private static final String ASSET_NAME_GENERIC = "this asset class";
+
 
     public static ActualAANode toActualAssetAllocation(final Portfolio portfolio)
     {
@@ -100,9 +107,35 @@ public class RebalanceManager
      * Determine which (if any) buy/sell transactions to perform across your accounts.
      * @param p the portfolio
      * @param rootAaan Consolidated view of target vs actual asset allocation
+     */
+    public static List<TransactionSpecific> toRebalanceSuggestions(final Portfolio p)
+    {
+        List<TransactionSpecific> suggestions = new ArrayList<>();
+        Portfolio workingP = p.clone();
+        while(true)
+        {
+            ActualAANode rootAaan = RebalanceManager.toActualAssetAllocation(workingP);
+            List<TransactionSpecific> thisRound = RebalanceManager.toRebalanceSuggestions(workingP, rootAaan);
+            if(thisRound.size() == 0)
+            {
+                break;
+            }
+            suggestions.addAll(thisRound);
+            workingP = workingP.apply(thisRound);
+        }
+
+        suggestions = TransactionSpecific.consolidate(suggestions);
+
+        return suggestions;
+    }
+
+    /**
+     * Determine which (if any) buy/sell transactions to perform across your accounts.
+     * @param p the portfolio
+     * @param rootAaan Consolidated view of target vs actual asset allocation
      * @return a list of suggested rebalancing transactions
      */
-    public static List<TransactionSpecific> toRebalanceSuggestions(final Portfolio p, final ActualAANode rootAaan)
+    private static List<TransactionSpecific> toRebalanceSuggestions(final Portfolio p, final ActualAANode rootAaan)
     {
         List<ActualAANode> all = rootAaan.allLeaves();
         List<ActualAANode> sells = new ArrayList<>();
@@ -114,11 +147,15 @@ public class RebalanceManager
 
         for(ActualAANode n : all)
         {
-            if(n.getSellLow().doubleValue() < 0)
+            if(n.getSellLow().doubleValue() <= -MIN_INVESTIBLE)
             {
-                sells.add(n);
+                if(!n.getName().equals(ASSET_CLASS_MISC))
+                {
+                    // don't recommend to sell the thing this algorithm just recommended to buy
+                    sells.add(n);
+                }
             }
-            if(n.getBuyLow().doubleValue() > 0)
+            if(n.getBuyLow().doubleValue() >= MIN_INVESTIBLE)
             {
                 buys.add(n);
             }
@@ -128,6 +165,37 @@ public class RebalanceManager
             return Collections.emptyList();
         }
 
+        List<TransactionSpecific> suggestions = new ArrayList<>();
+        suggestions.addAll(toRebalanceSells(sells, freedCashByAccountId));
+        // deal with cash changes caused by sells above
+        suggestions.addAll(toInvestSuggestions(p, rootAaan, freedCashByAccountId));
+
+        // only progress to buys once there are no further sells
+        // avoid double buying when toInvestSuggestions() has overlap with toRebalanceBuys()
+        // this method is meant to be called in iterations
+        if(suggestions.size() == 0)
+        {
+            suggestions.addAll(toRebalanceBuys(buys, neededCashByAccountId));
+            // deal with cash changes caused by buys above
+            suggestions.addAll(toWithdrawalSuggestions(p, rootAaan, neededCashByAccountId));
+        }
+
+//        {
+//            // offset negative/positive and resplit
+//            TempCash merged = TempCash.sum(freedCashByAccountId, neededCashByAccountId);
+//            freedCashByAccountId = merged.positiveOnly();
+//            neededCashByAccountId = merged.negativeOnly();
+//
+//            // deal with cash changes caused by buy/sell above
+//            suggestions.addAll(toInvestSuggestions(p, rootAaan, freedCashByAccountId));
+//            suggestions.addAll(toWithdrawalSuggestions(p, rootAaan, neededCashByAccountId));
+//        }
+
+        return suggestions;
+    }
+
+    private static List<TransactionSpecific> toRebalanceSells(final List<ActualAANode> sells, final TempCash freedCashByAccountId)
+    {
         List<TransactionSpecific> suggestions = new ArrayList<>();
         for(ActualAANode n : sells)
         {
@@ -161,7 +229,7 @@ public class RebalanceManager
                             surplus = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), -howMuchUnits, -howMuchDollars, a.getAccount(), null));
+                        suggestions.add(new TransactionSpecific(Sell, assetClass, nameOf(a), -howMuchUnits, -howMuchDollars, a.getAccount(), null));
                         freedCashByAccountId.add(a.getAccount(), howMuchDollars);
                     }
                 }
@@ -183,7 +251,7 @@ public class RebalanceManager
                             surplus = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), -howMuchUnits, -howMuchDollars, a.getAccount(), null));
+                        suggestions.add(new TransactionSpecific(Sell, assetClass, nameOf(a), -howMuchUnits, -howMuchDollars, a.getAccount(), null));
                         freedCashByAccountId.add(a.getAccount(), howMuchDollars);
                     }
                 }
@@ -211,18 +279,23 @@ public class RebalanceManager
                         }
                         if(wasAll)
                         {
-                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, -howMuchDollars, a.getAccount(), "this asset is a single unit, so may not be partially sellable"));
+                            suggestions.add(new TransactionSpecific(Sell, assetClass, nameOf(a), null, -howMuchDollars, a.getAccount(), "represents entire asset"));
                         }
                         else
                         {
-                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, -howMuchDollars, a.getAccount(), "represents entire asset"));
+                            suggestions.add(new TransactionSpecific(Sell, assetClass, nameOf(a), null, -howMuchDollars, a.getAccount(), "this asset is a single unit, so may not be partially sellable"));
                         }
                         freedCashByAccountId.add(a.getAccount(), howMuchDollars);
                     }
                 }
             }
         }
+        return suggestions;
+    }
 
+    private static List<TransactionSpecific> toRebalanceBuys(final List<ActualAANode> buys, final TempCash neededCashByAccountId)
+    {
+        List<TransactionSpecific> suggestions = new ArrayList<>();
         for(ActualAANode n : buys)
         {
             String assetClass = n.getName();
@@ -255,7 +328,7 @@ public class RebalanceManager
                             deficit = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), howMuchUnits, howMuchDollars, a.getAccount(), null));
+                        suggestions.add(new TransactionSpecific(Buy, assetClass, nameOf(a), howMuchUnits, howMuchDollars, a.getAccount(), null));
                         neededCashByAccountId.subtract(a.getAccount(), howMuchDollars);
                     }
                 }
@@ -277,7 +350,7 @@ public class RebalanceManager
                             deficit = 0.0;
                         }
                         howMuchUnits = howMuchDollars / a.getBestUnitValue().doubleValue();
-                        suggestions.add(new TransactionSpecific(assetClass, nameOf(a), howMuchUnits, howMuchDollars, a.getAccount(), null));
+                        suggestions.add(new TransactionSpecific(Buy, assetClass, nameOf(a), howMuchUnits, howMuchDollars, a.getAccount(), null));
                         neededCashByAccountId.subtract(a.getAccount(), howMuchDollars);
                     }
                 }
@@ -305,11 +378,11 @@ public class RebalanceManager
                         }
                         if(wasAll)
                         {
-                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, howMuchDollars, a.getAccount(), "this asset is a single unit, so may not be partially buyable"));
+                            suggestions.add(new TransactionSpecific(Buy, assetClass, nameOf(a), null, howMuchDollars, a.getAccount(), "represents entire asset"));
                         }
                         else
                         {
-                            suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, howMuchDollars, a.getAccount(), "represents entire asset"));
+                            suggestions.add(new TransactionSpecific(Buy, assetClass, nameOf(a), null, howMuchDollars, a.getAccount(), "this asset is a single unit, so may not be partially buyable"));
                         }
 
                         neededCashByAccountId.subtract(a.getAccount(), howMuchDollars);
@@ -317,22 +390,9 @@ public class RebalanceManager
                 }
             }
         }
-
-        {
-            // offset negative/positive and resplit
-            TempCash merged = TempCash.sum(freedCashByAccountId, neededCashByAccountId);
-            freedCashByAccountId = merged.positiveOnly();
-            neededCashByAccountId = merged.negativeOnly();
-
-            // deal with cash changes caused by buy/sell above
-            suggestions.addAll(toInvestSuggestions(p, rootAaan, freedCashByAccountId));
-            suggestions.addAll(toWithdrawalSuggestions(p, rootAaan, neededCashByAccountId));
-        }
-
-        suggestions = TransactionSpecific.consolidate(suggestions);
-
         return suggestions;
     }
+
 
     private static List<Asset> filterByDivisible(final List<Asset> actual, final boolean b)
     {
@@ -455,7 +515,7 @@ public class RebalanceManager
                         desiredWithdrawalCash = 0.0;
                     }
                     sellUnits = sellCash / a.getBestUnitValue().doubleValue();
-                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), sellUnits, sellCash, a.getAccount(), null));
+                    suggestions.add(new TransactionSpecific(Sell, assetClass, nameOf(a), sellUnits, sellCash, a.getAccount(), null));
                     neededCashByAccountId.subtract(a.getAccount(), sellCash);
                 }
             }
@@ -475,7 +535,7 @@ public class RebalanceManager
                         sellCash = desiredWithdrawalCash;
                         desiredWithdrawalCash = 0.0;
                     }
-                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, sellCash, a.getAccount(), "this asset is a single unit, so may not be partially sellable"));
+                    suggestions.add(new TransactionSpecific(Sell, assetClass, nameOf(a), null, sellCash, a.getAccount(), "this asset is a single unit, so may not be partially sellable"));
                     neededCashByAccountId.subtract(a.getAccount(), sellCash);
                 }
             }
@@ -515,8 +575,8 @@ public class RebalanceManager
                             sellCash = desiredWithdrawalCash;
                             desiredWithdrawalCash = 0.0;
                         }
-                        String what = "this asset class";
-                        suggestions.add(new TransactionSpecific(assetClass, what, null, sellCash, acct, null));
+                        String what = ASSET_NAME_GENERIC;
+                        suggestions.add(new TransactionSpecific(Sell, assetClass, what, null, sellCash, acct, null));
                         neededCashByAccountId.subtract(acct, sellCash);
                     }
                 }
@@ -533,9 +593,9 @@ public class RebalanceManager
                 if(howMuchDollars <= -MIN_INVESTIBLE)
                 {
                     // TODO: specify: subtract in a balanced fashion
-                    String assetClass = "Misc";
-                    String what = "assets matching your asset allocation";
-                    suggestions.add(new TransactionSpecific(assetClass, what, null, howMuchDollars, acct, null));
+                    String assetClass = ASSET_CLASS_MISC;
+                    String what = ASSET_NAME_MISC;
+                    suggestions.add(new TransactionSpecific(Sell, assetClass, what, null, howMuchDollars, acct, null));
                     neededCashByAccountId.subtract(acct, howMuchDollars);
                 }
                 if(howMuchDollars > 0.0)
@@ -616,7 +676,7 @@ public class RebalanceManager
                         desiredInvestCash = 0.0;
                     }
                     buyUnits = buyCash / a.getBestUnitValue().doubleValue();
-                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), buyUnits, buyCash, a.getAccount(), null));
+                    suggestions.add(new TransactionSpecific(Buy, assetClass, nameOf(a), buyUnits, buyCash, a.getAccount(), null));
                     newCashByAcctId.subtract(a.getAccount(), buyCash);
                 }
             }
@@ -636,7 +696,7 @@ public class RebalanceManager
                         buyCash = desiredInvestCash;
                         desiredInvestCash = 0.0;
                     }
-                    suggestions.add(new TransactionSpecific(assetClass, nameOf(a), null, buyCash, a.getAccount(), "this asset is a single unit, so may not be partially buyable"));
+                    suggestions.add(new TransactionSpecific(Buy, assetClass, nameOf(a), null, buyCash, a.getAccount(), "this asset is a single unit, so may not be partially buyable"));
                     newCashByAcctId.subtract(a.getAccount(), buyCash);
                 }
             }
@@ -675,8 +735,8 @@ public class RebalanceManager
                             buyCash = desiredInvestCash;
                             desiredInvestCash = 0.0;
                         }
-                        String what = "this asset class";
-                        suggestions.add(new TransactionSpecific(assetClass, what, null, buyCash, acct, null));
+                        String what = ASSET_NAME_GENERIC;
+                        suggestions.add(new TransactionSpecific(Buy, assetClass, what, null, buyCash, acct, null));
                         newCashByAcctId.subtract(acct, buyCash);
                     }
                 }
@@ -692,9 +752,9 @@ public class RebalanceManager
                 if(howMuchDollars >= MIN_INVESTIBLE)
                 {
                     // TODO: specify: add in a balanced fashion
-                    String assetClass = "Misc";
-                    String what = "assets matching your asset allocation";
-                    suggestions.add(new TransactionSpecific(assetClass, what, null, howMuchDollars, acct, null));
+                    String assetClass = ASSET_CLASS_MISC;
+                    String what = ASSET_NAME_MISC;
+                    suggestions.add(new TransactionSpecific(Buy, assetClass, what, null, howMuchDollars, acct, null));
                     newCashByAcctId.subtract(acct, howMuchDollars);
                 }
                 if(howMuchDollars < 0.0)

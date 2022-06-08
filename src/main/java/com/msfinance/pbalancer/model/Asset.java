@@ -9,9 +9,10 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.Validation;
 
-public class Asset implements IPersistable
+public class Asset implements IPersistable, Cloneable
 {
     public enum PricingType { MANUAL_PER_UNIT, MANUAL_PER_WHOLE, AUTO_PER_UNIT, FIXED_PER_UNIT }
     public static final String CASH = "$CASH";
@@ -67,6 +68,23 @@ public class Asset implements IPersistable
         account = null;
         //basis = new ArrayList<>();
     }
+
+    @Override
+    public Asset clone()
+    {
+        try
+        {
+            Asset copy = (Asset) super.clone();
+            account = null; // caller should provide the appropriate cloned obj
+            // basis TBD
+            return copy;
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @JsonProperty
     public String getAccountId()
@@ -334,5 +352,80 @@ public class Asset implements IPersistable
             return perUnitValue.multiply(units).setScale(2, RoundingMode.HALF_UP);
         }
         return null;
+    }
+
+
+    /**
+     * Apply a (buy/sell) transaction to this asset. (modifies the object, so be careful)
+     * @param t
+     */
+    public void apply(final TransactionSpecific t)
+    {
+        if((lastAutoValue != null) && (units != null))
+        {
+            // this case covers proxied assets also
+            if(t.howMuchUnits() == null)
+            {
+                // not sure this case will ever occur
+                BigDecimal howMuchUnits = new BigDecimal(t.howMuchDollars() / this.lastAutoValue.doubleValue());
+                this.units = this.units.add(howMuchUnits);
+            }
+            else
+            {
+                this.units = this.units.add(new BigDecimal(t.howMuchUnits()));
+            }
+        }
+        if(pricingType == PricingType.MANUAL_PER_WHOLE)
+        {
+            manualValue = manualValue.add(new BigDecimal(t.howMuchDollars()));
+        }
+        if((pricingType == PricingType.MANUAL_PER_UNIT) && (manualValue != null) && (units != null))
+        {
+            if(t.howMuchUnits() == null)
+            {
+                // not sure this case will ever occur
+                BigDecimal howMuchUnits = new BigDecimal(t.howMuchDollars() / this.manualValue.doubleValue());
+                this.units = this.units.add(howMuchUnits);
+            }
+            else
+            {
+                this.units = this.units.add(new BigDecimal(t.howMuchUnits()));
+            }
+        }
+        if((pricingType == PricingType.FIXED_PER_UNIT) && (manualValue != null) && (units != null))
+        {
+            if(t.howMuchUnits() == null)
+            {
+                // not sure this case will ever occur
+                BigDecimal howMuchUnits = new BigDecimal(t.howMuchDollars() / this.manualValue.doubleValue());
+                this.units = this.units.add(howMuchUnits);
+            }
+            else
+            {
+                this.units = this.units.add(new BigDecimal(t.howMuchUnits()));
+            }
+        }
+    }
+
+    /**
+     * Test whether the transaction
+     * @param t
+     * @return
+     */
+    public boolean isMatch(final TransactionSpecific t)
+    {
+        if((this.ticker != null) && this.ticker.equals(t.whatAsset()))
+        {
+            return true;
+        }
+        if((this.autoName != null) && this.autoName.equals(t.whatAsset()))
+        {
+            return true;
+        }
+        if((this.manualName != null) && this.manualName.equals(t.whatAsset()))
+        {
+            return true;
+        }
+        return false;
     }
 }

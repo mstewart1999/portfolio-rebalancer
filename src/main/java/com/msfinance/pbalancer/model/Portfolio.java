@@ -10,10 +10,12 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
+import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.Validation;
 
-public class Portfolio implements IPersistable
+public class Portfolio implements IPersistable, Cloneable
 {
     private final String profileId;
     private final String id;
@@ -54,6 +56,31 @@ public class Portfolio implements IPersistable
         accounts = new ArrayList<>();
         targetAA = new AssetAllocation();
     }
+
+    @Override
+    public Portfolio clone()
+    {
+        try
+        {
+            Portfolio copy = (Portfolio) super.clone();
+            copy.profile = null; // caller should provide the appropriate cloned obj
+            copy.accounts = new ArrayList<>();
+            for(Account a : this.accounts)
+            {
+                Account aCopy = a.clone();
+                aCopy.setPortfolio(copy);
+                copy.accounts.add(aCopy);
+            }
+            // targetAA is not modified for our purposes, so leave the old one in place
+            //copy.targetAA = this.targetAA.clone();
+            return copy;
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @JsonProperty
     public String getProfileId()
@@ -182,5 +209,60 @@ public class Portfolio implements IPersistable
     public boolean isDirty()
     {
         return this.dirty;
+    }
+
+
+    /**
+     * Simulate performing a list of transactions on a portfolio.
+     * @param trans the transactions
+     * @return a copy of the portfolio with transactions applied
+     */
+    public Portfolio apply(final List<TransactionSpecific> trans)
+    {
+        Portfolio copy = this.clone();
+        for(TransactionSpecific t : trans)
+        {
+            for(Account acct : copy.accounts)
+            {
+                if(acct.getId().equals(t.where().getId()))
+                {
+                    boolean hadMatchAlready = false;
+                    for(Asset a : acct.getAssets())
+                    {
+                        if(!hadMatchAlready && a.isMatch(t))
+                        {
+                            a.apply(t);
+                            // in case of multiple matches, only apply to the first
+                            hadMatchAlready = true;
+                        }
+                    }
+                    if(!hadMatchAlready)
+                    {
+                        // create a simplified dummy asset and apply the transaction to it
+                        Asset newAsset = new Asset(acct.getId());
+                        newAsset.setAccount(acct);
+                        newAsset.setAssetClass(t.assetClass());
+                        newAsset.setManualName(t.whatAsset()); // this could be a ticker, but doesn't matter for our use case
+                        // for this dummy asset - just restrict to 2 cases of manual assets
+                        if(t.howMuchUnits() == null)
+                        {
+                            newAsset.setPricingType(PricingType.MANUAL_PER_WHOLE);
+                            newAsset.setManualValue(BigDecimal.ZERO);
+                            newAsset.setUnits(BigDecimal.ONE);
+                        }
+                        else
+                        {
+                            newAsset.setPricingType(PricingType.MANUAL_PER_UNIT);
+                            newAsset.setManualValue(BigDecimal.ZERO);
+                            newAsset.setUnits(BigDecimal.ZERO);
+                        }
+                        newAsset.apply(t);
+                        hadMatchAlready = true;
+                        acct.getAssets().add(newAsset);
+                    }
+                }
+            }
+        }
+        return copy;
     }
 }

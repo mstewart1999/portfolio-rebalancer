@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msfinance.pbalancer.util.Validation;
 
-public class Account implements IPersistable
+public class Account implements IPersistable, Cloneable
 {
     private final String portfolioId;
     private final String id;
@@ -53,6 +53,29 @@ public class Account implements IPersistable
         portfolio = null;
         assets = new ArrayList<>();
     }
+
+    @Override
+    public Account clone()
+    {
+        try
+        {
+            Account copy = (Account) super.clone();
+            copy.portfolio = null; // caller should provide the appropriate cloned obj
+            copy.assets = new ArrayList<>();
+            for(Asset a : this.assets)
+            {
+                Asset aCopy = a.clone();
+                aCopy.setAccount(copy);
+                copy.assets.add(aCopy);
+            }
+            return copy;
+        }
+        catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @JsonProperty
     public String getPortfolioId()

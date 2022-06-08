@@ -12,7 +12,6 @@ import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Portfolio;
-import com.msfinance.pbalancer.model.rebalance.ActualAANode;
 import com.msfinance.pbalancer.model.rebalance.RebalanceManager;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.HelpUrls;
@@ -84,8 +83,7 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Voi
     @Override
     protected void populateData(final Portfolio p)
     {
-        ActualAANode rootAaan = RebalanceManager.toActualAssetAllocation(p);
-        List<TransactionSpecific> suggestions = RebalanceManager.toRebalanceSuggestions(p, rootAaan);
+        List<TransactionSpecific> suggestions = RebalanceManager.toRebalanceSuggestions(p);
         String suggestionText = toString(suggestions);
 
         nameLabel.setText(p.getName());
@@ -127,7 +125,7 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Voi
             sb.append(curr.toString());
             sb.append("\n");
 
-            if((next != null) && (curr.where() != next.where()))
+            if((next != null) && !curr.where().getId().equals(next.where().getId()))
             {
                 sb.append("\n");
             }
@@ -141,7 +139,7 @@ public class RebalanceSuggestionsController extends BaseController<Portfolio,Voi
         @Override
         public int compare(final TransactionSpecific o1, final TransactionSpecific o2)
         {
-            if(o1.where() != o2.where())
+            if(!o1.where().getId().equals(o2.where().getId()))
             {
                 // primary sort by account - using user's preferred order, not alphabetic
                 return Integer.compare(o1.where().getListPosition(), o2.where().getListPosition());

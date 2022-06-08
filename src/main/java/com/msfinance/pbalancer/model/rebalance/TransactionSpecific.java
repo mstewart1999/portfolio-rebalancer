@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.msfinance.pbalancer.model.Account;
+import com.msfinance.pbalancer.model.rebalance.TransactionSpecific.Type;
 import com.msfinance.pbalancer.util.Validation;
 
 public record TransactionSpecific(
+        Type type,
         String assetClass,
         String whatAsset, // either a ticker, or a asset name
         Double howMuchUnits,
@@ -17,11 +19,17 @@ public record TransactionSpecific(
         String note
         )
 {
+    public static final double MIN_INVESTIBLE = 0.005;
+    public enum Type {Buy,Sell};
 
     @Override
     public String toString()
     {
-        String type = (howMuchDollars > 0) ? "Buy" : "Sell";
+        Type derivedType = (howMuchDollars > 0) ? Type.Buy : Type.Sell;
+        if(type != derivedType)
+        {
+            throw new RuntimeException("Mismatch betweeen type and derived type");
+        }
         String whatPretty = whatAsset.contains(" ") ? "'" + whatAsset + "'" : whatAsset;
         double sign = (howMuchDollars > 0) ? 1.0 : -1.0;
 
@@ -61,17 +69,26 @@ public record TransactionSpecific(
                 byKey.put(key, s);
             }
         }
-        return new ArrayList<>(byKey.values());
+
+        // eliminate transactions of $0
+        List<TransactionSpecific> out = byKey.values().stream()
+                .filter(t -> (t.howMuchDollars >= MIN_INVESTIBLE) || (t.howMuchDollars <= -MIN_INVESTIBLE))
+                .toList();
+        return new ArrayList<>(out);
     }
 
     public static TransactionSpecific consolidate(final TransactionSpecific t1, final TransactionSpecific t2)
     {
+        Double howMuchUnits = sum(t1.howMuchUnits, t2.howMuchUnits);
+        Double howMuchDollars = sum(t1.howMuchDollars, t2.howMuchDollars);
+        Type derivedType = (howMuchDollars > 0) ? Type.Buy : Type.Sell;
         // assume that for ones matching acctId+whatAsset, that most items can be taken from t1
         return new TransactionSpecific(
+                derivedType,
                 t1.assetClass,
                 t1.whatAsset, // either a ticker, or a asset name
-                sum(t1.howMuchUnits, t2.howMuchUnits),
-                sum(t1.howMuchDollars, t2.howMuchDollars),
+                howMuchUnits,
+                howMuchDollars,
                 t1.where,
                 coalesce(t1.note, t2.note)
                 );
