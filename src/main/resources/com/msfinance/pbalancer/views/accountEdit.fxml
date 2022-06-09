@@ -62,6 +62,7 @@
                   <TableColumn editable="false" prefWidth="120.0" sortable="false" text="Asset Class" />
                   <TableColumn id="unitsCol" editable="false" prefWidth="100.0" sortable="false" text="Units" />
                   <TableColumn id="valueCol" editable="false" prefWidth="115.3333740234375" sortable="false" text="\$" />
+                  <TableColumn editable="false" prefWidth="115.3333740234375" sortable="false" text="Alerts" />
               </columns>
             </TableView>
          </children>

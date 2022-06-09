@@ -59,6 +59,7 @@
                   <TableColumn editable="false" prefWidth="100.0" sortable="false" text="Institution" />
                   <TableColumn editable="false" prefWidth="100.0" sortable="false" text="Acct Type" />
                   <TableColumn id="value" editable="false" prefWidth="200.0" sortable="false" text="\$" />
+                  <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Alerts" />
               </columns>
             </TableView>
          </children>

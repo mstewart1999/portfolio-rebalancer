@@ -10,6 +10,8 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.model.PortfolioAlert.Level;
+import com.msfinance.pbalancer.model.PortfolioAlert.Type;
 import com.msfinance.pbalancer.util.Validation;
 
 public class Account implements IPersistable, Cloneable
@@ -137,6 +139,32 @@ public class Account implements IPersistable, Cloneable
         return assets;
     }
 
+    @JsonIgnore
+    public List<PortfolioAlert> getAlerts()
+    {
+        // dynamically generate this each time
+        List<PortfolioAlert> alerts = new ArrayList<>();
+
+        long errorAlerts = countErrors();
+        long warnAlerts = countWarns();
+        long infoAlerts = countInfos();
+        if(errorAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.ACCOUNT, Level.ERROR, "Asset errors: " + errorAlerts));
+        }
+        if(warnAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.ACCOUNT, Level.WARN, "Asset warnings: " + warnAlerts));
+        }
+        if(infoAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.ACCOUNT, Level.INFO, "Asset infos: " + infoAlerts));
+        }
+
+        return alerts;
+    }
+
+
     @JsonProperty
     public void setName(final String name)
     {
@@ -205,4 +233,36 @@ public class Account implements IPersistable, Cloneable
     {
         return this.dirty;
     }
+
+
+    public long countErrors()
+    {
+        return assets
+          .stream()
+          .flatMap(n -> n.getAlerts().stream())
+          .filter(a -> a.level() == PortfolioAlert.Level.ERROR)
+          .count()
+          ;
+    }
+
+    public long countWarns()
+    {
+        return assets
+                .stream()
+                .flatMap(n -> n.getAlerts().stream())
+                .filter(a -> a.level() == PortfolioAlert.Level.WARN)
+                .count()
+                ;
+    }
+
+    public long countInfos()
+    {
+        return assets
+                .stream()
+                .flatMap(n -> n.getAlerts().stream())
+                .filter(a -> a.level() == PortfolioAlert.Level.INFO)
+                .count()
+                ;
+    }
+
 }

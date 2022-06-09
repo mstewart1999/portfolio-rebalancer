@@ -18,10 +18,12 @@ import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.StateManager;
+import com.msfinance.pbalancer.controllers.cells.AlertsTableCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
 import com.msfinance.pbalancer.controllers.cells.PortfolioGoalTableCell;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
+import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.service.DataFactory;
@@ -107,12 +109,15 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         Validation.assertNonNull(statusLabel);
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
+        t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("goal"));
+        t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("lastValue"));
+        t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("accountAlerts"));
         TableColumn<Portfolio,PortfolioGoal> tCol1 = (TableColumn<Portfolio,PortfolioGoal>) t.getColumns().get(1);
-        tCol1.setCellValueFactory(new PropertyValueFactory<>("goal"));
         tCol1.setCellFactory(new PortfolioGoalTableCell.Factory<Portfolio>());
         TableColumn<Portfolio,Number> tCol2 = (TableColumn<Portfolio,Number>) t.getColumns().get(2);
-        tCol2.setCellValueFactory(new PropertyValueFactory<>("lastValue"));
         tCol2.setCellFactory(new NumericTableCell.CurrencyFactory<Portfolio>());
+        TableColumn<Portfolio,List<PortfolioAlert>> tCol3 = (TableColumn<Portfolio,List<PortfolioAlert>>) t.getColumns().get(3);
+        tCol3.setCellFactory(new AlertsTableCell.Factory<Portfolio>());
 
         t.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
             @Override

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msfinance.pbalancer.model.Asset.PricingType;
+import com.msfinance.pbalancer.model.PortfolioAlert.Level;
+import com.msfinance.pbalancer.model.PortfolioAlert.Type;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.Validation;
@@ -142,6 +144,48 @@ public class Portfolio implements IPersistable, Cloneable
         return targetAA;
     }
 
+    @JsonIgnore
+    public List<PortfolioAlert> getAccountAlerts()
+    {
+        // dynamically generate this each time
+        List<PortfolioAlert> alerts = new ArrayList<>();
+
+        long errorAlerts = countAccountErrors();
+        long warnAlerts = countAccountWarns();
+        long infoAlerts = countAccountInfos();
+        if(errorAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.ERROR, "Account errors: " + errorAlerts));
+        }
+        if(warnAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.WARN, "Account warnings: " + warnAlerts));
+        }
+        if(infoAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.INFO, "Account infos: " + infoAlerts));
+        }
+
+        errorAlerts = countTAAErrors();
+        warnAlerts = countTAAWarns();
+        infoAlerts = countTAAInfos();
+        if(errorAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.ERROR, "Target Asset Allocation errors: " + errorAlerts));
+        }
+        if(warnAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.WARN, "Target Asset Allocation warnings: " + warnAlerts));
+        }
+        if(infoAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.INFO, "Target Asset Allocation infos: " + infoAlerts));
+        }
+
+        return alerts;
+    }
+
+
     @JsonProperty
     public void setListPosition(final int listPosition)
     {
@@ -189,6 +233,53 @@ public class Portfolio implements IPersistable, Cloneable
     public void setTargetAA(final AssetAllocation targetAA)
     {
         this.targetAA = Objects.requireNonNull(targetAA);
+    }
+
+
+    public long countAccountErrors()
+    {
+        return accounts
+          .stream()
+          .map(a -> a.countErrors())
+          .filter(c -> c > 0)
+          .count()
+          ;
+    }
+
+    public long countAccountWarns()
+    {
+        return accounts
+                .stream()
+                .map(a -> a.countWarns())
+                .filter(c -> c > 0)
+                .count()
+                ;
+    }
+
+    public long countAccountInfos()
+    {
+        return accounts
+                .stream()
+                .map(a -> a.countInfos())
+                .filter(c -> c > 0)
+                .count()
+                ;
+    }
+
+
+    public long countTAAErrors()
+    {
+        return getTargetAA().countErrors();
+    }
+
+    public long countTAAWarns()
+    {
+        return getTargetAA().countWarns();
+    }
+
+    public long countTAAInfos()
+    {
+        return getTargetAA().countInfos();
     }
 
 

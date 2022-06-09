@@ -145,6 +145,7 @@
                 <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Portfolio Name" />
                 <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Goal" />
                   <TableColumn id="value" editable="false" prefWidth="200.0" sortable="false" text="\$" />
+                  <TableColumn editable="false" prefWidth="200.0" sortable="false" text="Alerts" />
               </columns>
             </TableView>
          </children>

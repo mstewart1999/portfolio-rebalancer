@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -16,11 +17,13 @@ import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AccountTypeTableCell;
+import com.msfinance.pbalancer.controllers.cells.AlertsTableCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.AccountType;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
+import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.FXUtil;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
@@ -104,12 +107,15 @@ public class AccountListController extends BaseController<Portfolio,Portfolio>
 
         t.getColumns().get(0).setCellValueFactory(new PropertyValueFactory<>("name"));
         t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("institution"));
+        t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("type"));
+        t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("lastValue"));
+        t.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("alerts"));
         TableColumn<Account,AccountType> tCol2 = (TableColumn<Account,AccountType>) t.getColumns().get(2);
-        tCol2.setCellValueFactory(new PropertyValueFactory<>("type"));
         tCol2.setCellFactory(new AccountTypeTableCell.Factory<Account>());
         TableColumn<Account,Number> tCol3 = (TableColumn<Account,Number>) t.getColumns().get(3);
-        tCol3.setCellValueFactory(new PropertyValueFactory<>("lastValue"));
         tCol3.setCellFactory(new NumericTableCell.CurrencyFactory<Account>());
+        TableColumn<Account,List<PortfolioAlert>> tCol4 = (TableColumn<Account,List<PortfolioAlert>>) t.getColumns().get(4);
+        tCol4.setCellFactory(new AlertsTableCell.Factory<Account>());
 
         t.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
             @Override

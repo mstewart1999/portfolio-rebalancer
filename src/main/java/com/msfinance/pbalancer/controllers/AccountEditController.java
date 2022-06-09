@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.AccountTypeListCell;
+import com.msfinance.pbalancer.controllers.cells.AlertsTableCell;
 import com.msfinance.pbalancer.controllers.cells.AssetClassTableCell;
 import com.msfinance.pbalancer.controllers.cells.NumericTableCell;
 import com.msfinance.pbalancer.model.Account;
@@ -23,6 +25,7 @@ import com.msfinance.pbalancer.model.AccountType;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.Institution;
+import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.FXUtil;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
@@ -126,12 +129,15 @@ public class AccountEditController extends BaseController<Account,Account>
         t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("assetClass"));
         t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("units"));
         t.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("bestTotalValue"));
+        t.getColumns().get(5).setCellValueFactory(new PropertyValueFactory<>("alerts"));
         TableColumn<Asset,String> tCol2 = (TableColumn<Asset,String>) t.getColumns().get(2);
         tCol2.setCellFactory(new AssetClassTableCell.Factory<Asset>());
         TableColumn<Asset,Number> tCol3 = (TableColumn<Asset,Number>) t.getColumns().get(3);
         tCol3.setCellFactory(new NumericTableCell.UnitsFactory<Asset>());
         TableColumn<Asset,Number> tCol4 = (TableColumn<Asset,Number>) t.getColumns().get(4);
         tCol4.setCellFactory(new NumericTableCell.CurrencyFactory<Asset>());
+        TableColumn<Asset,List<PortfolioAlert>> tCol5 = (TableColumn<Asset,List<PortfolioAlert>>) t.getColumns().get(5);
+        tCol5.setCellFactory(new AlertsTableCell.Factory<Asset>());
 
         t.getSelectionModel().selectedItemProperty().addListener(new InvalidationListener() {
             @Override
@@ -308,6 +314,7 @@ public class AccountEditController extends BaseController<Account,Account>
 
         getApp().<Asset,Asset>mySwitchView(App.ASSET_ADD_VIEW, item,
                 a -> {
+                    a.validate();
                     StateManager.recalculateAccountValue(a.getAccount());
                     StateManager.recalculatePortfolioValue(a.getAccount().getPortfolio());
                     StateManager.recalculateProfileValue(a.getAccount().getPortfolio().getProfile());
@@ -356,6 +363,7 @@ public class AccountEditController extends BaseController<Account,Account>
 
         getApp().<Asset,Asset>mySwitchView(editScreen, item,
                 a -> {
+                    a.validate();
                     StateManager.recalculateAccountValue(a.getAccount());
                     StateManager.recalculatePortfolioValue(a.getAccount().getPortfolio());
                     StateManager.recalculateProfileValue(a.getAccount().getPortfolio().getProfile());

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
+import com.msfinance.pbalancer.model.InvalidDataException;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.aa.AssetClass;
@@ -54,6 +55,9 @@ public class ProfileData
                 parent.getAssets().add(a);
                 a.setAccount(parent);
             }
+            // check for alerts
+            a.validate();
+
             // deal with custom asset classes
             AssetClass.add(a.getAssetClass());
         }
@@ -82,9 +86,19 @@ public class ProfileData
                 parent.getPortfolios().add(p);
                 p.setProfile(parent);
             }
-            // deal with custom asset classes
             if(p.getTargetAA() != null)
             {
+                // check for alerts
+                try
+                {
+                    p.getTargetAA().getRoot().validate();
+                }
+                catch (InvalidDataException e)
+                {
+                    // ignore here
+                }
+
+                // deal with custom asset classes
                 p.getTargetAA().getRoot().allLeaves().stream()
                     .forEach(n -> AssetClass.add(n.getName()));
             }

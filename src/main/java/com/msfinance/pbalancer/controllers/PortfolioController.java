@@ -24,7 +24,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 
 public class PortfolioController extends BaseController<Portfolio,Portfolio>
@@ -192,21 +191,24 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
     private void populateAlerts(final Portfolio p)
     {
+        accountsInfoImg.setVisible(p.countAccountInfos() > 0);
+        accountsWarnImg.setVisible(p.countAccountWarns() > 0);
+        accountsErrorImg.setVisible(p.countAccountErrors() > 0);
+//        Tooltip.install(taaInfoImg, new Tooltip("Account Info Alerts: " + p.countAccountInfos()));
+//        Tooltip.install(taaWarnImg, new Tooltip("Account Warn Alerts: " + p.countAccountWarns()));
+//        Tooltip.install(taaErrorImg, new Tooltip("Account Error Alerts: " + p.countAccountErrors()));
+
+        taaInfoImg.setVisible(p.countTAAInfos() > 0);
+        taaWarnImg.setVisible(p.countTAAWarns() > 0);
+        taaErrorImg.setVisible(p.countTAAErrors() > 0);
+//        Tooltip.install(taaInfoImg, new Tooltip("AA Info Alerts: " + p.countTAAInfos()));
+//        Tooltip.install(taaWarnImg, new Tooltip("AA Warn Alerts: " + p.countTAAWarns()));
+//        Tooltip.install(taaErrorImg, new Tooltip("AA Error Alerts: " + p.countTAAErrors()));
+
         // TODO: replace dummy values once alerts are properly implemented in all places
-        boolean infos = false;
+        boolean infos = true;
         boolean warns = true;
         boolean errors = true;
-        accountsInfoImg.setVisible(infos);
-        accountsWarnImg.setVisible(warns);
-        accountsErrorImg.setVisible(errors);
-
-        taaInfoImg.setVisible(p.getTargetAA().countInfos() > 0);
-        taaWarnImg.setVisible(p.getTargetAA().countWarns() > 0);
-        taaErrorImg.setVisible(p.getTargetAA().countErrors() > 0);
-        Tooltip.install(taaInfoImg, new Tooltip("Info Alerts: " + p.getTargetAA().countInfos()));
-        Tooltip.install(taaWarnImg, new Tooltip("Warn Alerts: " + p.getTargetAA().countWarns()));
-        Tooltip.install(taaErrorImg, new Tooltip("Error Alerts: " + p.getTargetAA().countErrors()));
-
         acmInfoImg.setVisible(infos);
         acmWarnImg.setVisible(warns);
         acmErrorImg.setVisible(errors);

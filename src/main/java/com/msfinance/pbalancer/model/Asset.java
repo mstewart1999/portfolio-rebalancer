@@ -2,13 +2,18 @@ package com.msfinance.pbalancer.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.model.PortfolioAlert.Level;
+import com.msfinance.pbalancer.model.PortfolioAlert.Type;
+import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -34,6 +39,7 @@ public class Asset implements IPersistable, Cloneable
 
     private Account account;
     //private List<Basis> basis;
+    private final List<PortfolioAlert> alerts;
 
     private boolean dirty = false;
 
@@ -67,6 +73,7 @@ public class Asset implements IPersistable, Cloneable
         lastAutoValueTmstp = null;
         account = null;
         //basis = new ArrayList<>();
+        alerts = new ArrayList<>();
     }
 
     @Override
@@ -77,6 +84,7 @@ public class Asset implements IPersistable, Cloneable
             Asset copy = (Asset) super.clone();
             account = null; // caller should provide the appropriate cloned obj
             // basis TBD
+            // alerts can be left as-is
             return copy;
         }
         catch (CloneNotSupportedException e)
@@ -182,6 +190,12 @@ public class Asset implements IPersistable, Cloneable
 //        return basis;
 //    }
 
+    @JsonIgnore
+    public List<PortfolioAlert> getAlerts()
+    {
+        return alerts;
+    }
+
     @JsonProperty
     public void setTicker(final String ticker)
     {
@@ -266,6 +280,47 @@ public class Asset implements IPersistable, Cloneable
 //    {
 //        this.basis = Objects.requireNonNull(basis);
 //    }
+
+
+    /**
+     * Check for alerts.
+     */
+    public void validate()
+    {
+        alerts.clear();
+        if(account == null)
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.ERROR, "Account is undefined"));
+        }
+        if(pricingType == null)
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.ERROR, "PricingType is undefined"));
+        }
+        if(units == null)
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.ERROR, "Units is undefined"));
+        }
+        if(getBestTotalValue() == null)
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.ERROR, "Total value is undefined"));
+        }
+        if(Validation.isBlank(getBestName()))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.ERROR, "Name is undefined"));
+        }
+        if(Validation.isBlank(assetClass))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.WARN, "AssetClass is blank"));
+        }
+        else if(AssetClass.UNDEFINED.equals(assetClass))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.WARN, "AssetClass is 'Undefined'"));
+        }
+        if((getBestTotalValue() != null) && Validation.almostEqual(getBestTotalValue().doubleValue(), 0.0, 0.001))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.INFO, "Total value is $0"));
+        }
+    }
 
 
     @Override
