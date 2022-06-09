@@ -15,6 +15,7 @@ import com.msfinance.pbalancer.model.PortfolioAlert.Level;
 import com.msfinance.pbalancer.model.PortfolioAlert.Type;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
+import com.msfinance.pbalancer.util.DateHelper;
 import com.msfinance.pbalancer.util.Validation;
 
 public class Portfolio implements IPersistable, Cloneable
@@ -26,6 +27,7 @@ public class Portfolio implements IPersistable, Cloneable
     private PortfolioGoal goal;
     private BigDecimal lastValue;
     private Date lastValueTmstp;
+    private Date lastValueTmstpLow;
 
     private Profile profile;
     private List<Account> accounts;
@@ -54,6 +56,7 @@ public class Portfolio implements IPersistable, Cloneable
         goal = PortfolioGoal.Other;
         lastValue = null;
         lastValueTmstp = null;
+        lastValueTmstpLow = null;
         profile = null;
         accounts = new ArrayList<>();
         targetAA = new AssetAllocation();
@@ -124,6 +127,20 @@ public class Portfolio implements IPersistable, Cloneable
     public Date getLastValueTmstp()
     {
         return lastValueTmstp;
+    }
+
+    @JsonProperty
+    public Date getLastValueTmstpLow()
+    {
+        return lastValueTmstpLow;
+    }
+
+    @JsonIgnore
+    public String getLastValueTmstpRange()
+    {
+        return String.format("%s to %s",
+                DateHelper.formatISOLocalDate(lastValueTmstpLow),
+                DateHelper.formatISOLocalDate(lastValueTmstp));
     }
 
     @JsonIgnore
@@ -214,6 +231,12 @@ public class Portfolio implements IPersistable, Cloneable
     public void setLastValueTmstp(final Date lastValueTmstp)
     {
         this.lastValueTmstp = lastValueTmstp;
+    }
+
+    @JsonProperty
+    public void setLastValueTmstpLow(final Date lastValueTmstpLow)
+    {
+        this.lastValueTmstpLow = lastValueTmstpLow;
     }
 
     @JsonIgnore

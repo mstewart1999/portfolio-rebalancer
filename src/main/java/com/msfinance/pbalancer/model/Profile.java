@@ -10,6 +10,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msfinance.pbalancer.util.DateHelper;
 
 public class Profile implements IPersistable
 {
@@ -20,6 +21,7 @@ public class Profile implements IPersistable
     private String name;
     private BigDecimal lastValue;
     private Date lastValueTmstp;
+    private Date lastValueTmstpLow;
 
     private boolean dirty = false;
 
@@ -39,6 +41,7 @@ public class Profile implements IPersistable
         name = "";
         lastValue = null;
         lastValueTmstp = null;
+        lastValueTmstpLow = null;
         portfolios = new ArrayList<>();
     }
 
@@ -66,6 +69,20 @@ public class Profile implements IPersistable
         return lastValueTmstp;
     }
 
+    @JsonProperty
+    public Date getLastValueTmstpLow()
+    {
+        return lastValueTmstpLow;
+    }
+
+    @JsonIgnore
+    public String getLastValueTmstpRange()
+    {
+        return String.format("%s to %s",
+                DateHelper.formatISOLocalDate(lastValueTmstpLow),
+                DateHelper.formatISOLocalDate(lastValueTmstp));
+    }
+
     @JsonIgnore
     public List<Portfolio> getPortfolios()
     {
@@ -88,6 +105,12 @@ public class Profile implements IPersistable
     public void setLastValueTmstp(final Date lastValueTmstp)
     {
         this.lastValueTmstp = lastValueTmstp;
+    }
+
+    @JsonProperty
+    public void setLastValueTmstpLow(final Date lastValueTmstpLow)
+    {
+        this.lastValueTmstpLow = lastValueTmstpLow;
     }
 
     @JsonIgnore

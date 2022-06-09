@@ -1,8 +1,6 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -112,6 +110,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         t.getColumns().get(1).setCellValueFactory(new PropertyValueFactory<>("goal"));
         t.getColumns().get(2).setCellValueFactory(new PropertyValueFactory<>("lastValue"));
         t.getColumns().get(3).setCellValueFactory(new PropertyValueFactory<>("accountAlerts"));
+        t.getColumns().get(4).setCellValueFactory(new PropertyValueFactory<>("lastValueTmstpRange"));
         TableColumn<Portfolio,PortfolioGoal> tCol1 = (TableColumn<Portfolio,PortfolioGoal>) t.getColumns().get(1);
         tCol1.setCellFactory(new PortfolioGoalTableCell.Factory<Portfolio>());
         TableColumn<Portfolio,Number> tCol2 = (TableColumn<Portfolio,Number>) t.getColumns().get(2);
@@ -213,10 +212,7 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         if(p.getLastValueTmstp() != null)
         {
             valueAsOfLabel.setText(
-                    String.format(
-                        "(as of %s)",
-                        DateTimeFormatter.ISO_LOCAL_DATE.format(
-                                p.getLastValueTmstp().toInstant().atZone(ZoneId.systemDefault()))));
+                String.format("(as of %s)", p.getLastValueTmstpRange()));
         }
         else
         {

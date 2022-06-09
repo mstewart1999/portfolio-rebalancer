@@ -1,8 +1,6 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,10 +176,7 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         if(p.getLastValueTmstp() != null)
         {
             valueAsOfLabel.setText(
-                    String.format(
-                        "(as of %s)",
-                        DateTimeFormatter.ISO_LOCAL_DATE.format(
-                                p.getLastValueTmstp().toInstant().atZone(ZoneId.systemDefault()))));
+                String.format("(as of %s)", p.getLastValueTmstpRange()));
         }
         else
         {

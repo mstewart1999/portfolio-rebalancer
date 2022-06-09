@@ -3,11 +3,11 @@ package com.msfinance.pbalancer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -57,24 +57,44 @@ public class StateManager
     {
         if(profile != null)
         {
-            Optional<BigDecimal> sum = profile.getPortfolios()
+            BigDecimal sum = profile.getPortfolios()
                     .stream()
                     .map(p -> (p.getLastValue() == null) ? BigDecimal.ZERO : p.getLastValue())
-                    .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2));
-            if(sum.isPresent())
+                    .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2))
+                    .orElse(null);
+            Date lastValueTmstpHigh = profile.getPortfolios()
+                    .stream()
+                    .map(a -> a.getLastValueTmstp())
+                    .filter(d -> d != null)
+                    .max(Comparator.naturalOrder())
+                    .orElse(null);
+            Date lastValueTmstpLow = profile.getPortfolios()
+                    .stream()
+                    .map(a -> a.getLastValueTmstpLow())
+                    .filter(d -> d != null)
+                    .min(Comparator.naturalOrder())
+                    .orElse(null);
+            if(sum != null)
             {
-                if(!sum.get().equals(profile.getLastValue()))
+                if(!sum.equals(profile.getLastValue()))
                 {
-                    LOG.debug("Profile value changed by recalculation: old={} new={}", profile.getLastValue(), sum.get());
-                    profile.setLastValue(sum.get());
-                    profile.setLastValueTmstp(new Date()); // TODO
+                    LOG.debug("Profile value changed by recalculation: old={} new={}", profile.getLastValue(), sum);
+                    profile.setLastValue(sum);
+                    profile.setLastValueTmstp(lastValueTmstpHigh);
+                    profile.setLastValueTmstpLow(lastValueTmstpLow);
                     profile.markDirty();
+                }
+                else
+                {
+                    // leave no obvious trace
+                    LOG.trace("Profile value not changed");
                 }
             }
             else
             {
                 profile.setLastValue(null);
                 profile.setLastValueTmstp(null);
+                profile.setLastValueTmstpLow(null);
                 profile.markDirty();
             }
         }
@@ -84,24 +104,44 @@ public class StateManager
     {
         if(portfolio != null)
         {
-            Optional<BigDecimal> sum = portfolio.getAccounts()
+            BigDecimal sum = portfolio.getAccounts()
                     .stream()
                     .map(a -> (a.getLastValue() == null) ? BigDecimal.ZERO : a.getLastValue())
-                    .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2));
-            if(sum.isPresent())
+                    .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2))
+                    .orElse(null);
+            Date lastValueTmstpHigh = portfolio.getAccounts()
+                    .stream()
+                    .map(a -> a.getLastValueTmstp())
+                    .filter(d -> d != null)
+                    .max(Comparator.naturalOrder())
+                    .orElse(null);
+            Date lastValueTmstpLow = portfolio.getAccounts()
+                    .stream()
+                    .map(a -> a.getLastValueTmstpLow())
+                    .filter(d -> d != null)
+                    .min(Comparator.naturalOrder())
+                    .orElse(null);
+            if(sum != null)
             {
-                if(!sum.get().equals(portfolio.getLastValue()))
+                if(!sum.equals(portfolio.getLastValue()))
                 {
-                    LOG.debug("Portfolio value changed by recalculation: old={} new={}", portfolio.getLastValue(), sum.get());
-                    portfolio.setLastValue(sum.get());
-                    portfolio.setLastValueTmstp(new Date()); // TODO
+                    LOG.debug("Portfolio value changed by recalculation: old={} new={}", portfolio.getLastValue(), sum);
+                    portfolio.setLastValue(sum);
+                    portfolio.setLastValueTmstp(lastValueTmstpHigh);
+                    portfolio.setLastValueTmstpLow(lastValueTmstpLow);
                     portfolio.markDirty();
+                }
+                else
+                {
+                    // leave no obvious trace ;)
+                    LOG.trace("Portfolio value not changed");
                 }
             }
             else
             {
                 portfolio.setLastValue(null);
                 portfolio.setLastValueTmstp(null);
+                portfolio.setLastValueTmstpLow(null);
                 portfolio.markDirty();
             }
         }
@@ -111,24 +151,44 @@ public class StateManager
     {
         if(account != null)
         {
-            Optional<BigDecimal> sum = account.getAssets()
+            BigDecimal sum = account.getAssets()
                     .stream()
                     .map(a -> (a.getBestTotalValue() == null) ? BigDecimal.ZERO : a.getBestTotalValue())
-                    .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2));
-            if(sum.isPresent())
+                    .reduce((v1,v2) -> NumberFormatHelper.sum(v1,v2))
+                    .orElse(null);
+            Date lastValueTmstpHigh = account.getAssets()
+                    .stream()
+                    .map(a -> a.getBestValueTmstp())
+                    .filter(d -> d != null)
+                    .max(Comparator.naturalOrder())
+                    .orElse(null);
+            Date lastValueTmstpLow = account.getAssets()
+                    .stream()
+                    .map(a -> a.getBestValueTmstp())
+                    .filter(d -> d != null)
+                    .min(Comparator.naturalOrder())
+                    .orElse(null);
+            if(sum != null)
             {
-                if(!sum.get().equals(account.getLastValue()))
+                if(!sum.equals(account.getLastValue()))
                 {
-                    LOG.debug("Account value changed by recalculation: old={} new={}", account.getLastValue(), sum.get());
-                    account.setLastValue(sum.get());
-                    account.setLastValueTmstp(new Date()); // TODO
+                    LOG.debug("Account value changed by recalculation: old={} new={}", account.getLastValue(), sum);
+                    account.setLastValue(sum);
+                    account.setLastValueTmstp(lastValueTmstpHigh);
+                    account.setLastValueTmstpLow(lastValueTmstpLow);
                     account.markDirty();
+                }
+                else
+                {
+                    // leave no obvious trace ;)
+                    LOG.trace("Account value not changed");
                 }
             }
             else
             {
                 account.setLastValue(null);
                 account.setLastValueTmstp(null);
+                account.setLastValueTmstpLow(null);
                 account.markDirty();
             }
         }

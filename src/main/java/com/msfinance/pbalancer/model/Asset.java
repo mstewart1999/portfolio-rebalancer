@@ -15,6 +15,7 @@ import com.msfinance.pbalancer.model.PortfolioAlert.Level;
 import com.msfinance.pbalancer.model.PortfolioAlert.Type;
 import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
+import com.msfinance.pbalancer.util.DateHelper;
 import com.msfinance.pbalancer.util.Validation;
 
 public class Asset implements IPersistable, Cloneable
@@ -398,6 +399,26 @@ public class Asset implements IPersistable, Cloneable
         }
         // WTF?
         return BigDecimal.ZERO;
+    }
+
+    @JsonIgnore
+    public Date getBestValueTmstp()
+    {
+        if(lastAutoValueTmstp != null)
+        {
+            return lastAutoValueTmstp;
+        }
+        if(manualValueTmstp != null)
+        {
+            return manualValueTmstp;
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public String getBestValueTmstpAsString()
+    {
+        return DateHelper.formatISOLocalDate(getBestValueTmstp());
     }
 
     public static BigDecimal totalValue(final BigDecimal units, final BigDecimal perUnitValue)

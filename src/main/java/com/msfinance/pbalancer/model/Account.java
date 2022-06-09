@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msfinance.pbalancer.model.PortfolioAlert.Level;
 import com.msfinance.pbalancer.model.PortfolioAlert.Type;
+import com.msfinance.pbalancer.util.DateHelper;
 import com.msfinance.pbalancer.util.Validation;
 
 public class Account implements IPersistable, Cloneable
@@ -24,6 +25,7 @@ public class Account implements IPersistable, Cloneable
     private int listPosition;
     private BigDecimal lastValue;
     private Date lastValueTmstp;
+    private Date lastValueTmstpLow;
 
     private Portfolio portfolio;
     private List<Asset> assets;
@@ -52,6 +54,7 @@ public class Account implements IPersistable, Cloneable
         listPosition = 0;
         lastValue = null;
         lastValueTmstp = null;
+        lastValueTmstpLow = null;
         portfolio = null;
         assets = new ArrayList<>();
     }
@@ -127,6 +130,20 @@ public class Account implements IPersistable, Cloneable
         return lastValueTmstp;
     }
 
+    @JsonProperty
+    public Date getLastValueTmstpLow()
+    {
+        return lastValueTmstpLow;
+    }
+
+    @JsonIgnore
+    public String getLastValueTmstpRange()
+    {
+        return String.format("%s to %s",
+                DateHelper.formatISOLocalDate(lastValueTmstpLow),
+                DateHelper.formatISOLocalDate(lastValueTmstp));
+    }
+
     @JsonIgnore
     public Portfolio getPortfolio()
     {
@@ -199,6 +216,12 @@ public class Account implements IPersistable, Cloneable
     public void setLastValueTmstp(final Date lastValueTmstp)
     {
         this.lastValueTmstp = lastValueTmstp;
+    }
+
+    @JsonProperty
+    public void setLastValueTmstpLow(final Date lastValueTmstpLow)
+    {
+        this.lastValueTmstpLow = lastValueTmstpLow;
     }
 
     @JsonIgnore

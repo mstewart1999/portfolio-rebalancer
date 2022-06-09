@@ -5,10 +5,12 @@ import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.YEAR;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.format.SignStyle;
+import java.util.Date;
 
 public class DateHelper
 {
@@ -38,5 +40,15 @@ public class DateHelper
             return "";
         }
         return US_DATE.format(dt);
+    }
+
+    public static String formatISOLocalDate(final Date when)
+    {
+        if(when == null)
+        {
+            return "";
+        }
+        return DateTimeFormatter.ISO_LOCAL_DATE.format(
+                when.toInstant().atZone(ZoneId.systemDefault()));
     }
 }
