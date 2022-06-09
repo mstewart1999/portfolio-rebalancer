@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
-import com.gluonhq.charm.glisten.control.Icon;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
@@ -25,9 +24,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Paint;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 
 public class PortfolioController extends BaseController<Portfolio,Portfolio>
 {
@@ -38,19 +36,37 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
     private Button accountsButton;
 
     @FXML
+    private Button acmButton;
+
+    @FXML
     private Button actualAAButton;
 
     @FXML
-    private Button alertsButton;
+    private ImageView accountsErrorImg;
 
     @FXML
-    private Icon alertsErrorIcon;
+    private ImageView accountsInfoImg;
 
     @FXML
-    private Icon alertsInfoIcon;
+    private ImageView accountsWarnImg;
 
     @FXML
-    private Icon alertsWarnIcon;
+    private ImageView taaErrorImg;
+
+    @FXML
+    private ImageView taaInfoImg;
+
+    @FXML
+    private ImageView taaWarnImg;
+
+    @FXML
+    private ImageView acmErrorImg;
+
+    @FXML
+    private ImageView acmInfoImg;
+
+    @FXML
+    private ImageView acmWarnImg;
 
     @FXML
     private ComboBox<PortfolioGoal> goalCombo;
@@ -92,11 +108,17 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
     void initialize()
     {
         Validation.assertNonNull(accountsButton);
+        Validation.assertNonNull(acmButton);
         Validation.assertNonNull(actualAAButton);
-        Validation.assertNonNull(alertsErrorIcon);
-        Validation.assertNonNull(alertsButton);
-        Validation.assertNonNull(alertsInfoIcon);
-        Validation.assertNonNull(alertsWarnIcon);
+        Validation.assertNonNull(accountsErrorImg);
+        Validation.assertNonNull(accountsInfoImg);
+        Validation.assertNonNull(accountsWarnImg);
+        Validation.assertNonNull(taaErrorImg);
+        Validation.assertNonNull(taaInfoImg);
+        Validation.assertNonNull(taaWarnImg);
+        Validation.assertNonNull(acmErrorImg);
+        Validation.assertNonNull(acmInfoImg);
+        Validation.assertNonNull(acmWarnImg);
         Validation.assertNonNull(goalCombo);
         Validation.assertNonNull(goalLabel);
         Validation.assertNonNull(investButton);
@@ -116,33 +138,20 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         goalCombo.setCellFactory(new PortfolioGoalListCell.Factory());
 
 
-        // TODO
-        //accountsButton.setDisable(true);
-        //targetAAButton.setDisable(true);
-        //actualAAButton.setDisable(true);
-        alertsButton.setDisable(true);
-        //investButton.setDisable(true);
-        //withdrawalButton.setDisable(true);
-        //rebalanceButton.setDisable(true);
         accountsButton.setOnAction(e -> visitAccountList());
         targetAAButton.setOnAction(e -> visitTargetAAList());
+        acmButton.setOnAction(e -> {});
         actualAAButton.setOnAction(e -> visitActualAAList());
-        alertsButton.setOnAction(e -> {});
         investButton.setOnAction(e -> visitInvest());
         withdrawalButton.setOnAction(e -> visitWithdrawal());
         rebalanceButton.setOnAction(e -> visitRebalance());
         accountsButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         targetAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
+        acmButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         actualAAButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
-        alertsButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         investButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         withdrawalButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
         rebalanceButton.setGraphic(MaterialDesignIcon.CHEVRON_RIGHT.graphic());
-
-        // colors?
-        alertsInfoIcon.setBackground(new Background(new BackgroundFill(Paint.valueOf("blue"), null, null)));
-        alertsWarnIcon.setBackground(new Background(new BackgroundFill(Paint.valueOf("yellow"), null, null)));
-        alertsErrorIcon.setBackground(new Background(new BackgroundFill(Paint.valueOf("red"), null, null)));
     }
 
     @Override
@@ -152,13 +161,7 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         goalCombo.getSelectionModel().select(p.getGoal());
 
         populateTotalValue();
-
-        boolean infos = false;
-        boolean warns = true;
-        boolean errors = true;
-        alertsInfoIcon.setVisible(infos);
-        alertsWarnIcon.setVisible(warns);
-        alertsErrorIcon.setVisible(errors);
+        populateAlerts(p);
     }
 
     private void populateTotalValue()
@@ -185,6 +188,28 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         {
             valueAsOfLabel.setText("");
         }
+    }
+
+    private void populateAlerts(final Portfolio p)
+    {
+        // TODO: replace dummy values once alerts are properly implemented in all places
+        boolean infos = false;
+        boolean warns = true;
+        boolean errors = true;
+        accountsInfoImg.setVisible(infos);
+        accountsWarnImg.setVisible(warns);
+        accountsErrorImg.setVisible(errors);
+
+        taaInfoImg.setVisible(p.getTargetAA().countInfos() > 0);
+        taaWarnImg.setVisible(p.getTargetAA().countWarns() > 0);
+        taaErrorImg.setVisible(p.getTargetAA().countErrors() > 0);
+        Tooltip.install(taaInfoImg, new Tooltip("Info Alerts: " + p.getTargetAA().countInfos()));
+        Tooltip.install(taaWarnImg, new Tooltip("Warn Alerts: " + p.getTargetAA().countWarns()));
+        Tooltip.install(taaErrorImg, new Tooltip("Error Alerts: " + p.getTargetAA().countErrors()));
+
+        acmInfoImg.setVisible(infos);
+        acmWarnImg.setVisible(warns);
+        acmErrorImg.setVisible(errors);
     }
 
     @Override
@@ -252,6 +277,7 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         getApp().<Portfolio,Portfolio>mySwitchView(App.ACCOUNT_LIST_VIEW, getIn(),
                 p -> {
                     populateTotalValue();
+                    populateAlerts(getIn());
                 },
                 () -> {
                     // no-op
@@ -265,6 +291,8 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                 aaOut -> {
                     getIn().setTargetAA(aaOut);
                     getIn().markDirty();
+
+                    populateAlerts(getIn());
 
                     try
                     {

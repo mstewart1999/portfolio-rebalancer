@@ -39,19 +39,19 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
             {
                 activeAlerts = errorAlerts;
                 //setGraphic(MaterialDesignIcon.ERROR.graphic());
-                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/error48.png"))));
+                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/error24.png"))));
             }
             else if(warnAlerts.size() > 0)
             {
                 activeAlerts = warnAlerts;
                 //setGraphic(MaterialDesignIcon.WARNING.graphic());
-                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/warn48.png"))));
+                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/warn24.png"))));
             }
             else if(infoAlerts.size() > 0)
             {
                 activeAlerts = infoAlerts;
                 //setGraphic(MaterialDesignIcon.INFO.graphic());
-                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/info48.png"))));
+                setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/info24.png"))));
             }
 
             StringBuilder sb = new StringBuilder();
