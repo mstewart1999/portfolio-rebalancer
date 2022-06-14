@@ -39,7 +39,7 @@ public class RebalanceManager
     public static ActualAANode toActualAssetAllocation(final Portfolio portfolio)
     {
         BigDecimal total = portfolio.getLastValue();
-        IRebalancingMethod method = new RebalancingBands525();
+        IRebalancingMethod method = new RebalancingToleranceBands(portfolio.getProfile().getSettings());
         ActualAANode rootAaan = RebalanceManager.wrap(portfolio.getTargetAA().getRoot(), total, method);
         ActualAANode unallocatedCategoryAaan = new ActualAANode(new AANode("N/A", "Unallocated", "Unallocated", 0, DoubleExpression.createSafe0Percent(), AANodeType.G), total, method);
         Map<String,ActualAANode> index = RebalanceManager.indexLeaves(rootAaan);

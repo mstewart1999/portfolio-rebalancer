@@ -321,6 +321,21 @@ public class Asset implements IPersistable, Cloneable
         {
             alerts.add(new PortfolioAlert(Type.ASSET, Level.INFO, "Total value is $0"));
         }
+
+        ProfileSettings settings = getAccount().getPortfolio().getProfile().getSettings();
+        int days = settings.getAssetPricingAgeWarningDays();
+        if((getLastAutoValue() != null) && (DateHelper.olderThanDays(getLastAutoValueTmstp(), days)))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.WARN, "Value is too stale"));
+        }
+        if((getManualValue() != null) && (DateHelper.olderThanDays(getManualValueTmstp(), days)))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.WARN, "Manual Value is too stale"));
+        }
+        if((getProxy() != null) && (getProxy().getPricingCompDate() != null) && (DateHelper.olderThanDays(getProxy().getPricingCompDate(), days)))
+        {
+            alerts.add(new PortfolioAlert(Type.ASSET, Level.WARN, "Proxy pricing comparison data is too stale"));
+        }
     }
 
 

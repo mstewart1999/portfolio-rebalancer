@@ -3,10 +3,22 @@ package com.msfinance.pbalancer.model.rebalance;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class RebalancingBands525 implements IRebalancingMethod
+import com.msfinance.pbalancer.model.ProfileSettings;
+
+public class RebalancingToleranceBands implements IRebalancingMethod
 {
-    private final double bandRelative = 0.25;
-    private final double bandAbsolute = 0.05;
+    private double bandAbsolute = 0.05;
+    private double bandRelative = 0.25;
+
+    public RebalancingToleranceBands()
+    {
+    }
+
+    public RebalancingToleranceBands(final ProfileSettings settings)
+    {
+        bandAbsolute = settings.getRebalanceToleranceBandAbsolute();
+        bandRelative = settings.getRebalanceToleranceBandRelative();
+    }
 
     @Override
     public BigDecimal computeSellLow(final double targetPercent, final BigDecimal portfolioValue, final BigDecimal assetClassValue)

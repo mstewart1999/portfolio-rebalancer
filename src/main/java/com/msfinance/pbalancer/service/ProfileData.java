@@ -74,8 +74,6 @@ public class ProfileData
                 parent.getAssets().add(a);
                 a.setAccount(parent);
             }
-            // check for alerts
-            a.validate();
 
             // deal with custom asset classes
             AssetClass.add(a.getAssetClass());
@@ -125,6 +123,14 @@ public class ProfileData
 
         sortRecursive(profile);
         StateManager.recalculateRecursive(profile);
+
+        // check for alerts
+        for(Asset a : assets.values())
+        {
+            a.validate();
+        }
+        // NOTE: account & portfolio alerts are generated dynamically
+        // TargetAA alerts are generated above
     }
 
     private static void sortRecursive(final Profile profile)

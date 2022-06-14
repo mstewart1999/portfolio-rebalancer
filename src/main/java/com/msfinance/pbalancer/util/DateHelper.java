@@ -51,4 +51,23 @@ public class DateHelper
         return DateTimeFormatter.ISO_LOCAL_DATE.format(
                 when.toInstant().atZone(ZoneId.systemDefault()));
     }
+
+    /**
+     * Determine if a date is older than a given number of days.
+     * @param dt when
+     * @param days how many
+     * @return true if it has been at least 'days' nbr of days since 'dt'
+     */
+    public static boolean olderThanDays(final Date dt, final int days)
+    {
+        Date now = new Date();
+        long daysDiff = (now.getTime() - dt.getTime()) / 1000 / 60 /60 / 24;
+        return daysDiff >= days;
+    }
+
+    public static boolean olderThanDays(final LocalDate dt, final int days)
+    {
+        Date date = Date.from(dt.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return olderThanDays(date, days);
+    }
 }
