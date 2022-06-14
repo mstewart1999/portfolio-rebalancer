@@ -7,9 +7,17 @@ import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.ProfileSettings;
 
 public class CentralData implements IData
 {
+
+    @Override
+    public List<Profile> listProfiles() throws IOException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     @Override
     public Profile getProfile(final String profileId) throws IOException
@@ -31,6 +39,44 @@ public class CentralData implements IData
         // TODO implement server and REST call
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void deleteProfile(final Profile p) throws IOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public List<ProfileSettings> listSettingsForProfile(final String profileId) throws IOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ProfileSettings getSettings(final String profileId, final String id) throws IOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void createSettings(final ProfileSettings s) throws IOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateSettings(final ProfileSettings s) throws IOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteSettings(final ProfileSettings s) throws IOException
+    {
+        throw new UnsupportedOperationException();
+    }
+
 
     @Override
     public List<Portfolio> listPortfoliosForProfile(final String profileId) throws IOException

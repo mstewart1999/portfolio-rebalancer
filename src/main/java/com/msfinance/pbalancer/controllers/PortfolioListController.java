@@ -25,6 +25,7 @@ import com.msfinance.pbalancer.model.PortfolioAlert;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.service.DataFactory;
+import com.msfinance.pbalancer.service.ProfileDataCache;
 import com.msfinance.pbalancer.util.FXUtil;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
@@ -159,10 +160,13 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     {
         super.initializeApp(app, root);
 
-//        // UGGG: major flaw, this never gets called from drawer, or on first init
-//        getRoot().setOnShowing(e -> {
-//            call(StateManager.currentProfile, null, null);
-//        });
+        // UGGG: major flaw, this never gets called from drawer, or on first init
+        getRoot().setOnShowing(e -> {
+            call(ProfileDataCache.get().getProfile(), null, null);
+        });
+        getRoot().setOnHiding(e -> {
+            save();
+        });
     }
 
     @Override
@@ -227,9 +231,6 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     {
         appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> getApp().showDrawer()));
         appBar.getActionItems().clear();
-// TODO
-//        appBar.getActionItems().add(MaterialDesignIcon.ADD_CIRCLE.button(e -> addPortfolio()));
-//        appBar.getActionItems().add(MaterialDesignIcon.REFRESH.button(e -> populateData()));
         appBar.setTitleText(APP_BAR_TITLE);
     }
 
@@ -253,11 +254,12 @@ public class PortfolioListController extends BaseController<Profile,Profile>
         try
         {
             PersistManager.persistAll(getIn());
+            getApp().showMessage("Saved profile");
         }
         catch (IOException e)
         {
-            LOG.error("Error updating portfolio positions for profile: " + getIn().getId(), e);
-            getApp().showMessage("Error updating portfolio positions");
+            LOG.error("Error updating profile: " + getIn().getId(), e);
+            getApp().showMessage("Error updating profile");
             return false;
         }
         return true;

@@ -26,8 +26,6 @@ import com.msfinance.pbalancer.controllers.PortfolioListController;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.aa.AssetTickerCache;
 import com.msfinance.pbalancer.service.ProfileDataCache;
-import com.msfinance.pbalancer.views.PrimaryView;
-import com.msfinance.pbalancer.views.SecondaryView;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -80,6 +78,8 @@ public class App extends Application
 
         // eagerly create all view
         createView(PORTFOLIO_LIST_VIEW, "portfolioList.fxml");
+        createView(ABOUT_VIEW, "about.fxml");
+        createView(SETTINGS_VIEW, "settings.fxml");
         createView(PORTFOLIO_VIEW, "portfolio.fxml");
         createView(ACCOUNT_LIST_VIEW, "accountList.fxml");
         createView(ACCOUNT_EDIT_VIEW, "accountEdit.fxml");
@@ -100,8 +100,8 @@ public class App extends Application
         // TODO: if first time, show a welcome screen as "HOME"?
         // views in drawer
         appManager.addViewFactory(PORTFOLIO_LIST_VIEW, () -> viewByKey.get(PORTFOLIO_LIST_VIEW));
-        appManager.addViewFactory(ABOUT_VIEW, PrimaryView::new);
-        appManager.addViewFactory(SETTINGS_VIEW, SecondaryView::new);
+        appManager.addViewFactory(ABOUT_VIEW, () -> viewByKey.get(ABOUT_VIEW));
+        appManager.addViewFactory(SETTINGS_VIEW, () -> viewByKey.get(SETTINGS_VIEW));
 
         // other views
         appManager.addViewFactory(PORTFOLIO_VIEW, () -> viewByKey.get(PORTFOLIO_VIEW));
@@ -125,7 +125,7 @@ public class App extends Application
         // TODO: create new UI for add/switch profile
         try
         {
-            ProfileDataCache.switchProfile(Profile.DEFAULT);
+            ProfileDataCache.switchProfile(Profile.SAMPLE);
         }
         catch (IOException e)
         {

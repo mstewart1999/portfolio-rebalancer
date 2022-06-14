@@ -3,6 +3,7 @@ package com.msfinance.pbalancer.service;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.InvalidDataException;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.ProfileSettings;
 import com.msfinance.pbalancer.model.aa.AssetClass;
 
 public class ProfileData
@@ -21,6 +23,7 @@ public class ProfileData
     private static final Logger LOG = LoggerFactory.getLogger(ProfileData.class);
 
     private final Profile profile;
+    private final List<ProfileSettings> settings;
     private final Map<String,Portfolio> portfolios = new HashMap<>();
     private final Map<String,Account> accounts = new HashMap<>();
     private final Map<String,Asset> assets = new HashMap<>();
@@ -28,6 +31,7 @@ public class ProfileData
     public ProfileData(final String id) throws IOException
     {
         profile = DataFactory.get().getProfile(id);
+        settings = DataFactory.get().listSettingsForProfile(id);
 
         DataFactory.get().listPortfoliosForProfile(id)
             .stream()
@@ -41,6 +45,21 @@ public class ProfileData
             .stream()
             .forEach(a -> assets.put(a.getId(), a))
             ;
+
+        if(settings.size() > 0)
+        {
+            profile.setSettings(settings.get(0));
+            if(settings.size() > 1)
+            {
+                LOG.warn("Excess profile settings: {}", settings.size());
+            }
+        }
+        else
+        {
+            // create some defaults
+            profile.setSettings(new ProfileSettings(id));
+            DataFactory.get().createSettings(profile.getSettings());
+        }
 
         // map each parent/child;
         for(Asset a : assets.values())

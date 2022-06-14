@@ -1,8 +1,11 @@
 package com.msfinance.pbalancer.service;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,11 +14,13 @@ import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.ProfileSettings;
 import com.msfinance.pbalancer.util.JSONHelper;
 
 public abstract class LocalData implements IData
 {
     private static final String PROFILE_DIR = "profile";
+    private static final String SETTINGS_DIR = "settings";
     private static final String PORTFOLIO_DIR = "portfolio";
     private static final String ACCOUNT_DIR = "account";
     private static final String ASSET_DIR = "asset";
@@ -25,6 +30,26 @@ public abstract class LocalData implements IData
 
     protected abstract Path getDataDir();
 
+
+
+    @Override
+    public List<Profile> listProfiles() throws IOException
+    {
+        Path dataDir = getDataDir();
+
+        List<String> ids = Files
+            .list(dataDir)
+            .filter(p -> Files.isDirectory(p))
+            .filter(p -> p.resolve(PROFILE_DIR).resolve(p.getFileName() + SUFFIX).toFile().isFile())
+            .map(p -> p.getFileName().toString())
+            .toList();
+        List<Profile> items = new ArrayList<>();
+        for(String id : ids)
+        {
+            items.add(getProfile(id));
+        }
+        return items;
+    }
 
     @Override
     public Profile getProfile(final String profileId) throws IOException
@@ -83,6 +108,107 @@ public abstract class LocalData implements IData
 
         String str = JSONHelper.toJson(p);
         Files.writeString(path, str);
+    }
+
+    @Override
+    public void deleteProfile(final Profile p) throws IOException
+    {
+        String profileId = p.getId();
+        Path pathToFile = getDataDir().resolve(profileId).resolve(PROFILE_DIR).resolve(p.getId() + SUFFIX);
+        if(Files.exists(pathToFile))
+        {
+            Path path = getDataDir().resolve(profileId);
+            Files.walkFileTree(
+                    path,
+                    new SimpleFileVisitor<>() {
+
+                        // delete directories or folders
+                        @Override
+                        public FileVisitResult postVisitDirectory(final Path dir,
+                                final IOException exc)
+                                        throws IOException {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        }
+
+                        // delete files
+                        @Override
+                        public FileVisitResult visitFile(final Path file,
+                                final BasicFileAttributes attrs)
+                                        throws IOException {
+                            Files.delete(file);
+                            return FileVisitResult.CONTINUE;
+                        }
+                    }
+                );
+        }
+    }
+
+
+    @Override
+    public List<ProfileSettings> listSettingsForProfile(final String profileId) throws IOException
+    {
+        Path dataDir = getDataDir().resolve(profileId).resolve(SETTINGS_DIR);
+        Files.createDirectories(dataDir);
+
+        List<String> ids = Files
+            .list(dataDir)
+            .filter(p -> Files.isRegularFile(p))
+            .filter(p -> p.getFileName().toString().endsWith(SUFFIX))
+            .map(p -> p.getFileName().toString().replace(SUFFIX, ""))
+            .collect(Collectors.toList());
+        List<ProfileSettings> items = new ArrayList<>();
+        for(String id : ids)
+        {
+            items.add(getSettings(profileId, id));
+        }
+        return items;
+    }
+
+    @Override
+    public ProfileSettings getSettings(final String profileId, final String id) throws IOException
+    {
+        Path path = getDataDir().resolve(profileId).resolve(SETTINGS_DIR).resolve(id + SUFFIX);
+        if(!Files.isRegularFile(path))
+        {
+            throw new IOException("ProfileSettings not found " + path);
+        }
+
+        String str = Files.readString(path);
+        return JSONHelper.fromJson(str, ProfileSettings.class);
+    }
+
+    @Override
+    public void createSettings(final ProfileSettings s) throws IOException
+    {
+        String profileId = s.getProfileId();
+        Path path = getDataDir().resolve(profileId).resolve(SETTINGS_DIR).resolve(s.getId() + SUFFIX);
+        Files.createDirectories(path.getParent());
+
+        String str = JSONHelper.toJson(s);
+        Files.writeString(path, str);
+    }
+
+    @Override
+    public void updateSettings(final ProfileSettings s) throws IOException
+    {
+        String profileId = s.getProfileId();
+        Path path = getDataDir().resolve(profileId).resolve(SETTINGS_DIR).resolve(s.getId() + SUFFIX);
+        if(!Files.isRegularFile(path))
+        {
+            throw new IOException("ProfileSettings not found " + path);
+        }
+
+        String str = JSONHelper.toJson(s);
+        Files.writeString(path, str);
+    }
+
+    @Override
+    public void deleteSettings(final ProfileSettings s) throws IOException
+    {
+        String profileId = s.getProfileId();
+        Path path = getDataDir().resolve(profileId).resolve(SETTINGS_DIR).resolve(s.getId() + SUFFIX);
+        Files.deleteIfExists(path);
     }
 
 
@@ -151,30 +277,6 @@ public abstract class LocalData implements IData
         Path path = getDataDir().resolve(profileId).resolve(PORTFOLIO_DIR).resolve(p.getId() + SUFFIX);
         Files.deleteIfExists(path);
         // TODO: remove linked AA, Accounts, Assets, Alerts, etc...
-        // old code when structure was different
-//        Files.walkFileTree(
-//                path,
-//                new SimpleFileVisitor<>() {
-//
-//                    // delete directories or folders
-//                    @Override
-//                    public FileVisitResult postVisitDirectory(final Path dir,
-//                            final IOException exc)
-//                                    throws IOException {
-//                        Files.delete(dir);
-//                        return FileVisitResult.CONTINUE;
-//                    }
-//
-//                    // delete files
-//                    @Override
-//                    public FileVisitResult visitFile(final Path file,
-//                            final BasicFileAttributes attrs)
-//                                    throws IOException {
-//                        Files.delete(file);
-//                        return FileVisitResult.CONTINUE;
-//                    }
-//                }
-//            );
     }
 
 

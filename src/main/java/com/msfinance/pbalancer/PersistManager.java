@@ -23,6 +23,7 @@ public class PersistManager
     public static boolean persistAll(final Profile profile) throws IOException
     {
         int numProfileUpdates = 0;
+        int numSettingsUpdates = 0;
         int numPortfolioUpdates = 0;
         int numAccountUpdates = 0;
         int numAssetUpdates = 0;
@@ -35,6 +36,13 @@ public class PersistManager
                 DataFactory.get().updateProfile(profile);
                 profile.markClean();
                 numProfileUpdates++;
+            }
+
+            if((profile.getSettings() != null) && profile.getSettings().isDirty())
+            {
+                DataFactory.get().updateSettings(profile.getSettings());
+                profile.getSettings().markClean();
+                numSettingsUpdates++;
             }
 
             for(Portfolio p : profile.getPortfolios())
@@ -67,7 +75,7 @@ public class PersistManager
                 }
             }
         }
-        LOG.debug("Persisted: {} profiles, {} portfolios, {} accounts, {} assets", numProfileUpdates, numPortfolioUpdates, numAccountUpdates, numAssetUpdates);
+        LOG.debug("Persisted: {} profiles, {} settings, {} portfolios, {} accounts, {} assets", numProfileUpdates, numSettingsUpdates, numPortfolioUpdates, numAccountUpdates, numAssetUpdates);
         return true;
     }
 }

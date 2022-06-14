@@ -7,12 +7,21 @@ import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.ProfileSettings;
 
 public interface IData
 {
+    List<Profile> listProfiles() throws IOException;
     Profile getProfile(String profileId) throws IOException;
     void createProfile(Profile p) throws IOException;
     void updateProfile(Profile p) throws IOException;
+    void deleteProfile(Profile p) throws IOException;
+
+    List<ProfileSettings> listSettingsForProfile(String profileId) throws IOException;
+    ProfileSettings getSettings(String profileId, String id) throws IOException;
+    void createSettings(ProfileSettings s) throws IOException;
+    void updateSettings(ProfileSettings s) throws IOException;
+    void deleteSettings(ProfileSettings s) throws IOException;
 
     List<Portfolio> listPortfoliosForProfile(String profileId) throws IOException;
     Portfolio getPortfolio(String profileId, String id) throws IOException;

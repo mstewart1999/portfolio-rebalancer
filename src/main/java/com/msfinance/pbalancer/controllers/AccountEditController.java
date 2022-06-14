@@ -263,7 +263,11 @@ public class AccountEditController extends BaseController<Account,Account>
         try
         {
             // NOTE: any changes to table data, other than "positions" has already been saved
-            PersistManager.persistAll(acct.getPortfolio().getProfile());
+            boolean saved = PersistManager.persistAll(acct.getPortfolio().getProfile());
+            if(saved)
+            {
+                getApp().showMessage("Saved account");
+            }
         }
         catch (IOException e)
         {

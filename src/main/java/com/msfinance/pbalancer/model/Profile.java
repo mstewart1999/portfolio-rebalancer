@@ -26,6 +26,8 @@ public class Profile implements IPersistable
     private boolean dirty = false;
 
     private List<Portfolio> portfolios;
+    private ProfileSettings settings;
+
 
     public Profile()
     {
@@ -43,6 +45,7 @@ public class Profile implements IPersistable
         lastValueTmstp = null;
         lastValueTmstpLow = null;
         portfolios = new ArrayList<>();
+        settings = null;
     }
 
     @JsonProperty
@@ -89,6 +92,12 @@ public class Profile implements IPersistable
         return portfolios;
     }
 
+    @JsonIgnore
+    public ProfileSettings getSettings()
+    {
+        return settings;
+    }
+
     @JsonProperty
     public void setName(final String name)
     {
@@ -117,6 +126,12 @@ public class Profile implements IPersistable
     public void setPortfolios(final List<Portfolio> portfolios)
     {
         this.portfolios = portfolios;
+    }
+
+    @JsonIgnore
+    public void setSettings(final ProfileSettings settings)
+    {
+        this.settings = settings;
     }
 
 
