@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.msfinance.pbalancer.model.PortfolioAlert;
-import com.msfinance.pbalancer.model.aa.AANode;
 
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -16,7 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
-public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAlert>>
+public class AlertsTreeTableCell<T> extends TreeTableCell<T,List<PortfolioAlert>>
 {
     @Override
     protected void updateItem(final List<PortfolioAlert> alerts, final boolean empty)
@@ -57,24 +56,25 @@ public class AAAlertsTreeTableCell extends TreeTableCell<AANode,List<PortfolioAl
             for(PortfolioAlert a : activeAlerts)
             {
                 sb.append(a.text());
-                sb.append("; ");
+                sb.append("\n ");
             }
             if(sb.length() >= 2)
             {
-                // delete final '; '
+                // delete final '\n '
                 sb.deleteCharAt(sb.length()-1);
                 sb.deleteCharAt(sb.length()-1);
             }
             setText(sb.toString());
+            setWrapText(true);
         }
     }
 
-    public static class Factory implements Callback<TreeTableColumn<AANode,List<PortfolioAlert>>, TreeTableCell<AANode,List<PortfolioAlert>>>
+    public static class Factory<T> implements Callback<TreeTableColumn<T,List<PortfolioAlert>>, TreeTableCell<T,List<PortfolioAlert>>>
     {
         @Override
-        public TreeTableCell<AANode,List<PortfolioAlert>> call(final TreeTableColumn<AANode,List<PortfolioAlert>> col)
+        public TreeTableCell<T,List<PortfolioAlert>> call(final TreeTableColumn<T,List<PortfolioAlert>> col)
         {
-            return new AAAlertsTreeTableCell();
+            return new AlertsTreeTableCell<>();
         }
     }
 }

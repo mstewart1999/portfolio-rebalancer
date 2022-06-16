@@ -13,7 +13,7 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.control.Icon;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
-import com.msfinance.pbalancer.controllers.cells.AAAlertsTreeTableCell;
+import com.msfinance.pbalancer.controllers.cells.AlertsTreeTableCell;
 import com.msfinance.pbalancer.controllers.cells.AssetClassListCell;
 import com.msfinance.pbalancer.controllers.cells.AssetClassTableCell;
 import com.msfinance.pbalancer.controllers.cells.AssetClassTreeTableCell;
@@ -165,7 +165,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         TreeTableColumn<AANode,String> ttCol1 = (TreeTableColumn<AANode,String>) tt.getColumns().get(1);
         ttCol1.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
         TreeTableColumn<AANode,List<PortfolioAlert>> ttCol2 = (TreeTableColumn<AANode,List<PortfolioAlert>>) tt.getColumns().get(2);
-        ttCol2.setCellFactory(new AAAlertsTreeTableCell.Factory());
+        ttCol2.setCellFactory(new AlertsTreeTableCell.Factory<AANode>());
         tt.setEditable(true);
         ttCol1.setEditable(true);
         ttCol1.setOnEditCommit(e -> onCommitPercentOfParent(e));
