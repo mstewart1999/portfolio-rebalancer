@@ -8,6 +8,7 @@ import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.ProfileSettings;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 
 public interface IData
 {
@@ -30,16 +31,20 @@ public interface IData
     void deletePortfolio(Portfolio p) throws IOException;
 
     List<Account> listAccountsForProfile(String profileId) throws IOException;
-    List<Account> listAccountsForPortfolio(String profileId, String portfolioId) throws IOException;
     Account getAccount(String profileId, String id) throws IOException;
     void createAccount(Account a) throws IOException;
     void updateAccount(Account a) throws IOException;
     void deleteAccount(Account a) throws IOException;
 
     List<Asset> listAssetsForProfile(String profileId) throws IOException;
-    List<Asset> listAssetsForPortfolio(String profileId, String portfolioId) throws IOException;
     Asset getAsset(String profileId, String id) throws IOException;
     void createAsset(Asset a) throws IOException;
     void updateAsset(Asset a) throws IOException;
     void deleteAsset(Asset a) throws IOException;
+
+    List<PreferredAsset> listAssetClassMappingsForProfile(String profileId) throws IOException;
+    PreferredAsset getAssetClassMapping(String profileId, String id) throws IOException;
+    void createAssetClassMapping(PreferredAsset acm) throws IOException;
+    void updateAssetClassMapping(PreferredAsset acm) throws IOException;
+    void deleteAssetClassMapping(PreferredAsset acm) throws IOException;
 }

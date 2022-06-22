@@ -3,8 +3,10 @@ package com.msfinance.pbalancer.model;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,6 +16,7 @@ import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.PortfolioAlert.Level;
 import com.msfinance.pbalancer.model.PortfolioAlert.Type;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.DateHelper;
 import com.msfinance.pbalancer.util.Validation;
@@ -32,6 +35,7 @@ public class Portfolio implements IPersistable, Cloneable
     private Profile profile;
     private List<Account> accounts;
     private AssetAllocation targetAA;
+    private List<PreferredAsset> assetClassMappings;
 
     private boolean dirty = false;
 
@@ -60,6 +64,7 @@ public class Portfolio implements IPersistable, Cloneable
         profile = null;
         accounts = new ArrayList<>();
         targetAA = new AssetAllocation();
+        assetClassMappings = new ArrayList<>();
     }
 
     @Override
@@ -76,8 +81,13 @@ public class Portfolio implements IPersistable, Cloneable
                 aCopy.setPortfolio(copy);
                 copy.accounts.add(aCopy);
             }
+
             // targetAA is not modified for our purposes, so leave the old one in place
             //copy.targetAA = this.targetAA.clone();
+
+            // assetClassMapping is not modified for our purposes, so leave the old one in place
+            //copy.assetClassMapping = this.assetClassMapping.clone();
+
             return copy;
         }
         catch (CloneNotSupportedException e)
@@ -162,6 +172,12 @@ public class Portfolio implements IPersistable, Cloneable
     }
 
     @JsonIgnore
+    public List<PreferredAsset> getAssetClassMappings()
+    {
+        return assetClassMappings;
+    }
+
+    @JsonIgnore
     public List<PortfolioAlert> getAccountAlerts()
     {
         // dynamically generate this each time
@@ -197,6 +213,22 @@ public class Portfolio implements IPersistable, Cloneable
         if(infoAlerts > 0)
         {
             alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.INFO, "Target Asset Allocation infos: " + infoAlerts));
+        }
+
+        errorAlerts = countACMErrors();
+        warnAlerts = countACMWarns();
+        infoAlerts = countACMInfos();
+        if(errorAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.ERROR, "Preferred Investment errors: " + errorAlerts));
+        }
+        if(warnAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.WARN, "Preferred Investment warnings: " + warnAlerts));
+        }
+        if(infoAlerts > 0)
+        {
+            alerts.add(new PortfolioAlert(Type.PORTFOLIO, Level.INFO, "Preferred Investment infos: " + infoAlerts));
         }
 
         return alerts;
@@ -252,21 +284,27 @@ public class Portfolio implements IPersistable, Cloneable
         this.accounts = Objects.requireNonNull(accounts);
     }
 
-    @JsonIgnore
+    @JsonProperty
     public void setTargetAA(final AssetAllocation targetAA)
     {
         this.targetAA = Objects.requireNonNull(targetAA);
+    }
+
+    @JsonIgnore
+    public void setAssetClassMappings(final List<PreferredAsset> assetClassMappings)
+    {
+        this.assetClassMappings = Objects.requireNonNull(assetClassMappings);
     }
 
 
     public long countAccountErrors()
     {
         return accounts
-          .stream()
-          .map(a -> a.countErrors())
-          .filter(c -> c > 0)
-          .count()
-          ;
+                .stream()
+                .map(a -> a.countErrors())
+                .filter(c -> c > 0)
+                .count()
+                ;
     }
 
     public long countAccountWarns()
@@ -306,6 +344,37 @@ public class Portfolio implements IPersistable, Cloneable
     }
 
 
+    public long countACMErrors()
+    {
+        return assetClassMappings
+                .stream()
+                .map(m -> m.countErrors())
+                .filter(c -> c > 0)
+                .count()
+                ;
+    }
+
+    public long countACMWarns()
+    {
+        return assetClassMappings
+                .stream()
+                .map(m -> m.countWarns())
+                .filter(c -> c > 0)
+                .count()
+                ;
+    }
+
+    public long countACMInfos()
+    {
+        return assetClassMappings
+                .stream()
+                .map(m -> m.countInfos())
+                .filter(c -> c > 0)
+                .count()
+                ;
+    }
+
+
     @Override
     public void markDirty()
     {
@@ -334,6 +403,7 @@ public class Portfolio implements IPersistable, Cloneable
     public Portfolio apply(final List<TransactionSpecific> trans)
     {
         Portfolio copy = this.clone();
+        copy.setProfile(this.getProfile());
         for(TransactionSpecific t : trans)
         {
             for(Account acct : copy.accounts)
@@ -378,5 +448,62 @@ public class Portfolio implements IPersistable, Cloneable
             }
         }
         return copy;
+    }
+
+    /**
+     * Verify that the set of asset class mappings cover the needed asset classes.
+     * @return new asset class mappings that must be persisted
+     */
+    public List<PreferredAsset> validateAssetClassMappings()
+    {
+        List<String> needed = targetAA.getRoot().allLeaves().stream().map(l -> l.getName()).toList();
+        needed = new ArrayList<>(needed); // modifiable copy
+        Set<String> found = new HashSet<>();
+        Set<String> duplicates = new HashSet<>();
+
+        for(PreferredAsset acm : assetClassMappings)
+        {
+            acm.validate();
+
+            String ac = acm.getAssetClass();
+            if(needed.contains(ac))
+            {
+                needed.remove(ac);
+                if(found.contains(ac))
+                {
+                    duplicates.add(ac);
+                }
+                found.add(ac);
+            }
+            else
+            {
+                acm.getAlerts().add(new PortfolioAlert(Type.ACM, Level.INFO, "Unnecessary mapping"));
+            }
+        }
+        // warn about duplicates
+        for(PreferredAsset acm : assetClassMappings)
+        {
+            String ac = acm.getAssetClass();
+            if(duplicates.contains(ac))
+            {
+                acm.getAlerts().add(new PortfolioAlert(Type.ACM, Level.WARN, "Duplicate mapping"));
+            }
+        }
+
+        List<PreferredAsset> created = new ArrayList<>();
+        for(String ac : needed)
+        {
+            PreferredAsset acm = new PreferredAsset(this.getId());
+            acm.setPortfolio(this);
+            assetClassMappings.add(acm);
+            acm.setAssetClass(ac);
+            acm.setListPosition(assetClassMappings.size()-1);
+            acm.markDirty();
+
+            created.add(acm);
+
+            acm.validate();
+        }
+        return created;
     }
 }

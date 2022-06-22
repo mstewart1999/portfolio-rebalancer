@@ -56,15 +56,16 @@ public class AlertsTableCell<T> extends TableCell<T,List<PortfolioAlert>>
             for(PortfolioAlert a : activeAlerts)
             {
                 sb.append(a.text());
-                sb.append("; ");
+                sb.append("\n ");
             }
             if(sb.length() >= 2)
             {
-                // delete final '; '
+                // delete final '\n '
                 sb.deleteCharAt(sb.length()-1);
                 sb.deleteCharAt(sb.length()-1);
             }
             setText(sb.toString());
+            setWrapText(true);
         }
     }
 

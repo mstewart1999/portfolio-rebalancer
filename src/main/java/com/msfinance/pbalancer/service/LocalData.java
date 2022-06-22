@@ -15,6 +15,7 @@ import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.ProfileSettings;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 import com.msfinance.pbalancer.util.JSONHelper;
 
 public abstract class LocalData implements IData
@@ -24,6 +25,7 @@ public abstract class LocalData implements IData
     private static final String PORTFOLIO_DIR = "portfolio";
     private static final String ACCOUNT_DIR = "account";
     private static final String ASSET_DIR = "asset";
+    private static final String ACM_DIR = "acm";
 
     private static final String SUFFIX = ".data";
 
@@ -301,16 +303,6 @@ public abstract class LocalData implements IData
     }
 
     @Override
-    public List<Account> listAccountsForPortfolio(final String profileId, final String portfolioId) throws IOException
-    {
-        List<Account> items = new ArrayList<>();
-        items = items.stream()
-                .filter(a -> a.getPortfolioId().equals(portfolioId))
-                .collect(Collectors.toList());
-        return items;
-    }
-
-    @Override
     public Account getAccount(final String profileId, final String id) throws IOException
     {
         Path path = getDataDir().resolve(profileId).resolve(ACCOUNT_DIR).resolve(id + SUFFIX);
@@ -378,16 +370,6 @@ public abstract class LocalData implements IData
     }
 
     @Override
-    public List<Asset> listAssetsForPortfolio(final String profileId, final String portfolioId) throws IOException
-    {
-        List<Asset> items = new ArrayList<>();
-        items = items.stream()
-                .filter(a -> a.getAccountId().equals(portfolioId))
-                .collect(Collectors.toList());
-        return items;
-    }
-
-    @Override
     public Asset getAsset(final String profileId, final String id) throws IOException
     {
         Path path = getDataDir().resolve(profileId).resolve(ASSET_DIR).resolve(id + SUFFIX);
@@ -430,6 +412,73 @@ public abstract class LocalData implements IData
     {
         String profileId = a.getAccount().getPortfolio().getProfileId();
         Path path = getDataDir().resolve(profileId).resolve(ASSET_DIR).resolve(a.getId() + SUFFIX);
+        Files.deleteIfExists(path);
+    }
+
+
+    @Override
+    public List<PreferredAsset> listAssetClassMappingsForProfile(final String profileId) throws IOException
+    {
+        Path dataDir = getDataDir().resolve(profileId).resolve(ACM_DIR);
+        Files.createDirectories(dataDir);
+
+        List<String> ids = Files
+            .list(dataDir)
+            .filter(p -> Files.isRegularFile(p))
+            .filter(p -> p.getFileName().toString().endsWith(SUFFIX))
+            .map(p -> p.getFileName().toString().replace(SUFFIX, ""))
+            .collect(Collectors.toList());
+        List<PreferredAsset> items = new ArrayList<>();
+        for(String id : ids)
+        {
+            items.add(getAssetClassMapping(profileId, id));
+        }
+        return items;
+    }
+
+    @Override
+    public PreferredAsset getAssetClassMapping(final String profileId, final String id) throws IOException
+    {
+        Path path = getDataDir().resolve(profileId).resolve(ACM_DIR).resolve(id + SUFFIX);
+        if(!Files.isRegularFile(path))
+        {
+            throw new IOException("AssetClassMapping not found " + path);
+        }
+
+        String str = Files.readString(path);
+        return JSONHelper.fromJson(str, PreferredAsset.class);
+    }
+
+    @Override
+    public void createAssetClassMapping(final PreferredAsset acm) throws IOException
+    {
+        String profileId = acm.getPortfolio().getProfileId();
+        Path path = getDataDir().resolve(profileId).resolve(ACM_DIR).resolve(acm.getId() + SUFFIX);
+        Files.createDirectories(path.getParent());
+
+        String str = JSONHelper.toJson(acm);
+        Files.writeString(path, str);
+    }
+
+    @Override
+    public void updateAssetClassMapping(final PreferredAsset acm) throws IOException
+    {
+        String profileId = acm.getPortfolio().getProfileId();
+        Path path = getDataDir().resolve(profileId).resolve(ACM_DIR).resolve(acm.getId() + SUFFIX);
+        if(!Files.isRegularFile(path))
+        {
+            throw new IOException("AssetClassMapping not found " + path);
+        }
+
+        String str = JSONHelper.toJson(acm);
+        Files.writeString(path, str);
+    }
+
+    @Override
+    public void deleteAssetClassMapping(final PreferredAsset acm) throws IOException
+    {
+        String profileId = acm.getPortfolio().getProfileId();
+        Path path = getDataDir().resolve(profileId).resolve(ACM_DIR).resolve(acm.getId() + SUFFIX);
         Files.deleteIfExists(path);
     }
 

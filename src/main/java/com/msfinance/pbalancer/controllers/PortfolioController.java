@@ -1,6 +1,7 @@
 package com.msfinance.pbalancer.controllers;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +10,14 @@ import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.App;
 import com.msfinance.pbalancer.PersistManager;
+import com.msfinance.pbalancer.StateManager;
 import com.msfinance.pbalancer.controllers.cells.PortfolioGoalListCell;
 import com.msfinance.pbalancer.model.InvalidDataException;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.PortfolioGoal;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
+import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
@@ -200,13 +204,9 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 //        Tooltip.install(taaWarnImg, new Tooltip("AA Warn Alerts: " + p.countTAAWarns()));
 //        Tooltip.install(taaErrorImg, new Tooltip("AA Error Alerts: " + p.countTAAErrors()));
 
-        // TODO: replace dummy values once alerts are properly implemented in all places
-        boolean infos = true;
-        boolean warns = true;
-        boolean errors = true;
-        acmInfoImg.setVisible(infos);
-        acmWarnImg.setVisible(warns);
-        acmErrorImg.setVisible(errors);
+        acmInfoImg.setVisible(p.countACMInfos() > 0);
+        acmWarnImg.setVisible(p.countACMWarns() > 0);
+        acmErrorImg.setVisible(p.countACMErrors() > 0);
     }
 
     @Override
@@ -289,6 +289,21 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                     getIn().setTargetAA(aaOut);
                     getIn().markDirty();
 
+                    List<PreferredAsset> created = getIn().validateAssetClassMappings();
+                    for(PreferredAsset acm : created)
+                    {
+                        try
+                        {
+                            DataFactory.get().createAssetClassMapping(acm);
+                            acm.markClean();
+                        }
+                        catch (IOException e)
+                        {
+                            LOG.error("Error creating asset class mapping: " + acm.getId(), e);
+                            getApp().showMessage("Error creating asset class mapping");
+                        }
+                    }
+
                     populateAlerts(getIn());
 
                     try
@@ -332,6 +347,15 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         {
             return;
         }
+        // not needed for invest
+//        if(!confirmAssets(getIn()))
+//        {
+//            return;
+//        }
+        if(!confirmAssetClassMapping(getIn()))
+        {
+            return;
+        }
         getApp().<Portfolio,Void>mySwitchView(App.INVEST_SUGGESTIONS_PROMPT_VIEW, getIn(),
                 p -> {
                     // no-op
@@ -351,6 +375,15 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         {
             return;
         }
+        if(!confirmAssets(getIn()))
+        {
+            return;
+        }
+        // not needed for withdrawal
+//        if(!confirmAssetClassMapping(getIn()))
+//        {
+//            return;
+//        }
         getApp().<Portfolio,Void>mySwitchView(App.WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, getIn(),
                 p -> {
                     // no-op
@@ -367,6 +400,14 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
             return;
         }
         if(!confirmAccounts(getIn()))
+        {
+            return;
+        }
+        if(!confirmAssets(getIn()))
+        {
+            return;
+        }
+        if(!confirmAssetClassMapping(getIn()))
         {
             return;
         }
@@ -410,6 +451,26 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
         if(p.getAccounts().size() == 0)
         {
             getApp().showMessage("Define accounts first");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean confirmAssets(final Portfolio p)
+    {
+        if(StateManager.listAssets(p).size() == 0)
+        {
+            getApp().showMessage("Define assets first");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean confirmAssetClassMapping(final Portfolio p)
+    {
+        if((p.countACMErrors() > 0) || (p.countACMWarns() > 0))
+        {
+            getApp().showMessage("Fix asset class mapping alerts first");
             return false;
         }
         return true;

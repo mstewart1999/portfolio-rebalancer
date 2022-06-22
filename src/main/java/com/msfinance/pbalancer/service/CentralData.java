@@ -8,6 +8,7 @@ import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.ProfileSettings;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 
 public class CentralData implements IData
 {
@@ -122,13 +123,6 @@ public class CentralData implements IData
     }
 
     @Override
-    public List<Account> listAccountsForPortfolio(final String profileId, final String portfolioId) throws IOException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Account getAccount(final String profileId, final String id) throws IOException
     {
         // TODO Auto-generated method stub
@@ -165,13 +159,6 @@ public class CentralData implements IData
     }
 
     @Override
-    public List<Asset> listAssetsForPortfolio(final String profileId, final String portfolioId) throws IOException
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Asset getAsset(final String profileId, final String id) throws IOException
     {
         // TODO Auto-generated method stub
@@ -194,6 +181,41 @@ public class CentralData implements IData
 
     @Override
     public void deleteAsset(final Asset a) throws IOException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public List<PreferredAsset> listAssetClassMappingsForProfile(final String profileId) throws IOException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public PreferredAsset getAssetClassMapping(final String profileId, final String id) throws IOException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void createAssetClassMapping(final PreferredAsset acm) throws IOException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateAssetClassMapping(final PreferredAsset acm) throws IOException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void deleteAssetClassMapping(final PreferredAsset acm) throws IOException
     {
         // TODO Auto-generated method stub
 

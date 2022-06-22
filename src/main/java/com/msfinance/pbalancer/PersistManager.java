@@ -9,6 +9,7 @@ import com.msfinance.pbalancer.model.Account;
 import com.msfinance.pbalancer.model.Asset;
 import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 import com.msfinance.pbalancer.service.DataFactory;
 
 public class PersistManager
@@ -27,6 +28,8 @@ public class PersistManager
         int numPortfolioUpdates = 0;
         int numAccountUpdates = 0;
         int numAssetUpdates = 0;
+        int numAssetClassMappingUpdates = 0;
+
         // TODO: not sure if it would be worth it to structure rest API with bulk updates, or just traditional single record updates
         // TODO: implement retries?
         if(profile != null)
@@ -73,9 +76,25 @@ public class PersistManager
                         }
                     }
                 }
+
+                if(p.getAssetClassMappings() != null)
+                {
+                    for(PreferredAsset acm : p.getAssetClassMappings())
+                    {
+                        if(acm.isDirty())
+                        {
+                            DataFactory.get().updateAssetClassMapping(acm);
+                            acm.markClean();
+                            numAssetClassMappingUpdates++;
+                        }
+                    }
+                }
             }
         }
-        LOG.debug("Persisted: {} profiles, {} settings, {} portfolios, {} accounts, {} assets", numProfileUpdates, numSettingsUpdates, numPortfolioUpdates, numAccountUpdates, numAssetUpdates);
+
+        LOG.debug(
+                "Persisted: {} profiles, {} settings, {} portfolios, {} accounts, {} assets, {} acm",
+                numProfileUpdates, numSettingsUpdates, numPortfolioUpdates, numAccountUpdates, numAssetUpdates, numAssetClassMappingUpdates);
         return true;
     }
 }

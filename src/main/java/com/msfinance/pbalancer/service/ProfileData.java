@@ -17,6 +17,7 @@ import com.msfinance.pbalancer.model.Portfolio;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.ProfileSettings;
 import com.msfinance.pbalancer.model.aa.AssetClass;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 
 public class ProfileData
 {
@@ -27,6 +28,7 @@ public class ProfileData
     private final Map<String,Portfolio> portfolios = new HashMap<>();
     private final Map<String,Account> accounts = new HashMap<>();
     private final Map<String,Asset> assets = new HashMap<>();
+    private final Map<String,PreferredAsset> acms = new HashMap<>();
 
     public ProfileData(final String id) throws IOException
     {
@@ -44,6 +46,11 @@ public class ProfileData
         DataFactory.get().listAssetsForProfile(id)
             .stream()
             .forEach(a -> assets.put(a.getId(), a))
+            ;
+
+        DataFactory.get().listAssetClassMappingsForProfile(id)
+            .stream()
+            .forEach(acm -> acms.put(acm.getId(), acm))
             ;
 
         if(settings.size() > 0)
@@ -91,6 +98,21 @@ public class ProfileData
                 a.setPortfolio(parent);
             }
         }
+
+        for(PreferredAsset acm : acms.values())
+        {
+            Portfolio parent = portfolios.get(acm.getPortfolioId());
+            if(parent == null)
+            {
+                LOG.warn("Orphaned acm: {}", acm.getId());
+            }
+            else
+            {
+                parent.getAssetClassMappings().add(acm);
+                acm.setPortfolio(parent);
+            }
+        }
+
         for(Portfolio p : portfolios.values())
         {
             Profile parent = profile;
@@ -131,6 +153,17 @@ public class ProfileData
         }
         // NOTE: account & portfolio alerts are generated dynamically
         // TargetAA alerts are generated above
+
+        for(Portfolio p : portfolios.values())
+        {
+            List<PreferredAsset> created = p.validateAssetClassMappings();
+
+            for(PreferredAsset acm : created)
+            {
+                DataFactory.get().createAssetClassMapping(acm);
+                acm.markClean();
+            }
+        }
     }
 
     private static void sortRecursive(final Profile profile)
