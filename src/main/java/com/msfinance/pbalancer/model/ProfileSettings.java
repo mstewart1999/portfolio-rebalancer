@@ -1,5 +1,6 @@
 package com.msfinance.pbalancer.model;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ public class ProfileSettings implements IPersistable
     private int rebalanceCheckIntervalDays;
     private double rebalanceToleranceBandAbsolute;
     private double rebalanceToleranceBandRelative;
+    private BigDecimal rebalanceMinimumDollars;
     private int assetPricingAgeWarningDays;
 
     private boolean dirty = false;
@@ -37,6 +39,7 @@ public class ProfileSettings implements IPersistable
         this.rebalanceCheckIntervalDays = 1;
         this.rebalanceToleranceBandAbsolute = 0.05;
         this.rebalanceToleranceBandRelative = 0.25;
+        this.rebalanceMinimumDollars = BigDecimal.ZERO;
         this.assetPricingAgeWarningDays = 90;
     }
 
@@ -71,6 +74,12 @@ public class ProfileSettings implements IPersistable
     }
 
     @JsonProperty
+    public BigDecimal getRebalanceMinimumDollars()
+    {
+        return rebalanceMinimumDollars;
+    }
+
+    @JsonProperty
     public int getAssetPricingAgeWarningDays()
     {
         return assetPricingAgeWarningDays;
@@ -93,6 +102,12 @@ public class ProfileSettings implements IPersistable
     public void setRebalanceToleranceBandRelative(final double rebalanceToleranceBandRelative)
     {
         this.rebalanceToleranceBandRelative = rebalanceToleranceBandRelative;
+    }
+
+    @JsonProperty
+    public void setRebalanceMinimumDollars(final BigDecimal rebalanceMinimumDollars)
+    {
+        this.rebalanceMinimumDollars = rebalanceMinimumDollars;
     }
 
     @JsonProperty

@@ -35,6 +35,7 @@ public class RebalanceManager
     private static final String ASSET_NAME_MISC = "assets matching your asset allocation";
     private static final String ASSET_NAME_GENERIC = "this asset class";
 
+    private static final int MAX_REBALANCE_ITERATIONS = 10;
 
     public static ActualAANode toActualAssetAllocation(final Portfolio portfolio)
     {
@@ -112,7 +113,10 @@ public class RebalanceManager
     {
         List<TransactionSpecific> suggestions = new ArrayList<>();
         Portfolio workingP = p.clone();
-        while(true)
+        workingP.setProfile(p.getProfile());
+
+        int iterations = 0;
+        while(iterations < MAX_REBALANCE_ITERATIONS)
         {
             ActualAANode rootAaan = RebalanceManager.toActualAssetAllocation(workingP);
             List<TransactionSpecific> thisRound = RebalanceManager.toRebalanceSuggestions(workingP, rootAaan);
@@ -122,6 +126,12 @@ public class RebalanceManager
             }
             suggestions.addAll(thisRound);
             workingP = workingP.apply(thisRound);
+            iterations++;
+        }
+
+        if(iterations >= MAX_REBALANCE_ITERATIONS)
+        {
+            // TODO: what action?
         }
 
         suggestions = TransactionSpecific.consolidate(suggestions);

@@ -19,6 +19,7 @@ import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.ProfileSettings;
 import com.msfinance.pbalancer.service.DataFactory;
 import com.msfinance.pbalancer.service.ProfileDataCache;
+import com.msfinance.pbalancer.util.NumberFormatHelper;
 import com.msfinance.pbalancer.util.Validation;
 
 import javafx.fxml.FXML;
@@ -27,6 +28,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 
 public class SettingsController extends BaseController<Void,Void>
 {
@@ -53,6 +55,9 @@ public class SettingsController extends BaseController<Void,Void>
     private ComboBox<Integer> rebalCheckDaysComboBox;
 
     @FXML
+    private TextField rebalMinimumDollarsText;
+
+    @FXML
     private ComboBox<Integer> assetPricingAgeWarningDaysComboBox;
 
 
@@ -70,6 +75,7 @@ public class SettingsController extends BaseController<Void,Void>
         Validation.assertNonNull(rebalBandAbsoluteSlider);
         Validation.assertNonNull(rebalBandRelativeSlider);
         Validation.assertNonNull(rebalCheckDaysComboBox);
+        Validation.assertNonNull(rebalMinimumDollarsText);
         Validation.assertNonNull(assetPricingAgeWarningDaysComboBox);
 
         profileComboBox.setOnAction(e -> onProfileChange());
@@ -144,6 +150,7 @@ public class SettingsController extends BaseController<Void,Void>
         rebalCheckDaysComboBox.getSelectionModel().select((Integer)settings.getRebalanceCheckIntervalDays());
         rebalBandAbsoluteSlider.setValue(100.0*settings.getRebalanceToleranceBandAbsolute());
         rebalBandRelativeSlider.setValue(100.0*settings.getRebalanceToleranceBandRelative());
+        rebalMinimumDollarsText.setText( NumberFormatHelper.formatWith2Decimals(settings.getRebalanceMinimumDollars()) );
         assetPricingAgeWarningDaysComboBox.getSelectionModel().select((Integer)settings.getAssetPricingAgeWarningDays());
     }
 
@@ -154,6 +161,7 @@ public class SettingsController extends BaseController<Void,Void>
         settings.setRebalanceCheckIntervalDays(rebalCheckDaysComboBox.getSelectionModel().getSelectedItem());
         settings.setRebalanceToleranceBandAbsolute(rebalBandAbsoluteSlider.getValue()/100.0);
         settings.setRebalanceToleranceBandRelative(rebalBandRelativeSlider.getValue()/100.0);
+        settings.setRebalanceMinimumDollars( NumberFormatHelper.parseNumber2(rebalMinimumDollarsText.getText()) );
         settings.setAssetPricingAgeWarningDays(assetPricingAgeWarningDaysComboBox.getSelectionModel().getSelectedItem());
         settings.markDirty();
 

@@ -9,6 +9,7 @@ public class RebalancingToleranceBands implements IRebalancingMethod
 {
     private double bandAbsolute = 0.05;
     private double bandRelative = 0.25;
+    private BigDecimal rebalanceMinimumDollars = BigDecimal.ZERO;
 
     public RebalancingToleranceBands()
     {
@@ -18,6 +19,7 @@ public class RebalancingToleranceBands implements IRebalancingMethod
     {
         bandAbsolute = settings.getRebalanceToleranceBandAbsolute();
         bandRelative = settings.getRebalanceToleranceBandRelative();
+        rebalanceMinimumDollars = settings.getRebalanceMinimumDollars();
     }
 
     @Override
@@ -30,7 +32,11 @@ public class RebalancingToleranceBands implements IRebalancingMethod
         BigDecimal maxValue = portfolioValue.multiply(new BigDecimal(maxPercent));
         if(assetClassValue.doubleValue() > maxValue.doubleValue())
         {
-            return assetClassValue.subtract(maxValue).setScale(2, RoundingMode.HALF_UP).negate();
+            BigDecimal change = assetClassValue.subtract(maxValue).setScale(2, RoundingMode.HALF_UP).negate();
+            if(change.doubleValue() <= -rebalanceMinimumDollars.doubleValue())
+            {
+                return change;
+            }
         }
         return BigDecimal.ZERO;
     }
@@ -43,7 +49,11 @@ public class RebalancingToleranceBands implements IRebalancingMethod
             BigDecimal targetValue = portfolioValue.multiply(new BigDecimal(targetPercent));
             if(assetClassValue.doubleValue() > targetValue.doubleValue())
             {
-                return assetClassValue.subtract(targetValue).setScale(2, RoundingMode.HALF_UP).negate();
+                BigDecimal change = assetClassValue.subtract(targetValue).setScale(2, RoundingMode.HALF_UP).negate();
+                if(change.doubleValue() <= -rebalanceMinimumDollars.doubleValue())
+                {
+                    return change;
+                }
             }
         }
         return BigDecimal.ZERO;
@@ -59,7 +69,11 @@ public class RebalancingToleranceBands implements IRebalancingMethod
         BigDecimal minValue = portfolioValue.multiply(new BigDecimal(minPercent));
         if(assetClassValue.doubleValue() < minValue.doubleValue())
         {
-            return minValue.subtract(assetClassValue).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal change = minValue.subtract(assetClassValue).setScale(2, RoundingMode.HALF_UP);
+            if(change.doubleValue() >= rebalanceMinimumDollars.doubleValue())
+            {
+                return change;
+            }
         }
         return BigDecimal.ZERO;
     }
@@ -72,7 +86,11 @@ public class RebalancingToleranceBands implements IRebalancingMethod
             BigDecimal targetValue = portfolioValue.multiply(new BigDecimal(targetPercent));
             if(assetClassValue.doubleValue() < targetValue.doubleValue())
             {
-                return targetValue.subtract(assetClassValue).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal change = targetValue.subtract(assetClassValue).setScale(2, RoundingMode.HALF_UP);
+                if(change.doubleValue() >= rebalanceMinimumDollars.doubleValue())
+                {
+                    return change;
+                }
             }
         }
         return BigDecimal.ZERO;
