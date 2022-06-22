@@ -179,6 +179,7 @@ public class ProfileData
                 ac.getAssets().sort(Comparator.comparing(Asset::getListPosition));
             }
             p.getAccounts().sort(Comparator.comparing(Account::getListPosition));
+            p.getAssetClassMappings().sort(Comparator.comparing(PreferredAsset::getListPosition));
         }
         profile.getPortfolios().sort(Comparator.comparing(Portfolio::getListPosition));
     }
