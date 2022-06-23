@@ -531,16 +531,13 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         if(item == null) return;
 
         AANode aan = item.getValue();
-        int listPos = 1;
-        Optional<Integer> currMaxListPosition = aan
-            .children()
-            .stream()
-            .map(c -> c.getListPosition())
-            .max((i, j) -> i.compareTo(j));
-        if(currMaxListPosition.isPresent())
-        {
-            listPos = currMaxListPosition.get() + 1;
-        }
+        int currMaxListPosition = aan
+                .children()
+                .stream()
+                .map(c -> c.getListPosition())
+                .max((i, j) -> i.compareTo(j))
+                .orElse(0);
+        int listPosition = currMaxListPosition + 1;
 
         TextInputDialog inputdialog = new TextInputDialog("");
         inputdialog.setContentText("Name: ");
@@ -553,7 +550,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         if(!Validation.isBlank(name))
         {
             String id = UUID.randomUUID().toString();
-            AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.G);
+            AANode aanChild = new AANode(aan.getId(), id, name, listPosition, DoubleExpression.createSafe0Percent(), AANodeType.G);
             aanChild.setParent(aan);
             aan.addChild(aanChild);
 
@@ -571,16 +568,13 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         if(item == null) return;
 
         AANode aan = item.getValue();
-        int listPos = 1;
-        Optional<Integer> currMaxListPosition = aan
-            .children()
-            .stream()
-            .map(c -> c.getListPosition())
-            .max((i, j) -> i.compareTo(j));
-        if(currMaxListPosition.isPresent())
-        {
-            listPos = currMaxListPosition.get() + 1;
-        }
+        int currMaxListPosition = aan
+                .children()
+                .stream()
+                .map(c -> c.getListPosition())
+                .max((i, j) -> i.compareTo(j))
+                .orElse(0);
+        int listPosition = currMaxListPosition + 1;
 
         List<String> choices = AssetClass.list().stream()
                 .map(ac -> ac.getCode())
@@ -610,7 +604,7 @@ public class TargetAAController extends BaseController<AssetAllocation,AssetAllo
         {
             AssetClass.add(name); // in case it is a new custom one
             String id = UUID.randomUUID().toString();
-            AANode aanChild = new AANode(aan.getId(), id, name, listPos, DoubleExpression.createSafe0Percent(), AANodeType.AC);
+            AANode aanChild = new AANode(aan.getId(), id, name, listPosition, DoubleExpression.createSafe0Percent(), AANodeType.AC);
             aanChild.setParent(aan);
             aan.addChild(aanChild);
 

@@ -491,6 +491,13 @@ public class Portfolio implements IPersistable, Cloneable
             }
         }
 
+        int currMaxListPosition = assetClassMappings
+                .stream()
+                .map(c -> c.getListPosition())
+                .max((i, j) -> i.compareTo(j))
+                .orElse(0);
+        int listPosition = currMaxListPosition + 1;
+
         List<PreferredAsset> created = new ArrayList<>();
         for(String ac : needed)
         {
@@ -498,7 +505,7 @@ public class Portfolio implements IPersistable, Cloneable
             acm.setPortfolio(this);
             assetClassMappings.add(acm);
             acm.setAssetClass(ac);
-            acm.setListPosition(assetClassMappings.size()-1);
+            acm.setListPosition(listPosition++);
             acm.markDirty();
 
             created.add(acm);

@@ -259,16 +259,13 @@ public class AccountListController extends BaseController<Portfolio,Portfolio>
 
     private void onAdd()
     {
-        int listPosition = 1;
-        Optional<Integer> currMaxListPosition = t
-            .getItems()
-            .stream()
-            .map(c -> c.getListPosition())
-            .max((i, j) -> i.compareTo(j));
-        if(currMaxListPosition.isPresent())
-        {
-            listPosition = currMaxListPosition.get() + 1;
-        }
+        int currMaxListPosition = t
+                .getItems()
+                .stream()
+                .map(c -> c.getListPosition())
+                .max((i, j) -> i.compareTo(j))
+                .orElse(0);
+        int listPosition = currMaxListPosition + 1;
 
         Account item = new Account(getIn().getId());
         item.setName("");

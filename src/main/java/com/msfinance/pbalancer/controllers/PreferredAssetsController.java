@@ -195,16 +195,13 @@ public class PreferredAssetsController extends BaseController<Portfolio,Portfoli
 
     private void onAdd()
     {
-        int listPosition = 1;
-        Optional<Integer> currMaxListPosition = t
+        int currMaxListPosition = t
             .getItems()
             .stream()
             .map(c -> c.getListPosition())
-            .max((i, j) -> i.compareTo(j));
-        if(currMaxListPosition.isPresent())
-        {
-            listPosition = currMaxListPosition.get() + 1;
-        }
+            .max((i, j) -> i.compareTo(j))
+            .orElse(0);
+        int listPosition = currMaxListPosition + 1;
 
         PreferredAsset item = new PreferredAsset(getIn().getId());
         item.setListPosition(listPosition);
