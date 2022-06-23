@@ -141,7 +141,7 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
 
         accountsButton.setOnAction(e -> visitAccountList());
         targetAAButton.setOnAction(e -> visitTargetAAList());
-        acmButton.setOnAction(e -> {});
+        acmButton.setOnAction(e -> visitAssetClassMapping());
         actualAAButton.setOnAction(e -> visitActualAAList());
         investButton.setOnAction(e -> visitInvest());
         withdrawalButton.setOnAction(e -> visitWithdrawal());
@@ -299,8 +299,8 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                         }
                         catch (IOException e)
                         {
-                            LOG.error("Error creating asset class mapping: " + acm.getId(), e);
-                            getApp().showMessage("Error creating asset class mapping");
+                            LOG.error("Error creating preferred assets: " + acm.getId(), e);
+                            getApp().showMessage("Error creating preferred assets");
                         }
                     }
 
@@ -316,6 +316,32 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
                         LOG.error("Error updating portfolio: " + getIn().getId(), e);
                         getApp().showMessage("Error updating portfolio");
                     }
+                },
+                () -> {
+                    // no-op
+                });
+    }
+
+    private void visitAssetClassMapping()
+    {
+        getApp().<Portfolio,Portfolio>mySwitchView(App.PREFERRED_ASSETS_VIEW, getIn(),
+                p -> {
+                    List<PreferredAsset> created = getIn().validateAssetClassMappings();
+                    for(PreferredAsset acm : created)
+                    {
+                        try
+                        {
+                            DataFactory.get().createAssetClassMapping(acm);
+                            acm.markClean();
+                        }
+                        catch (IOException e)
+                        {
+                            LOG.error("Error creating preferred assets: " + acm.getId(), e);
+                            getApp().showMessage("Error creating preferred assets");
+                        }
+                    }
+
+                    populateAlerts(getIn());
                 },
                 () -> {
                     // no-op
@@ -470,7 +496,7 @@ public class PortfolioController extends BaseController<Portfolio,Portfolio>
     {
         if((p.countACMErrors() > 0) || (p.countACMWarns() > 0))
         {
-            getApp().showMessage("Fix asset class mapping alerts first");
+            getApp().showMessage("Fix preferred asset alerts first");
             return false;
         }
         return true;

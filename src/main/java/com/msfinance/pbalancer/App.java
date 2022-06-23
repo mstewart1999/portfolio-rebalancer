@@ -58,6 +58,8 @@ public class App extends Application
     public static final String ASSET_EDIT_MANUAL_VIEW = "ASSET_EDIT_MANUAL_VIEW";
     public static final String TARGET_AA_VIEW = "TARGET_AA_VIEW";
     public static final String ACTUAL_AA_VIEW = "ACTUAL_AA_VIEW";
+    public static final String PREFERRED_ASSETS_VIEW = "PREFERRED_ASSETS_VIEW";
+    public static final String PREFERRED_ASSET_EDIT_VIEW = "PREFERRED_ASSET_EDIT_VIEW";
     public static final String INVEST_SUGGESTIONS_PROMPT_VIEW = "INVEST_SUGGESTIONS_PROMPT_VIEW";
     public static final String INVEST_SUGGESTIONS_RESULTS_VIEW = "INVEST_SUGGESTIONS_RESULTS_VIEW";
     public static final String WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW = "WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW";
@@ -89,6 +91,8 @@ public class App extends Application
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(ASSET_EDIT_MANUAL_VIEW, "assetEditManual.fxml");
         createView(TARGET_AA_VIEW, "targetAA.fxml");
+        createView(PREFERRED_ASSETS_VIEW, "preferredAssets.fxml");
+        createView(PREFERRED_ASSET_EDIT_VIEW, "preferredAssetEdit.fxml");
         createView(INVEST_SUGGESTIONS_PROMPT_VIEW, "investSuggestionsPrompt.fxml");
         createView(INVEST_SUGGESTIONS_RESULTS_VIEW, "investSuggestionsResults.fxml");
         createView(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, "withdrawalSuggestionsPrompt.fxml");
@@ -113,6 +117,8 @@ public class App extends Application
         appManager.addViewFactory(ASSET_EDIT_MANUAL_VIEW, () -> viewByKey.get(ASSET_EDIT_MANUAL_VIEW));
         appManager.addViewFactory(TARGET_AA_VIEW, () -> viewByKey.get(TARGET_AA_VIEW));
         appManager.addViewFactory(ACTUAL_AA_VIEW, () -> viewByKey.get(ACTUAL_AA_VIEW));
+        appManager.addViewFactory(PREFERRED_ASSETS_VIEW, () -> viewByKey.get(PREFERRED_ASSETS_VIEW));
+        appManager.addViewFactory(PREFERRED_ASSET_EDIT_VIEW, () -> viewByKey.get(PREFERRED_ASSET_EDIT_VIEW));
         appManager.addViewFactory(INVEST_SUGGESTIONS_PROMPT_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_PROMPT_VIEW));
         appManager.addViewFactory(INVEST_SUGGESTIONS_RESULTS_VIEW, () -> viewByKey.get(INVEST_SUGGESTIONS_RESULTS_VIEW));
         appManager.addViewFactory(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW, () -> viewByKey.get(WITHDRAWAL_SUGGESTIONS_PROMPT_VIEW));
