@@ -469,16 +469,17 @@ public class Portfolio implements IPersistable, Cloneable
             if(needed.contains(ac))
             {
                 needed.remove(ac);
-                if(found.contains(ac))
-                {
-                    duplicates.add(ac);
-                }
-                found.add(ac);
             }
             else
             {
                 acm.getAlerts().add(new PortfolioAlert(Type.ACM, Level.INFO, "Unnecessary mapping"));
             }
+
+            if(found.contains(ac))
+            {
+                duplicates.add(ac);
+            }
+            found.add(ac);
         }
         // warn about duplicates
         for(PreferredAsset acm : assetClassMappings)
