@@ -17,11 +17,11 @@ EQ-ID-SV|Intl Developed Mkts (ex-US) Small-Cap Value Stocks|
 EQ-IE-TSM|Intl Emerging Mkts Stocks|
 EQ-IE-LV|Intl Emerging Mkts Large-Cap Value Stocks|
 EQ-IG-TSM|Global (ex-US) Stocks|Market cap weighted combination of Developed and Emerging markets stocks (excludes US)
+EQ-IG-SB|Global (ex-US) Small-Cap Blend Stocks|
 EQ-TW-TSM|Total World Stocks|Market cap weighted combination of Developed and Emerging markets stocks (includes US)
 
 FI-CASH|Cash|Bank deposits,Money market funds,T-Bills|
 FI-LT-GOV|Long Term Treasury Bonds|
-FI-IT-ANY|Intermediate Term Bonds|
 FI-IT-GOV|Intermediate Term Treasury Bonds|
 FI-IT-IPS|Intermediate Term Inflation Protected Bonds (TIPS)|
 FI-IT-TBM|Intermediate Term Total Bond Market|

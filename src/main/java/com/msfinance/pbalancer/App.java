@@ -25,6 +25,7 @@ import com.msfinance.pbalancer.controllers.BaseController.SuccessCallback;
 import com.msfinance.pbalancer.controllers.PortfolioListController;
 import com.msfinance.pbalancer.model.Profile;
 import com.msfinance.pbalancer.model.aa.AssetTickerCache;
+import com.msfinance.pbalancer.model.aa.DefaultPreferredAssetCache;
 import com.msfinance.pbalancer.service.ProfileDataCache;
 
 import javafx.application.Application;
@@ -141,6 +142,7 @@ public class App extends Application
 
         // TODO: progress bar
         AssetTickerCache.getInstance();
+        DefaultPreferredAssetCache.getInstance();
     }
 
     private View createView(final String key, final String fxml)

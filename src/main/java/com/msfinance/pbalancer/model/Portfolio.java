@@ -16,6 +16,8 @@ import com.msfinance.pbalancer.model.Asset.PricingType;
 import com.msfinance.pbalancer.model.PortfolioAlert.Level;
 import com.msfinance.pbalancer.model.PortfolioAlert.Type;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
+import com.msfinance.pbalancer.model.aa.DefaultPreferredAsset;
+import com.msfinance.pbalancer.model.aa.DefaultPreferredAssetCache;
 import com.msfinance.pbalancer.model.aa.PreferredAsset;
 import com.msfinance.pbalancer.model.rebalance.TransactionSpecific;
 import com.msfinance.pbalancer.util.DateHelper;
@@ -506,6 +508,14 @@ public class Portfolio implements IPersistable, Cloneable
             assetClassMappings.add(acm);
             acm.setAssetClass(ac);
             acm.setListPosition(listPosition++);
+            {
+                DefaultPreferredAsset dpa = DefaultPreferredAssetCache.getInstance().lookupPrimary(ac);
+                if(dpa != null)
+                {
+                    acm.setPrimaryAssetTicker(dpa.getTicker());
+                    acm.setPrimaryAssetName(dpa.getName());
+                }
+            }
             acm.markDirty();
 
             created.add(acm);
