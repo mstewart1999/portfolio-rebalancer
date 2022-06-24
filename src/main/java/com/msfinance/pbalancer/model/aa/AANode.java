@@ -400,7 +400,7 @@ public class AANode
     @JsonIgnore
     public String getPercentOfRootExprAsString()
     {
-        if(isRoot())
+        if(isRoot() || (parent == null))
         {
             return "";
         }
@@ -419,7 +419,7 @@ public class AANode
     @JsonIgnore
     public int getDepth()
     {
-        if(isRoot())
+        if(isRoot() || (parent == null))
         {
             return 0;
         }
