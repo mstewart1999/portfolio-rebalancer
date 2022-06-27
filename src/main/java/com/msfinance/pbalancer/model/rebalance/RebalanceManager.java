@@ -24,6 +24,7 @@ import com.msfinance.pbalancer.model.aa.AANode;
 import com.msfinance.pbalancer.model.aa.AANodeType;
 import com.msfinance.pbalancer.model.aa.AssetClass;
 import com.msfinance.pbalancer.model.aa.DoubleExpression;
+import com.msfinance.pbalancer.model.aa.PreferredAsset;
 import com.msfinance.pbalancer.util.Validation;
 
 public class RebalanceManager
@@ -746,6 +747,11 @@ public class RebalanceManager
                             desiredInvestCash = 0.0;
                         }
                         String what = ASSET_NAME_GENERIC;
+                        PreferredAsset acm = p.lookupPreferredAsset(assetClass);
+                        if((acm != null) && !Validation.isBlank(acm.getPrimaryAssetTicker()))
+                        {
+                            what = acm.getPrimaryAssetTicker();
+                        }
                         suggestions.add(new TransactionSpecific(Buy, assetClass, what, null, buyCash, acct, null));
                         newCashByAcctId.subtract(acct, buyCash);
                     }

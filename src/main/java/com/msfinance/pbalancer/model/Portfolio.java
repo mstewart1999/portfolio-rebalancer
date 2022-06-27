@@ -524,4 +524,17 @@ public class Portfolio implements IPersistable, Cloneable
         }
         return created;
     }
+
+    public PreferredAsset lookupPreferredAsset(final String desiredAssetClass)
+    {
+        for(PreferredAsset acm : assetClassMappings)
+        {
+            String ac = acm.getAssetClass();
+            if(ac.equals(desiredAssetClass))
+            {
+                return acm;
+            }
+        }
+        return null;
+    }
 }
