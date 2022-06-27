@@ -244,6 +244,10 @@ public class App extends Application
         scene.getWindow().setWidth(800);
         scene.getWindow().setHeight(900);
         scene.getWindow().centerOnScreen();
+        scene.getWindow().setOnHidden(e -> {
+                Services.get(LifecycleService.class).ifPresent(LifecycleService::shutdown);
+            }
+        );
     }
 
 
