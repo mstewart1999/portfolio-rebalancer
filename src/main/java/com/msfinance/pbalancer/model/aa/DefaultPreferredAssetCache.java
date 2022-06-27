@@ -119,13 +119,21 @@ public class DefaultPreferredAssetCache
     }
 
 
-    public DefaultPreferredAsset lookupPrimary(final String assetClass)
+    public DefaultPreferredAsset lookupPrimary(String assetClass)
     {
+        if(assetClass == null)
+        {
+            assetClass = "";
+        }
         return primary.get(assetClass);
     }
 
-    public List<DefaultPreferredAsset> lookupChoices(final String assetClass)
+    public List<DefaultPreferredAsset> lookupChoices(String assetClass)
     {
+        if(assetClass == null)
+        {
+            assetClass = "";
+        }
         List<DefaultPreferredAsset> dpas = choices.get(assetClass);
         if(dpas == null)
         {

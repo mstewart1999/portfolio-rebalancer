@@ -169,8 +169,12 @@ public class AssetTickerCache
         loadTmstp = System.currentTimeMillis();
     }
 
-    public AssetTicker lookup(final String symbol)
+    public AssetTicker lookup(String symbol)
     {
+        if(symbol == null)
+        {
+            symbol = "";
+        }
         return known.get(symbol);
     }
 

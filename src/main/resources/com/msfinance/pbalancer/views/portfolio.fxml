@@ -106,7 +106,7 @@
                                        </padding>
                                     </Label>
                                     <Button fx:id="acmButton" layoutX="107.0" layoutY="69.0" maxWidth="500.0" mnemonicParsing="false" text="Preferred Assets" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <Label layoutX="343.0" layoutY="67.0" text="Define preferred assets to use for your asset allocation." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                    <Label layoutX="343.0" layoutY="67.0" text="Pick funds to use for the asset classes in your asset allocation." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2">
                                        <padding>
                                           <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
                                        </padding>

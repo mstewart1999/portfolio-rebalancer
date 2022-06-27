@@ -2,29 +2,48 @@ package com.msfinance.pbalancer.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.controlsfx.control.ToggleSwitch;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.TextFields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
 import com.msfinance.pbalancer.controllers.cells.AssetClassListCell;
+import com.msfinance.pbalancer.controllers.cells.AssetTickerListCell;
 import com.msfinance.pbalancer.model.aa.AssetAllocation;
 import com.msfinance.pbalancer.model.aa.AssetClass;
+import com.msfinance.pbalancer.model.aa.AssetTicker;
+import com.msfinance.pbalancer.model.aa.AssetTickerCache;
+import com.msfinance.pbalancer.model.aa.DefaultPreferredAsset;
+import com.msfinance.pbalancer.model.aa.DefaultPreferredAssetCache;
 import com.msfinance.pbalancer.model.aa.PreferredAsset;
 import com.msfinance.pbalancer.util.Validation;
 
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import impl.org.controlsfx.skin.AutoCompletePopupSkin;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.RowConstraints;
 
 public class PreferredAssetEditController extends BaseController<PreferredAsset,PreferredAsset>
 {
@@ -42,12 +61,6 @@ public class PreferredAssetEditController extends BaseController<PreferredAsset,
     private ComboBox<String> assetClassCombo;
 
     @FXML
-    private Label autoNameLabel;
-
-    @FXML
-    private Label tickerLabel;
-
-    @FXML
     private ButtonBar buttonBar;
 
     @FXML
@@ -55,6 +68,27 @@ public class PreferredAssetEditController extends BaseController<PreferredAsset,
 
     @FXML
     private Button saveBtn;
+
+    @FXML
+    private GridPane primaryAssetGrid;
+
+    @FXML
+    private Label tickerTitleLabel;
+
+    @FXML
+    private Label nameTitleLabel;
+
+    @FXML
+    private RadioButton otherRB;
+
+    @FXML
+    private TextField otherTickerText;
+
+    @FXML
+    private Label otherNameLabel;
+
+    private List<RadioButton> assetRBs;
+    private List<DefaultPreferredAsset> assetChoices;
 
 
     public PreferredAssetEditController()
@@ -68,16 +102,41 @@ public class PreferredAssetEditController extends BaseController<PreferredAsset,
         Validation.assertNonNull(aaFilterBox);
         Validation.assertNonNull(filterAssetClassesTS);
         Validation.assertNonNull(assetClassCombo);
-        Validation.assertNonNull(autoNameLabel);
-        Validation.assertNonNull(tickerLabel);
         Validation.assertNonNull(buttonBar);
         Validation.assertNonNull(cancelBtn);
         Validation.assertNonNull(saveBtn);
+        Validation.assertNonNull(primaryAssetGrid);
+        Validation.assertNonNull(tickerTitleLabel);
+        Validation.assertNonNull(nameTitleLabel);
+        Validation.assertNonNull(otherRB);
+        Validation.assertNonNull(otherTickerText);
+        Validation.assertNonNull(otherNameLabel);
 
         filterAssetClassesTS.selectedProperty().addListener(e -> populateAssetClasses());
         assetClassCombo.setEditable(true); // allow entry of item not in list
         assetClassCombo.setButtonCell(new AssetClassListCell(AssetClass.all()));
         assetClassCombo.setCellFactory(new AssetClassListCell.Factory(AssetClass.all()));
+        assetClassCombo.setOnAction(e -> onAssetClassChanged());
+
+        // otherTickerText auto complete
+        final Map<String,AssetTicker> tickerSuggestions = AssetTickerCache.getInstance().all();
+        AutoCompletionBinding<String> bindAutoCompletion = TextFields.bindAutoCompletion(otherTickerText, new TickerSuggestionProvider(tickerSuggestions));
+        AutoCompletePopup<String> tickerCompletionPopup = bindAutoCompletion.getAutoCompletionPopup();
+        tickerCompletionPopup.setSkin(new AutoCompletePopupSkin<String>(tickerCompletionPopup, new AssetTickerListCell.Factory(tickerSuggestions)));
+        tickerCompletionPopup.setPrefWidth(500);
+        tickerCompletionPopup.setMaxWidth(500);
+        tickerCompletionPopup.setWidth(500);
+
+        //tickerCompletionPopup.setMaxWidth(tickerText.getMaxWidth());
+        otherTickerText.textProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(final Observable observable)
+            {
+                onTickerChanged();
+            }
+        });
+        otherTickerText.textProperty().addListener(e -> onTickerChanged());
+
 
         ButtonBar.setButtonData(cancelBtn, ButtonData.CANCEL_CLOSE);
         ButtonBar.setButtonData(saveBtn, ButtonData.FINISH);
@@ -136,10 +195,11 @@ public class PreferredAssetEditController extends BaseController<PreferredAsset,
 
         assetClassCombo.setValue(mapping.getAssetClass());
 
-        tickerLabel.setText(mapping.getPrimaryAssetTicker());
-        autoNameLabel.setText(mapping.getPrimaryAssetName());
-
         populateAssetClasses();
+        onAssetClassChanged();
+
+        // populate radio button selection and/or text box
+        setSelectedDPA(mapping.getPrimaryAssetTicker(), mapping.getPrimaryAssetName());
     }
 
     protected void populateAssetClasses()
@@ -232,14 +292,144 @@ public class PreferredAssetEditController extends BaseController<PreferredAsset,
 
         PreferredAsset mapping = getIn();
         mapping.setAssetClass(assetClassCombo.getValue());
-        mapping.setPrimaryAssetTicker(tickerLabel.getText());
-        mapping.setPrimaryAssetName(autoNameLabel.getText());
-        mapping.markDirty();
 
-        // TODO: better validation and error msg UX
+        DefaultPreferredAsset choice = getSelectedDPA();
+        if(choice != null)
+        {
+            mapping.setPrimaryAssetTicker(choice.getTicker());
+            mapping.setPrimaryAssetName(choice.getName());
+            mapping.markDirty();
+        }
+        else
+        {
+            if(otherRB.isSelected())
+            {
+                String ticker = otherTickerText.getText();
+                AssetTicker at = AssetTickerCache.getInstance().lookup(ticker);
+                if(at == null)
+                {
+                    getApp().showMessage("A valid ticker is required");
+                    return false;
+                }
+                mapping.setPrimaryAssetTicker(at.getSymbol());
+                mapping.setPrimaryAssetName(at.getName());
+                mapping.markDirty();
+            }
+            else
+            {
+                getApp().showMessage("Selection for primary asset is required.");
+                return false;
+            }
+        }
 
         AssetClass.add(mapping.getAssetClass());
         return true;
     }
 
+    private void onAssetClassChanged()
+    {
+        List<Node> trash = new ArrayList<>();
+        for(Node child : primaryAssetGrid.getChildren())
+        {
+            // leave header labels
+            if((child != tickerTitleLabel) && (child != nameTitleLabel))
+            {
+                trash.add(child);
+            }
+        }
+        primaryAssetGrid.getChildren().removeAll(trash);
+        primaryAssetGrid.getRowConstraints().clear();
+        primaryAssetGrid.getRowConstraints().add(new RowConstraints(0, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
+
+        String ac = assetClassCombo.getValue();
+        assetChoices = DefaultPreferredAssetCache.getInstance().lookupChoices(ac);
+        assetRBs = new ArrayList<>();
+        ToggleGroup primaryAssetToggleGroup = new ToggleGroup();
+
+        int row = 1;
+        for(DefaultPreferredAsset choice : assetChoices)
+        {
+            RadioButton rb = new RadioButton();
+            Label tickerLabel = new Label(choice.getTicker());
+            Label nameLabel = new Label(choice.getName());
+            rb.setPadding(new Insets(8));
+            tickerLabel.setPadding(new Insets(8));
+            nameLabel.setPadding(new Insets(8));
+            primaryAssetGrid.add(rb, 0, row);
+            primaryAssetGrid.add(tickerLabel, 1, row);
+            primaryAssetGrid.add(nameLabel, 2, row);
+            primaryAssetGrid.getRowConstraints().add(new RowConstraints(0, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
+            assetRBs.add(rb);
+            rb.setToggleGroup(primaryAssetToggleGroup);
+
+            row++;
+        }
+        otherRB.selectedProperty().set(false);
+        otherTickerText.setText("");
+        otherNameLabel.setText("");
+        primaryAssetGrid.add(otherRB, 0, row);
+        primaryAssetGrid.add(otherTickerText, 1, row);
+        primaryAssetGrid.add(otherNameLabel, 2, row);
+        otherRB.setPadding(new Insets(8));
+        otherTickerText.setPadding(new Insets(8));
+        // no assetRBs.add(otherRB);
+        otherRB.setToggleGroup(primaryAssetToggleGroup);
+
+        primaryAssetToggleGroup.selectedToggleProperty().addListener(e -> onPrimaryChange());
+        primaryAssetToggleGroup.selectToggle(null);
+    }
+
+    private void onPrimaryChange()
+    {
+        if(otherRB.isSelected())
+        {
+            otherTickerText.setDisable(false);
+        }
+        else
+        {
+            otherTickerText.setDisable(true);
+        }
+    }
+
+
+    private void onTickerChanged()
+    {
+        String ticker = otherTickerText.getText();
+        AssetTicker t = AssetTickerCache.getInstance().lookup(ticker);
+        if(t == null)
+        {
+            otherNameLabel.setText("");
+        }
+        else
+        {
+            otherNameLabel.setText(t.getName());
+        }
+    }
+
+    private DefaultPreferredAsset getSelectedDPA()
+    {
+        for(int i=0; i<assetRBs.size(); i++)
+        {
+            if(assetRBs.get(i).isSelected())
+            {
+                return assetChoices.get(i);
+            }
+        }
+        return null;
+    }
+
+    private void setSelectedDPA(final String ticker, final String name)
+    {
+        for(int i=0; i<assetRBs.size(); i++)
+        {
+            if(assetChoices.get(i).getTicker().equals(ticker))
+            {
+                assetRBs.get(i).selectedProperty().set(true);
+                return;
+            }
+        }
+        otherRB.selectedProperty().set(true);
+        otherTickerText.setText(ticker);
+        otherNameLabel.setText(name);
+    }
 }
