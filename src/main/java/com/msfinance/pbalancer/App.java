@@ -36,15 +36,7 @@ import javafx.stage.Stage;
 
 public class App extends Application
 {
-    private static final Logger LOG;
-    static
-    {
-        String path = App.class.getClassLoader()
-                                    .getResource("logging.properties")
-                                    .getFile();
-        System.setProperty("java.util.logging.config.file", path);
-        LOG = LoggerFactory.getLogger(App.class);
-    }
+    private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
     public static final String PORTFOLIO_LIST_VIEW = AppManager.HOME_VIEW;
     public static final String ABOUT_VIEW = "ABOUT_VIEW";
@@ -77,7 +69,7 @@ public class App extends Application
     @Override
     public void init()
     {
-        LOG.info("App.init()");
+        LOG.info("App.init() - starting");
 
         // eagerly create all view
         createView(PORTFOLIO_LIST_VIEW, "portfolioList.fxml");
@@ -136,13 +128,14 @@ public class App extends Application
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException("Unable to load initial profile", e);
         }
 
         // TODO: progress bar
         AssetTickerCache.getInstance();
         DefaultPreferredAssetCache.getInstance();
+
+        LOG.info("App.init() - ending");
     }
 
     private View createView(final String key, final String fxml)
@@ -213,7 +206,7 @@ public class App extends Application
     @Override
     public void start(final Stage stage)
     {
-        LOG.info("App.start() - begin");
+        LOG.info("App.start() - starting");
         appManager.start(stage);
         // postInit is called here by appManager
 
@@ -226,12 +219,13 @@ public class App extends Application
                     // no-op
                 });
 
-        LOG.info("App.start() - end");
+        LOG.info("App.start() - ending");
     }
 
     private void postInit(final Scene scene)
     {
-        LOG.info("App.postInit()");
+        LOG.info("App.postInit() - starting");
+
         //Swatch.getDefault().assignTo(scene);
         Swatch.LIGHT_GREEN.assignTo(scene);
         // hex #85bb65 (also known as Dollar bill)
@@ -248,6 +242,8 @@ public class App extends Application
                 Services.get(LifecycleService.class).ifPresent(LifecycleService::shutdown);
             }
         );
+
+        LOG.info("App.postInit() - ending");
     }
 
 
@@ -291,8 +287,4 @@ public class App extends Application
         appManager.getDrawer().open();
     }
 
-    public static void main(final String args[])
-    {
-        launch(args);
-    }
 }
