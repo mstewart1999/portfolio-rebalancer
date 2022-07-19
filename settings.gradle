@@ -7,3 +7,8 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+
+// Name needs to not have hyphen for Wix installer
+rootProject.name="pbalancer"
+

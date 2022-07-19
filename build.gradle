@@ -1,7 +1,7 @@
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.10'
-    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.8'
+    id 'com.gluonhq.gluonfx-gradle-plugin' version '1.0.14'
     id 'jacoco'
 }
 
@@ -12,7 +12,7 @@ repositories {
     }
 }
 
-mainClassName = 'com.msfinance.pbalancer.App'
+mainClassName = 'com.msfinance.pbalancer.Main'
 
 test {
     useJUnitPlatform()
@@ -24,13 +24,17 @@ jacocoTestReport {
 
 
 dependencies {
-    implementation 'com.gluonhq:charm-glisten:6.1.0'
+    implementation 'com.gluonhq:charm-glisten:6.1.1'
       // https://jmaven.com/maven/org.controlsfx/controlsfx 
     implementation 'org.controlsfx:controlsfx:11.1.1'
     implementation 'net.objecthunter:exp4j:0.4.8'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'org.slf4j:slf4j-jdk14:1.7.36'
+    
+    implementation 'org.glassfish.jersey.core:jersey-client:3.1.0-M3'
+    implementation 'org.glassfish.jersey.media:jersey-media-json-jackson:3.1.0-M3'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:3.1.0-M3'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
@@ -43,11 +47,117 @@ javafx {
 }
 
 gluonfx {
-    graalvmHome = "C:/tools/graalvm-ce-java17-22.0.0.2"
+    // https://github.com/gluonhq/gluonfx-gradle-plugin#configuration
+    //graalvmHome = "C:/tools/graalvm-ce-java17-22.0.0.2"
     // target = 'ios' // Uncomment to enable iOS
     // target = 'android' // Uncomment to enable Android
+    target = 'host'
+    
+    //nativeImageArgs
+    compilerArgs = ['--enable-url-protocols=ftp']
+    
+    resourcesList = [ '.*\\\\.properties$', '.*\\\\.csv$', '.*\\\\.psv$', '.*\\\\.css$', '.*\\\\.fxml$', '.*\\\\.png$']
+    reflectionList = [
+        'javafx.scene.control.Button',                  
+        'javafx.scene.control.ButtonBar',               
+        'javafx.scene.control.CheckBox',                
+        'javafx.scene.control.ComboBox',                
+        'javafx.scene.control.Control',                 
+        'javafx.scene.control.Hyperlink',               
+        'javafx.scene.control.Label',                   
+        'javafx.scene.control.Labeled',                 
+        'javafx.scene.control.PopupControl',            
+        'javafx.scene.control.RadioButton',             
+        'javafx.scene.control.ScrollPane',              
+        'javafx.scene.control.Slider',                  
+        'javafx.scene.control.Tab',                     
+        'javafx.scene.control.TabPane',                 
+        'javafx.scene.control.TableColumn',             
+        'javafx.scene.control.TableView',               
+        'javafx.scene.control.TextArea',                
+        'javafx.scene.control.TextField',               
+        'javafx.scene.control.TextInputControl',        
+        'javafx.scene.control.TitledPane',              
+        'javafx.scene.control.ToggleButton',            
+        'javafx.scene.control.Tooltip',                 
+        'javafx.scene.control.TreeTableColumn',         
+        'javafx.scene.control.TreeTableView',           
+        'javafx.scene.control.skin.TableColumnHeader',  
+        'javafx.scene.layout.AnchorPane',               
+        'javafx.scene.layout.BorderPane',               
+        'javafx.scene.layout.ColumnConstraints',        
+        'javafx.scene.layout.FlowPane',                 
+        'javafx.scene.layout.GridPane',                 
+        'javafx.scene.layout.HBox',                     
+        'javafx.scene.layout.Pane',                     
+        'javafx.scene.layout.Priority',                 
+        'javafx.scene.layout.Region',                   
+        'javafx.scene.layout.RowConstraints',           
+        'javafx.scene.layout.VBox',                     
+        
+        'org.controlsfx.control.ToggleSwitch',
+
+      'com.msfinance.pbalancer.App',
+      'com.msfinance.pbalancer.controllers.BaseController',
+      'com.msfinance.pbalancer.controllers.AboutController',
+      'com.msfinance.pbalancer.controllers.AccountEditController',
+      'com.msfinance.pbalancer.controllers.AccountListController',
+      'com.msfinance.pbalancer.controllers.ActualAAController',
+      'com.msfinance.pbalancer.controllers.AssetAddController',
+      'com.msfinance.pbalancer.controllers.AssetEditKnownController',
+      'com.msfinance.pbalancer.controllers.AssetEditManualController',
+      'com.msfinance.pbalancer.controllers.AssetEditProxyController',
+      'com.msfinance.pbalancer.controllers.InvestSuggestionsPromptController',
+      'com.msfinance.pbalancer.controllers.InvestSuggestionsResultsController',
+      'com.msfinance.pbalancer.controllers.PortfolioController',
+      'com.msfinance.pbalancer.controllers.PortfolioListController',
+      'com.msfinance.pbalancer.controllers.PreferredAssetEditController',
+      'com.msfinance.pbalancer.controllers.PreferredAssetsController',
+      'com.msfinance.pbalancer.controllers.RebalanceSuggestionsController',
+      'com.msfinance.pbalancer.controllers.SettingsController',
+      'com.msfinance.pbalancer.controllers.TargetAAController',
+      'com.msfinance.pbalancer.controllers.TickerSuggestionProvider',
+      'com.msfinance.pbalancer.controllers.WebViewController',
+      'com.msfinance.pbalancer.controllers.WithdrawalSuggestionsPromptController',
+      'com.msfinance.pbalancer.controllers.WithdrawalSuggestionsResultsController',
+      
+      'com.msfinance.pbalancer.model.Profile',
+      'com.msfinance.pbalancer.model.ProfileSettings',
+      'com.msfinance.pbalancer.model.Portfolio',
+      'com.msfinance.pbalancer.model.Account',
+      'com.msfinance.pbalancer.model.Asset',
+      'com.msfinance.pbalancer.model.aa.PreferredAsset',
+      
+      'com.msfinance.pbalancer.model.AssetProxy',
+      'com.msfinance.pbalancer.model.aa.AssetAllocation',
+      'com.msfinance.pbalancer.model.aa.AANode',
+      'com.msfinance.pbalancer.model.rebalance.ActualAANode',
+      
+      'com.msfinance.pbalancer.service.login.Credentials',
+      'com.msfinance.pbalancer.service.login.LoginResponse',
+      'com.msfinance.pbalancer.model.PriceResult'
+    ]
+    
+    runtimeArgs = [
+      '-Djavafx.platform=desktop',
+      '--module-path c:/tools/javafx-sdk-17.0.2/lib ',
+      '--add-modules javafx.controls,javafx.fxml,javafx.web',
+
+      '--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls',
+      '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls',
+      '--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls',
+      '--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls',
+      '--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior.TableViewBehavior=org.controlsfx.controls',
+      '--add-exports=javafx.base/com.sun.javafx.event.EventHandlerManager=org.controlsfx.controls',
+      '--add-opens=javafx.graphics/javafx.scene=org.controlsfx.controls',
+
+      '--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED',
+      '--add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED'
+    ]
+    
     attachConfig {
         version = "4.0.12"
         services 'display', 'lifecycle', 'statusbar', 'storage'
     }
+    //appIdentifier = "zzz" # no obvious effect
 }
