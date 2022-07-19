@@ -11,6 +11,7 @@ public class FtpDownload
 {
     public static void download(final Path p, final String url) throws IOException
     {
+        Files.createDirectories(p.getParent());
         try(
                 InputStream in = new URL(url).openStream();
                 OutputStream out = Files.newOutputStream(p)
