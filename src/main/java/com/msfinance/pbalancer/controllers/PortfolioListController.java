@@ -453,14 +453,14 @@ public class PortfolioListController extends BaseController<Profile,Profile>
     private void onRefresh()
     {
         Profile in = getIn();
-        Collection<Asset> updated = StateManager.refreshPrices(in);
-
-        t.refresh();
-        populateTotalValue();
-        getApp().showMessage(String.format("Updated prices for %s assets", updated.size()));
-
         try
         {
+            Collection<Asset> updated = StateManager.refreshPrices(in);
+
+            t.refresh();
+            populateTotalValue();
+            getApp().showMessage(String.format("Updated prices for %s assets", updated.size()));
+
             PersistManager.persistAll(in);
         }
         catch (IOException e)

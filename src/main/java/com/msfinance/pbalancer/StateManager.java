@@ -1,5 +1,6 @@
 package com.msfinance.pbalancer;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -195,25 +196,25 @@ public class StateManager
     }
 
 
-    public static Collection<Asset> refreshPrices(final Profile profile)
+    public static Collection<Asset> refreshPrices(final Profile profile) throws IOException
     {
         Collection<Asset> assets = listAssets(profile);
         return refreshPrices(assets);
     }
 
-    public static Collection<Asset> refreshPrices(final Portfolio portfolio)
+    public static Collection<Asset> refreshPrices(final Portfolio portfolio) throws IOException
     {
         Collection<Asset> assets = listAssets(portfolio);
         return refreshPrices(assets);
     }
 
-    public static Collection<Asset> refreshPrices(final Account account)
+    public static Collection<Asset> refreshPrices(final Account account) throws IOException
     {
         Collection<Asset> assets = listAssets(account);
         return refreshPrices(assets);
     }
 
-    private static Collection<Asset> refreshPrices(final Collection<Asset> assets)
+    private static Collection<Asset> refreshPrices(final Collection<Asset> assets) throws IOException
     {
         Collection<String> tickers = uniqueTickers(assets);
         Map<String,PriceResult> priceUpdates = PricingFactory.get().getMostRecentEOD(tickers);
@@ -267,9 +268,17 @@ public class StateManager
             return false;
         }
 
-        Map<String,PriceResult> priceUpdates = PricingFactory.get().getMostRecentEOD(tickers);
+        try
+        {
+            Map<String,PriceResult> priceUpdates = PricingFactory.get().getMostRecentEOD(tickers);
 
-        return applyPrice(asset, priceUpdates);
+            return applyPrice(asset, priceUpdates);
+        }
+        catch (IOException e)
+        {
+            LOG.error("Unable to get ticker price", e);
+            return false;
+        }
     }
 
     private static boolean applyPrice(final Asset asset, final Map<String, PriceResult> priceUpdates)

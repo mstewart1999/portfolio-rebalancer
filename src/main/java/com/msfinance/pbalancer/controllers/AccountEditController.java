@@ -504,14 +504,14 @@ public class AccountEditController extends BaseController<Account,Account>
     private void onRefresh()
     {
         Account in = getIn();
-        Collection<Asset> updated = StateManager.refreshPrices(in);
-
-        t.refresh();
-        populateTotalValue();
-        getApp().showMessage(String.format("Updated prices for %s assets", updated.size()));
-
         try
         {
+            Collection<Asset> updated = StateManager.refreshPrices(in);
+
+            t.refresh();
+            populateTotalValue();
+            getApp().showMessage(String.format("Updated prices for %s assets", updated.size()));
+
             PersistManager.persistAll(in.getPortfolio().getProfile());
         }
         catch (IOException e)
