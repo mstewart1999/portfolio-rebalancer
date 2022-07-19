@@ -27,3 +27,5 @@ bin/
 build/
 .gradle/
 
+/console.txt
+/target
