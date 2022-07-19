@@ -1,5 +1,6 @@
 package com.msfinance.pbalancer.util;
 
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class FXUtil
 
             // WARN: in order to get this to run, add the following runtime param:
             // --add-opens javafx.controls/javafx.scene.control.skin=ALL-UNNAMED
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException|InaccessibleObjectException e) {
             e.printStackTrace();
         }
     }
