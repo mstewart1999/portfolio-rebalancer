@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2017, Gluon and/or its affiliates.
+    All rights reserved. Use is subject to license terms.
+
+    This file is available and licensed under the following license:
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in
+     the documentation and/or other materials provided with the distribution.
+   - Neither the name of Oracle Corporation and Gluon nor the names of its
+     contributors may be used to endorse or promote products derived
+     from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import com.gluonhq.charm.glisten.mvc.View?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<View minHeight="-Infinity" minWidth="-Infinity" prefHeight="756.0" prefWidth="575.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pbalancer.client.controllers.PortfolioController">
+   <center>
+      <ScrollPane pannable="true" prefViewportHeight="200.0" prefViewportWidth="200.0" BorderPane.alignment="CENTER">
+         <content>
+            <AnchorPane maxWidth="1024.0">
+               <children>
+                  <VBox layoutX="8.0" layoutY="4.900000095367432" spacing="4.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <TitledPane text="Configure Portfolio">
+                           <content>
+                              <GridPane hgap="12.0" maxWidth="1024.0" vgap="12.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="80.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="30.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="60.0" prefWidth="250.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                  <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                </rowConstraints>
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="4.0">
+                                       <children>
+                                          <ImageView fx:id="accountsInfoImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../info24.png" />
+                                             </image>
+                                          </ImageView>
+                                          <ImageView fx:id="accountsWarnImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../warn24.png" />
+                                             </image>
+                                          </ImageView>
+                                          <ImageView fx:id="accountsErrorImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../error24.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                    <Button fx:id="accountsButton" maxWidth="500.0" mnemonicParsing="false" text="Accounts/Assets" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" />
+                                    <Button fx:id="targetAAButton" maxWidth="500.0" mnemonicParsing="false" text="Target Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                    <Label text="View and edit your investments." wrapText="true" GridPane.columnIndex="2">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Define your ideal asset allocation." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <Button fx:id="acmButton" layoutX="107.0" layoutY="69.0" maxWidth="500.0" mnemonicParsing="false" text="Preferred Assets" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <Label layoutX="343.0" layoutY="67.0" text="Pick funds to use for the asset classes in your asset allocation." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="21.0" layoutY="21.0" spacing="4.0" GridPane.rowIndex="1">
+                                       <children>
+                                          <ImageView fx:id="taaInfoImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../info24.png" />
+                                             </image>
+                                          </ImageView>
+                                          <ImageView fx:id="taaWarnImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../warn24.png" />
+                                             </image>
+                                          </ImageView>
+                                          <ImageView fx:id="taaErrorImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../error24.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER_LEFT" fillHeight="false" layoutX="21.0" layoutY="67.0" spacing="4.0" GridPane.rowIndex="2">
+                                       <children>
+                                          <ImageView fx:id="acmInfoImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../info24.png" />
+                                             </image>
+                                          </ImageView>
+                                          <ImageView fx:id="acmWarnImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../warn24.png" />
+                                             </image>
+                                          </ImageView>
+                                          <ImageView fx:id="acmErrorImg" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../../../error24.png" />
+                                             </image>
+                                          </ImageView>
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </GridPane>
+                           </content>
+                        </TitledPane>
+                        <TitledPane layoutX="10.0" layoutY="10.0" text="Reports">
+                           <content>
+                              <GridPane hgap="12.0" maxWidth="1024.0" vgap="12.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="76.6666259765625" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="30.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="60.0" prefWidth="250.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Button fx:id="actualAAButton" maxWidth="500.0" mnemonicParsing="false" text="Current Asset Allocation" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" />
+                                    <Label text="Compare your current invesment mix vs your target." wrapText="true" GridPane.columnIndex="2">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                           </content>
+                        </TitledPane>
+                        <TitledPane layoutX="10.0" layoutY="367.0" text="Actions">
+                           <content>
+                              <GridPane hgap="12.0" maxWidth="1024.0" vgap="12.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="10.0" prefWidth="76.6666259765625" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="30.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" maxWidth="800.0" minWidth="10.0" percentWidth="60.0" prefWidth="250.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                    <RowConstraints minHeight="10.0" vgrow="NEVER" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Button fx:id="investButton" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Invest $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" />
+                                    <Button fx:id="withdrawalButton" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Withdraw $$" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                    <Button fx:id="rebalanceButton" layoutX="95.0" layoutY="211.0" maxWidth="500.0" mnemonicParsing="false" text="Suggest: Rebalance" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+                                    <Label text="When you have new money to invest..." wrapText="true" GridPane.columnIndex="2">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="When you want money out of your portfolio..." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="What to buy and sell to perform rebalancing." wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                       <padding>
+                                          <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                                       </padding>
+                                    </Label>
+                                 </children>
+                              </GridPane>
+                           </content>
+                        </TitledPane>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </AnchorPane>
+         </content>
+      </ScrollPane>
+   </center>
+   <top>
+      <GridPane BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints fillWidth="false" hgrow="NEVER" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="500.0" minWidth="10.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label fx:id="nameLabel" text="Name">
+               <font>
+                  <Font name="System Bold" size="25.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </Label>
+            <Label fx:id="goalLabel" text="Goal" GridPane.rowIndex="1">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </Label>
+            <TextField fx:id="nameText" maxWidth="350.0" minWidth="250.0" promptText="name" GridPane.columnIndex="1">
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </TextField>
+            <ComboBox fx:id="goalCombo" maxWidth="350.0" minWidth="250.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+               </GridPane.margin>
+               <padding>
+                  <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+               </padding>
+            </ComboBox>
+            <Label text="Total Value" GridPane.rowIndex="2">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </Label>
+            <FlowPane hgap="24.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Label fx:id="totalValueLabel" text="\$2.56 M">
+                     <font>
+                        <Font size="18.0" />
+                     </font>
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="valueAsOfLabel" text="(as of 2022-04-03)">
+                     <padding>
+                        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                     </padding></Label>
+               </children>
+               <GridPane.margin>
+                  <Insets />
+               </GridPane.margin>
+            </FlowPane>
+         </children>
+      </GridPane>
+   </top>
+</View>

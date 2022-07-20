@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2017, Gluon and/or its affiliates.
+    All rights reserved. Use is subject to license terms.
+
+    This file is available and licensed under the following license:
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in
+     the documentation and/or other materials provided with the distribution.
+   - Neither the name of Oracle Corporation and Gluon nor the names of its
+     contributors may be used to endorse or promote products derived
+     from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import com.gluonhq.charm.glisten.mvc.View?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<View maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pbalancer.client.controllers.ActualAAController">
+   <center>
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <children>
+            <TabPane fx:id="tabs" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <tabs>
+                <Tab fx:id="nestedTab" closable="false" text="Nested">
+                  <content>
+                    <AnchorPane minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0">
+                           <children>
+                              <TreeTableView fx:id="tt" layoutX="8.0" layoutY="8.0" minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                  <TreeTableColumn editable="false" prefWidth="200.0" sortable="false" text="Category/Holding" />
+                                    <TreeTableColumn id="ttTotalValue" editable="false" prefWidth="200.0" sortable="false" text="\$" />
+                                    <TreeTableColumn id="ttTargetPercent" editable="false" prefWidth="110.0" sortable="false" text="Target % of Portfolio" />
+                                    <TreeTableColumn id="ttActualPercent" editable="false" prefWidth="110.0" sortable="false" text="Actual % of Portfolio" />
+                                    <TreeTableColumn id="ttDifferencePercent" editable="false" prefWidth="110.0" sortable="false" text="Absolute Difference" />
+                                    <TreeTableColumn id="ttBuyMin" editable="false" prefWidth="110.0" sortable="false" text="Buy Min" />
+                                    <TreeTableColumn id="ttBuyMax" editable="false" prefWidth="110.0" sortable="false" text="Buy Max" />
+                                    <TreeTableColumn id="ttSellMin" editable="false" prefWidth="110.0" sortable="false" text="Sell Min" />
+                                    <TreeTableColumn id="ttSellMax" editable="false" prefWidth="110.0" sortable="false" text="Sell Max" />
+                                </columns>
+                              </TreeTableView>
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab closable="false" text="Flat">
+                  <content>
+                    <AnchorPane minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0">
+                           <children>
+                              <TableView fx:id="t" minHeight="10.0" minWidth="10.0" prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                    <TableColumn editable="false" prefWidth="120.0" text="Category" />
+                                  <TableColumn editable="false" prefWidth="120.0" text="Holding" />
+                                    <TableColumn id="tTotalValue" editable="false" prefWidth="150.0" text="\$" />
+                                    <TableColumn id="tTargetPercent" editable="false" prefWidth="150.0" text="Target % of Portfolio" />
+                                    <TableColumn id="tActualPercent" editable="false" prefWidth="150.0" text="Actual % of Portfolio" />
+                                    <TableColumn id="tDifferencePercent" editable="false" prefWidth="150.0" text="Absolute Difference" />
+                                    <TableColumn id="tBuyMin" editable="false" prefWidth="150.0" text="Buy Min" />
+                                    <TableColumn id="tBuyMax" editable="false" prefWidth="150.0" text="Buy Max" />
+                                    <TableColumn id="tSellMin" editable="false" prefWidth="150.0" text="Sell Min" />
+                                    <TableColumn id="tSellMax" editable="false" prefWidth="150.0" text="Sell Max" />
+                                </columns>
+                              </TableView>
+                           </children>
+                           <padding>
+                              <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+                           </padding>
+                        </AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </AnchorPane>
+   </center>
+   <top>
+      <GridPane BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="50.0" minWidth="50.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <padding>
+            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+         </padding>
+         <children>
+            <Label text="Compare your investment portfolio's actual asset allocation vs the target.  Rebalancing opportunities are highlighted." wrapText="true" GridPane.columnSpan="2">
+               <padding>
+                  <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+               </padding>
+            </Label>
+         </children>
+      </GridPane>
+   </top>
+</View>

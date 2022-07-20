@@ -12,7 +12,7 @@ repositories {
     }
 }
 
-mainClassName = 'com.msfinance.pbalancer.Main'
+mainClassName = 'com.pbalancer.client.Main'
 
 test {
     useJUnitPlatform()
@@ -97,45 +97,45 @@ gluonfx {
         
         'org.controlsfx.control.ToggleSwitch',
 
-      'com.msfinance.pbalancer.App',
-      'com.msfinance.pbalancer.controllers.BaseController',
-      'com.msfinance.pbalancer.controllers.AboutController',
-      'com.msfinance.pbalancer.controllers.AccountEditController',
-      'com.msfinance.pbalancer.controllers.AccountListController',
-      'com.msfinance.pbalancer.controllers.ActualAAController',
-      'com.msfinance.pbalancer.controllers.AssetAddController',
-      'com.msfinance.pbalancer.controllers.AssetEditKnownController',
-      'com.msfinance.pbalancer.controllers.AssetEditManualController',
-      'com.msfinance.pbalancer.controllers.AssetEditProxyController',
-      'com.msfinance.pbalancer.controllers.InvestSuggestionsPromptController',
-      'com.msfinance.pbalancer.controllers.InvestSuggestionsResultsController',
-      'com.msfinance.pbalancer.controllers.PortfolioController',
-      'com.msfinance.pbalancer.controllers.PortfolioListController',
-      'com.msfinance.pbalancer.controllers.PreferredAssetEditController',
-      'com.msfinance.pbalancer.controllers.PreferredAssetsController',
-      'com.msfinance.pbalancer.controllers.RebalanceSuggestionsController',
-      'com.msfinance.pbalancer.controllers.SettingsController',
-      'com.msfinance.pbalancer.controllers.TargetAAController',
-      'com.msfinance.pbalancer.controllers.TickerSuggestionProvider',
-      'com.msfinance.pbalancer.controllers.WebViewController',
-      'com.msfinance.pbalancer.controllers.WithdrawalSuggestionsPromptController',
-      'com.msfinance.pbalancer.controllers.WithdrawalSuggestionsResultsController',
+      'com.pbalancer.client.App',
+      'com.pbalancer.client.controllers.BaseController',
+      'com.pbalancer.client.controllers.AboutController',
+      'com.pbalancer.client.controllers.AccountEditController',
+      'com.pbalancer.client.controllers.AccountListController',
+      'com.pbalancer.client.controllers.ActualAAController',
+      'com.pbalancer.client.controllers.AssetAddController',
+      'com.pbalancer.client.controllers.AssetEditKnownController',
+      'com.pbalancer.client.controllers.AssetEditManualController',
+      'com.pbalancer.client.controllers.AssetEditProxyController',
+      'com.pbalancer.client.controllers.InvestSuggestionsPromptController',
+      'com.pbalancer.client.controllers.InvestSuggestionsResultsController',
+      'com.pbalancer.client.controllers.PortfolioController',
+      'com.pbalancer.client.controllers.PortfolioListController',
+      'com.pbalancer.client.controllers.PreferredAssetEditController',
+      'com.pbalancer.client.controllers.PreferredAssetsController',
+      'com.pbalancer.client.controllers.RebalanceSuggestionsController',
+      'com.pbalancer.client.controllers.SettingsController',
+      'com.pbalancer.client.controllers.TargetAAController',
+      'com.pbalancer.client.controllers.TickerSuggestionProvider',
+      'com.pbalancer.client.controllers.WebViewController',
+      'com.pbalancer.client.controllers.WithdrawalSuggestionsPromptController',
+      'com.pbalancer.client.controllers.WithdrawalSuggestionsResultsController',
       
-      'com.msfinance.pbalancer.model.Profile',
-      'com.msfinance.pbalancer.model.ProfileSettings',
-      'com.msfinance.pbalancer.model.Portfolio',
-      'com.msfinance.pbalancer.model.Account',
-      'com.msfinance.pbalancer.model.Asset',
-      'com.msfinance.pbalancer.model.aa.PreferredAsset',
+      'com.pbalancer.client.model.Profile',
+      'com.pbalancer.client.model.ProfileSettings',
+      'com.pbalancer.client.model.Portfolio',
+      'com.pbalancer.client.model.Account',
+      'com.pbalancer.client.model.Asset',
+      'com.pbalancer.client.model.aa.PreferredAsset',
       
-      'com.msfinance.pbalancer.model.AssetProxy',
-      'com.msfinance.pbalancer.model.aa.AssetAllocation',
-      'com.msfinance.pbalancer.model.aa.AANode',
-      'com.msfinance.pbalancer.model.rebalance.ActualAANode',
+      'com.pbalancer.client.model.AssetProxy',
+      'com.pbalancer.client.model.aa.AssetAllocation',
+      'com.pbalancer.client.model.aa.AANode',
+      'com.pbalancer.client.model.rebalance.ActualAANode',
       
-      'com.msfinance.pbalancer.service.login.Credentials',
-      'com.msfinance.pbalancer.service.login.LoginResponse',
-      'com.msfinance.pbalancer.model.PriceResult'
+      'com.pbalancer.client.service.login.Credentials',
+      'com.pbalancer.client.service.login.LoginResponse',
+      'com.pbalancer.client.model.PriceResult'
     ]
     
     runtimeArgs = [
