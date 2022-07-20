@@ -101,6 +101,12 @@ public class Main
     public static void main(final String args[]) throws IOException
     {
         LOG.info("Main.main() - starting");
+
+        Version v = new Version();
+        LOG.info("version=" + v.getVersion());
+        LOG.info("buildNbr=" + v.getBuildNbr());
+        LOG.info("buildDate=" + v.getBuildDate());
+
         try
         {
             Application.launch(App.class, args);
