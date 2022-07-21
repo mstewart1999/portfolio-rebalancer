@@ -9,9 +9,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.pbalancer.client.model.PriceResult;
+import com.pbalancer.client.model.aa.AssetTickerCache;
 
 public class MockPricing implements IPricing
 {
+    private static final Date DEF_MOCK_WHEN = new Date(LocalDate.parse("2000-01-01").atTime(16, 0).atZone(ZoneId.of("America/New_York")).toInstant().toEpochMilli());
+
     private static Map<String,PriceResult> mockData = new HashMap<>();
     static
     {
@@ -80,6 +83,17 @@ public class MockPricing implements IPricing
             if(mockData.containsKey(ticker))
             {
                 out.put(ticker, mockData.get(ticker));
+            }
+            else
+            {
+                if(AssetTickerCache.getInstance().lookup(ticker) != null)
+                {
+                    out.put(ticker, new PriceResult(ticker, new BigDecimal("0.01"), DEF_MOCK_WHEN));
+                }
+                else
+                {
+                    // leave missing
+                }
             }
         }
         return out;

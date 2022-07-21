@@ -176,15 +176,15 @@ gluonfx {
     
     runtimeArgs = [
       '-Djavafx.platform=desktop',
-      '--module-path c:/tools/javafx-sdk-17.0.2/lib ',
+      //'--module-path c:/tools/javafx-sdk-17.0.2/lib ',
       '--add-modules javafx.controls,javafx.fxml,javafx.web',
 
       '--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls',
       '--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls',
       '--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls',
       '--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls',
-      '--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior.TableViewBehavior=org.controlsfx.controls',
-      '--add-exports=javafx.base/com.sun.javafx.event.EventHandlerManager=org.controlsfx.controls',
+      '--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls',
+      '--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls',
       '--add-opens=javafx.graphics/javafx.scene=org.controlsfx.controls',
 
       '--add-exports=javafx.base/com.sun.javafx.event=ALL-UNNAMED',

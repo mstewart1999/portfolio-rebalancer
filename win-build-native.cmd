@@ -14,6 +14,6 @@ if not defined VSCMD_VER (
 REM call .\gradlew nativeBuild nativePackage --stacktrace
 call .\gradlew nativeBuild --stacktrace
 
-REM editbin /SUBSYSTEM:CONSOLE .\build\gluonfx\x86_64-windows\pbalancerApp.exe
+REM editbin /SUBSYSTEM:CONSOLE .\build\gluonfx\x86_64-windows\pbalancer.exe
 
 dir .\build\gluonfx\x86_64-windows\*.exe
