@@ -13,7 +13,8 @@ repositories {
     }
 }
 
-version gitVersion()
+def GV = gitVersion()
+version "0.1.0-${GV}"
 mainClassName = 'com.pbalancer.client.Main'
 
 task createVersionProperties() {
@@ -196,3 +197,18 @@ gluonfx {
     }
     //appIdentifier = "zzz" # no obvious effect
 }
+
+task renameNativeBuild (type: Sync) {
+    from("${buildDir}/gluonfx/x86_64-windows/") {
+      include 'pbalancer.exe'
+      rename('pbalancer\\.exe', "pbalancer-${version}.exe")
+    }
+    into("${buildDir}/gluonfx/x86_64-windows/versioned-builds/")
+    
+    doLast {
+        println "renameNativeBuild pbalancer-${version}.exe"
+    }
+}
+
+//renameNativeBuild.dependsOn nativeBuild
+nativeBuild.finalizedBy(renameNativeBuild)
