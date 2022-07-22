@@ -1,6 +1,5 @@
 package com.pbalancer.client;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import com.pbalancer.client.model.Account;
 import com.pbalancer.client.model.Asset;
+import com.pbalancer.client.model.Asset.PricingType;
 import com.pbalancer.client.model.Portfolio;
 import com.pbalancer.client.model.PriceResult;
 import com.pbalancer.client.model.Profile;
-import com.pbalancer.client.model.Asset.PricingType;
 import com.pbalancer.client.service.PricingFactory;
+import com.pbalancer.client.service.ServiceException;
 import com.pbalancer.client.util.NumberFormatHelper;
 import com.pbalancer.client.util.Validation;
 
@@ -196,25 +196,25 @@ public class StateManager
     }
 
 
-    public static Collection<Asset> refreshPrices(final Profile profile) throws IOException
+    public static Collection<Asset> refreshPrices(final Profile profile) throws ServiceException
     {
         Collection<Asset> assets = listAssets(profile);
         return refreshPrices(assets);
     }
 
-    public static Collection<Asset> refreshPrices(final Portfolio portfolio) throws IOException
+    public static Collection<Asset> refreshPrices(final Portfolio portfolio) throws ServiceException
     {
         Collection<Asset> assets = listAssets(portfolio);
         return refreshPrices(assets);
     }
 
-    public static Collection<Asset> refreshPrices(final Account account) throws IOException
+    public static Collection<Asset> refreshPrices(final Account account) throws ServiceException
     {
         Collection<Asset> assets = listAssets(account);
         return refreshPrices(assets);
     }
 
-    private static Collection<Asset> refreshPrices(final Collection<Asset> assets) throws IOException
+    private static Collection<Asset> refreshPrices(final Collection<Asset> assets) throws ServiceException
     {
         Collection<String> tickers = uniqueTickers(assets);
         Map<String,PriceResult> priceUpdates = PricingFactory.get().getMostRecentEOD(tickers);
@@ -274,7 +274,7 @@ public class StateManager
 
             return applyPrice(asset, priceUpdates);
         }
-        catch (IOException e)
+        catch (ServiceException e)
         {
             LOG.error("Unable to get ticker price", e);
             return false;
