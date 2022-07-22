@@ -12,7 +12,7 @@ public class PricingFactory
         switch(impl)
         {
         case MOCK: return new MockPricing();
-        case CENTRAL: return new CentralPricing();
+        case CENTRAL: return new CentralPricing(CentralLogin.getInstance());
         default: throw new IllegalArgumentException("Unhandled enum " + impl);
         }
     }

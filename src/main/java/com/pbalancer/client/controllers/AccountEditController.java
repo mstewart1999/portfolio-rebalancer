@@ -21,10 +21,11 @@ import com.pbalancer.client.controllers.cells.NumericTableCell;
 import com.pbalancer.client.model.Account;
 import com.pbalancer.client.model.AccountType;
 import com.pbalancer.client.model.Asset;
+import com.pbalancer.client.model.Asset.PricingType;
 import com.pbalancer.client.model.Institution;
 import com.pbalancer.client.model.PortfolioAlert;
-import com.pbalancer.client.model.Asset.PricingType;
 import com.pbalancer.client.service.DataFactory;
+import com.pbalancer.client.service.ServiceException;
 import com.pbalancer.client.util.FXUtil;
 import com.pbalancer.client.util.NumberFormatHelper;
 import com.pbalancer.client.util.Validation;
@@ -514,7 +515,7 @@ public class AccountEditController extends BaseController<Account,Account>
 
             PersistManager.persistAll(in.getPortfolio().getProfile());
         }
-        catch (IOException e)
+        catch (ServiceException|IOException e)
         {
             LOG.error("Error updating assets for account: " + in.getId(), e);
             getApp().showMessage("Error updating assets");

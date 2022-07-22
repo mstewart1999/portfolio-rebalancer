@@ -23,6 +23,7 @@ import com.pbalancer.client.model.Asset;
 import com.pbalancer.client.model.Portfolio;
 import com.pbalancer.client.model.PortfolioAlert;
 import com.pbalancer.client.service.DataFactory;
+import com.pbalancer.client.service.ServiceException;
 import com.pbalancer.client.util.FXUtil;
 import com.pbalancer.client.util.NumberFormatHelper;
 import com.pbalancer.client.util.Validation;
@@ -454,7 +455,7 @@ public class AccountListController extends BaseController<Portfolio,Portfolio>
 
             PersistManager.persistAll(in.getProfile());
         }
-        catch (IOException e)
+        catch (ServiceException|IOException e)
         {
             LOG.error("Error updating assets for portfolio: " + in.getId(), e);
             getApp().showMessage("Error updating assets");
