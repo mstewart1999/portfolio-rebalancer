@@ -1,13 +1,12 @@
 package com.pbalancer.client;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Properties;
 
 import com.pbalancer.client.util.Validation;
@@ -31,26 +30,26 @@ public class Config
 
     private Config()
     {
-        loadFromFile(installedProps, "./pBalancer.properties");
+        loadFromFile(installedProps, new File(SystemSettings.getPBalancerDataDir(), "pBalancer.properties"));
         loadFromResource(baseProps, "/pBalancer.properties");
         loadFromResource(envProps, "/pBalancer-" + Environment.getActive().name().toLowerCase() + ".properties");
     }
 
-    private void loadFromFile(final Properties props, final String name)
+    private void loadFromFile(final Properties props, final File file)
     {
-        if (!Files.exists(Path.of(name)))
+        if (!file.exists())
         {
             // this is OK, just keep an empty set of properties
             return;
         }
 
-        try(Reader r = new InputStreamReader(new FileInputStream(name), StandardCharsets.UTF_8))
+        try(Reader r = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))
         {
             props.load(r);
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Unable to read config property file '" + name + "'");
+            throw new RuntimeException("Unable to read config property file '" + file.getAbsolutePath() + "'");
         }
     }
 
@@ -89,7 +88,6 @@ public class Config
         }
         return defaultValue;
     }
-
 
 
     public String getDataImpl()

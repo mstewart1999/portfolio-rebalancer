@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.pbalancer.client.SystemSettings;
 import com.pbalancer.client.model.Account;
 import com.pbalancer.client.model.Asset;
 import com.pbalancer.client.model.Portfolio;
@@ -18,7 +19,7 @@ import com.pbalancer.client.model.ProfileSettings;
 import com.pbalancer.client.model.aa.PreferredAsset;
 import com.pbalancer.client.util.JSONHelper;
 
-public abstract class LocalData implements IData
+public class LocalData implements IData
 {
     private static final String PROFILE_DIR = "profile";
     private static final String SETTINGS_DIR = "settings";
@@ -30,7 +31,10 @@ public abstract class LocalData implements IData
     private static final String SUFFIX = ".data";
 
 
-    protected abstract Path getDataDir();
+    protected Path getDataDir()
+    {
+        return SystemSettings.getPBalancerDataDir().toPath();
+    }
 
 
 

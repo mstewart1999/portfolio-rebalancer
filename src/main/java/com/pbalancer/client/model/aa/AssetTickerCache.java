@@ -1,5 +1,6 @@
 package com.pbalancer.client.model.aa;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pbalancer.client.SystemSettings;
 import com.pbalancer.client.service.FtpDownload;
 import com.pbalancer.client.util.FileUtil;
 
@@ -45,9 +47,11 @@ public class AssetTickerCache
 
     private Map<String,AssetTicker> known = new TreeMap<>();
     private long loadTmstp = 0;
+    private final String dir;
 
     private AssetTickerCache()
     {
+        dir = new File(SystemSettings.getPBalancerDataDir(), "ticker-data").getAbsolutePath();
     }
 
     private void reload(final int days)
@@ -68,7 +72,7 @@ public class AssetTickerCache
     {
         Map<String,AssetTicker> newKnown = new TreeMap<>();
 
-        Path p = Paths.get("./data", MFLIST_FILE_NAME);
+        Path p = Paths.get(dir, MFLIST_FILE_NAME);
         String url = MFLIST_URL;
         if(!FileUtil.isNewerThanDays(p, 7))
         {
@@ -100,7 +104,7 @@ public class AssetTickerCache
             throw new RuntimeException("Unable to load mutual funds from: " + p, e);
         }
 
-        p = Paths.get("./data", NASDAQ_FILE_NAME);
+        p = Paths.get(dir, NASDAQ_FILE_NAME);
         url = NASDAQ_URL;
         if(!FileUtil.isNewerThanDays(p, 7))
         {
@@ -133,7 +137,7 @@ public class AssetTickerCache
         }
 
 
-        p = Paths.get("./data", OTHER_FILE_NAME);
+        p = Paths.get(dir, OTHER_FILE_NAME);
         url = OTHER_URL;
         if(!FileUtil.isNewerThanDays(p, 7))
         {

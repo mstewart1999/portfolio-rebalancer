@@ -19,13 +19,17 @@ public class DataFactory
 
     private static IData getLocal()
     {
+        return new LocalData();
+
         // any differences for android or ios?
         // if(com.gluonhq.attach.util.Platform.isDesktop())
 
+        /*
         if(org.controlsfx.tools.Platform.getCurrent() == org.controlsfx.tools.Platform.WINDOWS)
         {
             return new WinLocalData();
         }
         throw new UnsupportedOperationException("Only windows :(");
+        */
     }
 }
